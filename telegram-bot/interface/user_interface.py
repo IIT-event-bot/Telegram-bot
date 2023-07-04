@@ -26,11 +26,11 @@ def confirmation_inline_keyboard() -> InlineKeyboardMarkup:
 
 
 def mark_inline_keyboard() -> InlineKeyboardMarkup:
-    one_star_btn = InlineKeyboardButton(Icon.STAR.value, callback_data='send_mark')
-    two_star_btn = InlineKeyboardButton(Icon.TWO_STAR.value, callback_data='send_mark')
-    three_star_btn = InlineKeyboardButton(Icon.THREE_STAR.value, callback_data='send_mark')
-    four_star_btn = InlineKeyboardButton(Icon.FOUR_STAR.value, callback_data='send_mark')
-    five_star_btn = InlineKeyboardButton(Icon.FIVE_STAR.value, callback_data='send_mark')
+    one_star_btn = InlineKeyboardButton(Icon.STAR.value, callback_data='send_mark_1')
+    two_star_btn = InlineKeyboardButton(Icon.TWO_STAR.value, callback_data='send_mark_2')
+    three_star_btn = InlineKeyboardButton(Icon.THREE_STAR.value, callback_data='send_mark_3')
+    four_star_btn = InlineKeyboardButton(Icon.FOUR_STAR.value, callback_data='send_mark_4')
+    five_star_btn = InlineKeyboardButton(Icon.FIVE_STAR.value, callback_data='send_mark_5')
     return InlineKeyboardMarkup(row_width=2).add(one_star_btn, two_star_btn, three_star_btn, four_star_btn, five_star_btn)
 
 

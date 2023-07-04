@@ -21,9 +21,12 @@ async def send_message(message):
 
 
 async def callback(channel: Channel, body: bytes, envelope, properties):
-    json_body = str(body.decode('utf-8'))
-    notification = service.convert_json_to_notification(json_body)
-    service.save_notification(notification=notification)
+    try:
+        json_body = str(body.decode('utf-8'))
+        notification = service.convert_json_to_notification(json_body)
+        await service.save_notification(notification=notification)
+    except Exception as e:
+        logger.error(e)
     await channel.basic_client_ack(delivery_tag=envelope.delivery_tag)
 
 

@@ -7,7 +7,7 @@ class NotificationDB(Base):
     __tablename__ = 'notifications'
 
     id = Column(INTEGER, autoincrement=True, primary_key=True)
-    user_id = Column(INTEGER)
+    type = Column(VARCHAR)
     chat_id = Column(INTEGER)
     text = Column(VARCHAR)
     title = Column(VARCHAR)

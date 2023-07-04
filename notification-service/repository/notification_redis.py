@@ -25,7 +25,11 @@ def push_event_to_queue(notifications: list[Notification]) -> None:
 
     json_list.sort(key=lambda x: x['send_time'], reverse=False)
 
+    now = datetime.now()
     for notification in json_list:
+        send_time = datetime.fromtimestamp(notification['send_time'])
+        if send_time.hour < now.hour or (send_time.hour == now.hour and send_time.minute < now.minute):
+            continue
         obj = json.dumps(notification)
         repository.lpush(QUEUE_NAME, obj)
 
@@ -43,15 +47,18 @@ def get_with_now_send_time_notifications() -> list[Notification]:
         json_notification = repository.rpop(QUEUE_NAME)
         if json_notification is None:
             break
-        notification = json.loads(json_notification)
-        notification_time = datetime.fromtimestamp(notification['send_time'])
+        notification_json = json.loads(json_notification)
+        notification_time = datetime.fromtimestamp(notification_json['send_time'])
         if notification_time.minute == now.minute:
-            notifications.append(Notification(id=notification['id'],
-                                              user_id=notification['user_id'],
-                                              chat_id=notification['chat_id'],
-                                              text=notification['text'],
-                                              title=notification['title'],
-                                              send_time=notification['send_time']))
+            notification = Notification()
+            notification.id = notification_json['id']
+            notification.send_time = notification_json['send_time']
+            notification.type = notification_json['type']
+            notification.chat_id = notification_json['chat_id']
+            notification.text = str(notification_json['text'])
+            notification.title = str(notification_json['title'])
+
+            notifications.append(notification)
         else:
             repository.rpush(QUEUE_NAME, json_notification)
             break
