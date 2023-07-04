@@ -10,5 +10,6 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(INTEGER, primary_key=True)
+    chat_id = Column(INTEGER, unique=True, nullable=False)
     username = Column(VARCHAR(35))
     role_id = Column(INTEGER, ForeignKey('roles.id'))

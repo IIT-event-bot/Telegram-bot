@@ -10,6 +10,7 @@ fastapi = "*"
 sqlalchemy = "*"
 bcrypt = "*"
 uvicorn = "*"
+aioamqp = "*"
 
 [dev-packages]
 

@@ -1,10 +1,13 @@
+import asyncio
 import logging
-from logging import INFO
+from logging import INFO, WARNING
 
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
+
+from core.rabbit.rabbitmq import connect_to_broker
 
 from core.exceptions.illegal_argument_exception import IllegalArgumentException
 from web.controllers.group_router import router as group_router
@@ -31,18 +34,23 @@ def other_exception_handler(request: Request, e: Exception) -> Response:
     return JSONResponse(status_code=500, content={'message': 'server error'})
 
 
-def main():
+async def main():
     logger.info('App was start')
-    uvicorn.run(app=app,
-                port=8082,
-                reload=False,
-                host='0.0.0.0')
+    config = uvicorn.Config('main:app',
+                            port=8082,
+                            reload=False,
+                            host='0.0.0.0')
+    server = uvicorn.Server(config=config)
+    await server.serve()
 
 
 def __config_logger():
     file_log = logging.FileHandler('user-service.log')
     console_log = logging.StreamHandler()
     FORMAT = '[%(levelname)s] %(asctime)s : %(message)s | %(filename)s'
+    logging.getLogger('apscheduler.scheduler').setLevel(WARNING)
+    logging.getLogger('pika').setLevel(WARNING)
+    logging.getLogger('sqlalchemy.engine').setLevel(WARNING)
     logging.basicConfig(level=INFO,
                         format=FORMAT,
                         handlers=(file_log, console_log),
@@ -52,4 +60,7 @@ def __config_logger():
 if __name__ == '__main__':
     __config_logger()
     load_dotenv('.env')
-    main()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(connect_to_broker())
+    loop.run_until_complete(main())
+    loop.run_forever()
