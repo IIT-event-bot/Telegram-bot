@@ -8,7 +8,7 @@ from .student_service import StudentService
 from ..exceptions.illegal_argument_exception import IllegalArgumentException
 from ..models.statement import Statement
 from ..models.user import User
-from ..rabbit.rabbitmq import send_message
+from ..rabbit import rabbitmq as rabbit
 from ..repositories.user_repository import UserRepository
 
 
@@ -95,7 +95,7 @@ class UserServiceImpl(UserService):
 
         self.update_user_role(user_id=saved_statement.user_id, role_name='STUDENT')
         user = self.__repository.get_user_by_id(user_id=saved_statement.user_id)
-        asyncio.run(send_message(f'{{"type": "INFO", '
+        asyncio.run(rabbit.send_message(f'{{"type": "INFO", '
                                  f'"chat_id": {user.chat_id}, '
                                  f'"title": "Добавление в систему", '
                                  f'"text": "Вы были добавлены в систему '
@@ -105,7 +105,7 @@ class UserServiceImpl(UserService):
         self.__statement_service.check_statement(statement_id=statement_id)
         statement = self.__statement_service.get_statement_by_id(statement_id=statement_id)
         user = self.get_user_by_id(user_id=statement.user_id)
-        asyncio.run(send_message(f'{{"type": "INFO", '
+        asyncio.run(rabbit.send_message(f'{{"type": "INFO", '
                                  f'"chat_id": {user.chat_id}, '
                                  f'"title": "Отклонение заявки", '
                                  f'"text": "Ваша заявка была отклонена"}}'))
@@ -122,7 +122,7 @@ class UserServiceImpl(UserService):
         self.__manager_service.create_manager(user=user, password=password)
         self.update_user_role(user_id=user_id, role_name='MANAGER')
 
-        asyncio.run(send_message(f'{{"type": "INFO", '
+        asyncio.run(rabbit.send_message(f'{{"type": "INFO", '
                                  f'"chat_id": {user.chat_id}, '
                                  f'"title": "Повышение", '
                                  f'"text": "Вы были назначены менеджером"}}'))
@@ -139,7 +139,7 @@ class UserServiceImpl(UserService):
         self.__manager_service.delete_manager(user_id=user.id)
         self.update_user_role(user_id=user_id, role_name='USER')
 
-        asyncio.run(send_message(f'{{"type": "INFO", '
+        asyncio.run(rabbit.send_message(f'{{"type": "INFO", '
                                  f'"chat_id": {user.chat_id}, '
                                  f'"title": "Понижение", '
                                  f'"text": "Вы быльше не менеджер"}}'))
@@ -166,7 +166,7 @@ class UserServiceImpl(UserService):
         self.update_user_role(user_id=student.user_id, role_name='USER')
 
         user = self.get_user_by_id(student.user_id)
-        asyncio.run(send_message(f'{{"type": "INFO", '
+        asyncio.run(rabbit.send_message(f'{{"type": "INFO", '
                                  f'"chat_id": {user.chat_id}, '
                                  f'"title": "Удаление из системы", '
                                  f'"text": "Вы были удалены из системы"}}'))

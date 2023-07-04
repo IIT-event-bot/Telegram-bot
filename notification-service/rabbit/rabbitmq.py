@@ -45,4 +45,5 @@ async def connect_to_broker():
     logger.info('Rabbit starts')
     await channel.exchange_declare(exchange_name=EXCHANGE, type_name=ExchangeType.topic.name)
     await channel.queue(queue_name=QUEUE, durable=True)
+    await channel.queue_bind(queue_name=QUEUE, exchange_name=EXCHANGE, routing_key=ROUTING_KEY)
     await channel.basic_consume(callback=callback, queue_name=QUEUE)

@@ -9,7 +9,7 @@ from ..repositories.db.base import Base
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(INTEGER, primary_key=True)
+    id = Column(INTEGER, primary_key=True, autoincrement=True)
     chat_id = Column(INTEGER, unique=True, nullable=False)
     username = Column(VARCHAR(35))
     role_id = Column(INTEGER, ForeignKey('roles.id'))

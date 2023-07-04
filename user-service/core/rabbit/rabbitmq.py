@@ -1,9 +1,14 @@
+import json
 import logging
 
 import aioamqp
 from aioamqp.channel import Channel
 from pika.exchange_type import ExchangeType
-# from service import notification_service as service
+from ..deps import ComponentsContainer
+from ..models.user import User
+
+ioc = ComponentsContainer()
+user_service = ioc.user_service
 
 logger = logging.getLogger()
 
@@ -22,7 +27,12 @@ async def send_message(message):
 
 async def callback(channel: Channel, body: bytes, envelope, properties):
     try:
-        print(body)
+        json_body = json.loads(body)
+        if json_body['type'] == 'ADD':
+            user = User()
+            user.chat_id = json_body['chat_id']
+            user.username = json_body['username']
+            user_service.save_user(user=user)
     except Exception as e:
         logger.error(e)
     await channel.basic_client_ack(delivery_tag=envelope.delivery_tag)

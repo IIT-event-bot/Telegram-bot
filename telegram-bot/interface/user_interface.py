@@ -1,5 +1,9 @@
+import asyncio
+
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from interface.Icon import *
+
+from rabbit.rabbitmq import send_user_service_message
 
 
 def start_inline_keyboard() -> InlineKeyboardMarkup:
@@ -21,7 +25,8 @@ def help_inline_keyboard() -> InlineKeyboardMarkup:
 
 
 def confirmation_inline_keyboard() -> InlineKeyboardMarkup:
-    confirmation_btn = InlineKeyboardButton('Уведомление о событии получено ' + Icon.CHECK.value, callback_data='confirmation')
+    confirmation_btn = InlineKeyboardButton('Уведомление о событии получено ' + Icon.CHECK.value,
+                                            callback_data='confirmation')
     return InlineKeyboardMarkup(row_width=2).add(confirmation_btn)
 
 
@@ -31,7 +36,8 @@ def mark_inline_keyboard() -> InlineKeyboardMarkup:
     three_star_btn = InlineKeyboardButton(Icon.THREE_STAR.value, callback_data='send_mark_3')
     four_star_btn = InlineKeyboardButton(Icon.FOUR_STAR.value, callback_data='send_mark_4')
     five_star_btn = InlineKeyboardButton(Icon.FIVE_STAR.value, callback_data='send_mark_5')
-    return InlineKeyboardMarkup(row_width=2).add(one_star_btn, two_star_btn, three_star_btn, four_star_btn, five_star_btn)
+    return InlineKeyboardMarkup(row_width=2).add(one_star_btn, two_star_btn, three_star_btn, four_star_btn,
+                                                 five_star_btn)
 
 
 def comment_inline_keyboard() -> InlineKeyboardMarkup:
@@ -50,6 +56,9 @@ async def start_message(message: Message):
     await message.answer(f'Привет, я бот института информационных технологий. Я помогу тебе узнать свое расписание и '
                          f'буду сообщать тебе о главных мероприятиях института. Нажми "Подать заявку на добавление" и'
                          f' заполни форму.', reply_markup=start_inline_keyboard())
+    await send_user_service_message(f'{{"type": "ADD", '
+                                          f'"username": "{message.chat.username}", '
+                                          f'"chat_id": {message.chat.id}}}')
 
 
 async def application_is_approved(message: Message):
@@ -61,7 +70,8 @@ async def help_message(message: Message):
 
 
 async def feedback_message(message: Message):
-    await message.answer(f'Обратная связь по прошедшему мероприятию, как все прошло?', reply_markup=mark_inline_keyboard())
+    await message.answer(f'Обратная связь по прошедшему мероприятию, как все прошло?',
+                         reply_markup=mark_inline_keyboard())
 
 
 async def create_statement(message: Message):
@@ -83,10 +93,11 @@ async def callback_query_send_statement(call: CallbackQuery):
 
 
 async def callback_query_mark(call: CallbackQuery):
-    await call.message.edit_text(text='Спасибо за оценку! Хочешь оставить комментарий? Напиши свой отзыв и нажми "Отправить комментарий"',
-                                 reply_markup=comment_inline_keyboard())
+    await call.message.edit_text(
+        text='Спасибо за оценку! Хочешь оставить комментарий? Напиши свой отзыв и нажми "Отправить комментарий"',
+        reply_markup=comment_inline_keyboard())
 
-    
+
 async def callback_query_send_comment(call: CallbackQuery):
     await call.message.edit_text(text='Комментарий успешно отправлен! ' + Icon.CHECK.value,
                                  reply_markup=student_main_inline_keyboard())
