@@ -1,5 +1,6 @@
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from interface.Icon import *
+from interface.statement import *
 
 
 def start_inline_keyboard() -> InlineKeyboardMarkup:
@@ -68,8 +69,14 @@ async def create_statement(message: Message):
     await message.answer('Пример заявки...', reply=True)
 
 
+async def pars_statement(message: Message):
+    statement = message.text
+    index = statement.find('_')
+    statement = Statement(message.from_user.id, statement[11:index], statement[index-1:])
+
+
 async def callback_query_statement(call: CallbackQuery):
-    await call.message.edit_text(text='Отправь мне свое ФИО и группу в формате: "ФИО_группа".\nНапример: "Иванов Иван '
+    await call.message.edit_text(text='Отправь мне команду /statement, свое ФИО и группу в формате: "/statement ФИО_группа".\nНапример: "/statement Иванов Иван '
                                       'Иванович_ПрИ-200"\nПосле того как отправишь анкету нажми "Отправить заявку"',
                                  reply_markup=create_statement_inline_keyboard())
 
@@ -95,3 +102,7 @@ async def callback_query_send_comment(call: CallbackQuery):
 async def callback_query_cancel_comment(call: CallbackQuery):
     await call.message.edit_text(text='Отказ от комментария',
                                  reply_markup=student_main_inline_keyboard())
+
+
+async def callback_query_confirmation_of_notification(call: CallbackQuery):
+    print(call.from_user.id) #идентицикация пользователя, который подтвердил получение уведомления
