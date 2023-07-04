@@ -1,10 +1,8 @@
-import json
 from datetime import datetime
 from typing import Optional
 
 
 class Notification:
-
     def __init__(self, user_id, chat_id, text, title, send_time, id: int = None) -> None:
         self.id = id
         self.user_id = user_id

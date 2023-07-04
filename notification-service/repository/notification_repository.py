@@ -16,8 +16,8 @@ def save_notification(notification: NotificationDB) -> None:
 
 def get_notification_on_hour() -> list[NotificationDB]:
     now = datetime.now()
-    hour = now + timedelta(hours=1)
+    in_an_hour = now + timedelta(hours=1)
     notifications = session.query(NotificationDB).filter(
-        and_(NotificationDB.send_time <= hour, NotificationDB.send_time >= now)).all()
+        and_(NotificationDB.send_time <= in_an_hour, NotificationDB.send_time >= now)).all()
     session.commit()
     return notifications
