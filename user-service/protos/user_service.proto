@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package user_service;
+
+message UserResponse {
+  int32 id = 1;
+  int32 chat_id = 2;
+  string username = 3;
+}
+
+message UserRequest {
+  int32 user_id = 1;
+}
+
+message GroupRequest {
+  int32 group_id = 1;
+}
+
+service UserService {
+  rpc getUser(UserRequest) returns (UserResponse);
+  rpc getUsersByGroup(GroupRequest) returns (stream UserResponse);
+}
