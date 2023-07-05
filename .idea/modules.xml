@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/IIT-event-bot.iml" filepath="$PROJECT_DIR$/.idea/IIT-event-bot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/user-service-java/user-service-java.iml" filepath="$PROJECT_DIR$/user-service-java/user-service-java.iml" />
     </modules>
   </component>
 </project>
