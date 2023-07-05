@@ -1,6 +1,7 @@
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from interface.Icon import *
-from interface.statement import *
+from .Icon import *
+from .statement import *
+from .States import *
 
 
 def start_inline_keyboard() -> InlineKeyboardMarkup:
@@ -10,7 +11,7 @@ def start_inline_keyboard() -> InlineKeyboardMarkup:
 
 
 def create_statement_inline_keyboard() -> InlineKeyboardMarkup:
-    back_btn = InlineKeyboardButton('Назад', callback_data='cancel')
+    back_btn = InlineKeyboardButton('Назад', callback_data='cancel_statement')
     create_statement_btn = InlineKeyboardButton('Отправить заявку', callback_data='send_statement')
     return InlineKeyboardMarkup(row_width=2).add(create_statement_btn, back_btn)
 
@@ -72,13 +73,20 @@ async def create_statement(message: Message):
 async def pars_statement(message: Message):
     statement = message.text
     index = statement.find('_')
-    statement = Statement(message.from_user.id, statement[11:index], statement[index-1:])
+    statement_to_send = Statement(message.from_user.id, statement[:index], statement[index+1:])
+    States.finish.set()
+
+
+async def pars_comment(message:Message):
+    comment = message.text
+    States.finish.set()
 
 
 async def callback_query_statement(call: CallbackQuery):
-    await call.message.edit_text(text='Отправь мне команду /statement, свое ФИО и группу в формате: "/statement ФИО_группа".\nНапример: "/statement Иванов Иван '
+    await call.message.edit_text(text='Отправь мне свое ФИО и группу в формате: "ФИО_группа".\nНапример: "Иванов Иван '
                                       'Иванович_ПрИ-200"\nПосле того как отправишь анкету нажми "Отправить заявку"',
                                  reply_markup=create_statement_inline_keyboard())
+    await States.statement.set()
 
 
 async def callback_query_help(call: CallbackQuery):
@@ -92,6 +100,7 @@ async def callback_query_send_statement(call: CallbackQuery):
 async def callback_query_mark(call: CallbackQuery):
     await call.message.edit_text(text='Спасибо за оценку! Хочешь оставить комментарий? Напиши свой отзыв и нажми "Отправить комментарий"',
                                  reply_markup=comment_inline_keyboard())
+    await States.comment.set()
 
     
 async def callback_query_send_comment(call: CallbackQuery):
@@ -102,7 +111,12 @@ async def callback_query_send_comment(call: CallbackQuery):
 async def callback_query_cancel_comment(call: CallbackQuery):
     await call.message.edit_text(text='Отказ от комментария',
                                  reply_markup=student_main_inline_keyboard())
+    States.finish.set()
 
 
 async def callback_query_confirmation_of_notification(call: CallbackQuery):
     print(call.from_user.id) #идентицикация пользователя, который подтвердил получение уведомления
+
+
+async def callback_query_cancel_statement(call: CallbackQuery):
+    States.finish.set()
