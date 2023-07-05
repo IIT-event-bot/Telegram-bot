@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package com.project.groupService;
+
+message GroupResponse {
+  int64 id = 1;
+  string title = 2;
+}
+
+message GroupRequest {
+  int64 groupId = 1;
+}
+
+service GroupService {
+  rpc getGroupByGroupId(GroupRequest) returns (GroupResponse);
+}
