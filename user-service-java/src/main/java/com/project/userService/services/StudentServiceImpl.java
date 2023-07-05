@@ -16,7 +16,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class StudentServiceImpl extends com.project.studentService.StudentServiceGrpc.StudentServiceImplBase implements StudentService {
+public class StudentServiceImpl extends com.project.studentService.StudentServiceGrpc.StudentServiceImplBase
+        implements StudentService {
     private final StudentRepository repository;
     private final GroupService groupService;
     private final UserService userService;
@@ -72,6 +73,23 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
                 .setId(user.getId())
                 .setChatId(user.getChatId())
                 .setUsername(user.getUsername())
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getStudentById(StudentServiceOuterClass.StudentRequest request,
+                               StreamObserver<StudentServiceOuterClass.StudentResponse> responseObserver) {
+        var studentId = request.getStudentId();
+        var student = getStudentById(studentId);
+
+        var response = StudentServiceOuterClass.StudentResponse.newBuilder()
+                .setId(student.getId())
+                .setName(student.getName())
+                .setSurname(student.getSurname())
+                .setPatronymic(student.getPatronymic())
                 .build();
 
         responseObserver.onNext(response);
