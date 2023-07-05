@@ -4,6 +4,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/user-service-java/pom.xml" />
+        <option value="$PROJECT_DIR$/event-service-java/pom.xml" />
       </list>
     </option>
   </component>
