@@ -1,8 +1,9 @@
 package com.project.event.controllers;
 
-import com.project.event.models.EventDto;
+import com.project.event.models.Event;
 import com.project.event.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,14 +28,14 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createEvent(@RequestBody EventDto event) {
+    public ResponseEntity<?> createEvent(@RequestBody Event event) {
         service.createEvent(event);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{eventId}")
     public ResponseEntity<?> updateEvent(@PathVariable("eventId") long eventId,
-                                         @RequestBody EventDto event) {
+                                         @RequestBody Event event) {
         event.setId(eventId);
         service.updateEvent(event);
         return ResponseEntity.ok().build();

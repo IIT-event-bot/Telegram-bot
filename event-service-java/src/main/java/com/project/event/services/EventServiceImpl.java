@@ -1,9 +1,10 @@
 package com.project.event.services;
 
 import com.project.event.models.Event;
-import com.project.event.models.EventDto;
 import com.project.event.models.EventType;
 import com.project.event.repositories.EventRepository;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,72 +25,102 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDto getEventById(long id) {
-        var event = repository.getEventById(id);
-        return convertEventToEventDto(event);
+    public Event getEventById(long id) {
+        return repository.getEventById(id);
     }
 
     @Override
     @Transactional
-    public void createEvent(EventDto dto) {
-        validateEvent(dto);
-        var event = convertDtoToEvent(dto);
-        repository.save(event);//TODO
+    public void createEvent(Event event) {
+        validateEvent(event);
+        repository.save(event);
     }
 
     @Override
     public void deleteEventById(long eventId) {
-//TODO
+        var event = repository.getEventById(eventId);
+        repository.delete(event);
     }
 
     @Override
-    public void updateEvent(EventDto event) {
-//TODO
-    }
-
-    private Event convertDtoToEvent(EventDto dto) {
-        EventType type;
-        try {
-            type = EventType.valueOf(dto.getType().toUpperCase());
-        } catch (Exception e) {
-            String errorMessage = "Wrong event type: '" + dto.getType() + "'";
-            log.error(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+    public void updateEvent(Event event) {
+        validateEvent(event);
+        var savedEvent = repository.getEventById(event.getId());
+        if (savedEvent == null) {
+            throw new IllegalArgumentException("Event with id " + event.getId() + " does not exist");
         }
-        return new Event(dto.getId(),
-                dto.getTitle(),
-                dto.getText(),
-                dto.isHasFeedback(),
-                dto.getEventTime(),
-                dto.isGroupEvent(),
-                dto.isStudentEvent(),
-                type);
+        repository.save(event);
     }
 
-    private EventDto convertEventToEventDto(Event event) {
-        return EventDto.builder()
-                .id(event.getId())
-                .title(event.getTitle())
-                .text(event.getText())
-                .hasFeedback(event.isHasFeedback())
-                .isGroupEvent(event.isGroupEvent())
-                .isStudentEvent(event.isStudentEvent())
-                .type(event.getType().name())
-                .eventTime(event.getEventTime())
+    private void validateStudents(List<Long> students) {
+        for (var studentId : students) {
+            checkStudentExists(studentId);
+        }
+    }
+
+    private void validateGroups(List<Long> groups) {
+        for (var group : groups) {
+            checkGroupExists(group);
+        }
+    }
+
+    private void checkGroupExists(long groupId) {
+        ManagedChannel channel = ManagedChannelBuilder
+                .forTarget("localhost:8100")
+                .usePlaintext()
                 .build();
+
+        var stub = com.project.groupService.GroupServiceGrpc.newBlockingStub(channel);
+
+        var request = com.project.groupService.GroupServiceOuterClass.GroupRequest
+                .newBuilder()
+                .setGroupId(groupId)
+                .build();
+        try {
+            var response = stub.getGroupByGroupId(request);
+        } catch (io.grpc.StatusRuntimeException e) {
+            log.error(e.getMessage());
+            throw new IllegalArgumentException("Group with id " + groupId + " does not exist");
+        }
     }
 
-    private void validateEvent(EventDto event) {
-        if (event.getType().equals(EventType.EVENT.name())) {
+    private void checkStudentExists(Long userId) {
+        ManagedChannel channel = ManagedChannelBuilder
+                .forTarget("localhost:8100")
+                .usePlaintext()
+                .build();
+
+        var stub = com.project.studentService.StudentServiceGrpc.newBlockingStub(channel);
+
+        var request = com.project.studentService.StudentServiceOuterClass.StudentRequest
+                .newBuilder()
+                .setStudentId(userId)
+                .build();
+        try {
+            var response = stub.getStudentById(request);
+        } catch (io.grpc.StatusRuntimeException e) {
+            log.error(e.getMessage());
+            throw new IllegalArgumentException("Student with id " + userId + " does not exist");
+        }
+    }
+
+    private void validateEvent(Event event) {
+        if (event.getType().equals(EventType.INFO)) {
             event.setEventTime(LocalDateTime.now());
         } else if (event.getEventTime().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Event with type not 'INFO' must be with eventTime");
         }
-        if (event.isGroupEvent() && event.getGroupsIds().size() == 0) {
-            throw new IllegalArgumentException("Event has 'for group' flag and doesn't have groups ids");
+        if (event.isGroupEvent() && event.getGroups().size() == 0) {
+            throw new IllegalArgumentException("Event has set flag 'isGroupEvent' and doesn't have groups ids");
         }
-        if (event.isStudentEvent() && event.getStudentsIds().size() == 0) {
-            throw new IllegalArgumentException("Event has 'for student' flag and doesn't have groups ids");
+        if (event.isGroupEvent()) {
+            validateGroups(event.getGroups());
+        }
+        if (event.isStudentEvent() && event.getStudents().size() == 0) {
+            throw new IllegalArgumentException("Event has set flag 'isStudentEvent' and doesn't have students ids");
+        }
+        if (event.isStudentEvent()) {
+            validateStudents(event.getStudents());
         }
     }
 }

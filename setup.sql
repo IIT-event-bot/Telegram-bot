@@ -30,7 +30,7 @@ create table students
             references users (id),
     constraint fk_student_group
         foreign key (group_id)
-            references student_group (id)
+            references groups (id)
 );
 
 create table statements
@@ -47,7 +47,7 @@ create table statements
             references users (id),
     constraint fk_statement_group
         foreign key (group_id)
-            references student_group (id)
+            references groups (id)
 );
 
 insert into roles(name)
