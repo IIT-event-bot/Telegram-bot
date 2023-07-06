@@ -11,7 +11,7 @@ public interface StatementService {
 
     List<Statement> getStatementByFilter(String filter);
 
-    void acceptStatement(long statementId);
+    void acceptStatement(Statement statement);
 
     void dismissStatement(long statementId);
 

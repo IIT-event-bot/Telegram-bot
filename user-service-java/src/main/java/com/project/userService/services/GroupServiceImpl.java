@@ -21,16 +21,21 @@ public class GroupServiceImpl extends com.project.groupService.GroupServiceGrpc.
     }
 
     @Override
-    public List<Group> getGroupsByTitle(String title) {
+    public List<Group> getGroupsLikeTitle(String title) {
         if (title == null) {
             return getAllGroups();
         }
-        return repository.getGroupByTitle(title);
+        return repository.getGroupLikeTitle(title);
     }
 
     @Override
     public List<Group> getAllGroups() {
         return repository.findAll();
+    }
+
+    @Override
+    public Group getGroupByTitle(String title) {
+        return repository.getGroupByTitle(title);
     }
 
     @Override
@@ -61,5 +66,10 @@ public class GroupServiceImpl extends com.project.groupService.GroupServiceGrpc.
     @Override
     public void updateGroup(Group group) {
         repository.save(group);
+    }
+
+    @Override
+    public List<Group> getGroupsByIds(List<Long> ids) {
+        return repository.getGroupsById(ids);
     }
 }

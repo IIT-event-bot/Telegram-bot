@@ -17,7 +17,7 @@ public class StudentController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllStudents(@RequestParam("group") String groupName) {
+    public ResponseEntity<?> getAllStudents(@RequestParam(value = "group", required = false) String groupName) {
         return ResponseEntity.ok(service.getStudentsByGroup(groupName));
     }
 

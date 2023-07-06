@@ -69,11 +69,11 @@ def save_notification_to_db(notification: Notification) -> None:
 
 
 def convert_json_to_notification(json_body) -> Notification:
-    json_notification = json.loads(json_body)
+    json_notification = json.loads(json.loads(json_body))
 
     notification = Notification()
     notification.type = json_notification['type']
-    notification.chat_id = json_notification['chat_id']
+    notification.chat_id = int(json_notification['chatId'])
     notification.text = json_notification['text']
     notification.title = json_notification['title']
     if json_notification.get('send_time') is not None and notification.type != 'INFO':

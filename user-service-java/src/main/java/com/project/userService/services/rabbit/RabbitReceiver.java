@@ -47,9 +47,9 @@ public class RabbitReceiver {
 
     private void saveStatementFromQueue(Map<String, Object> body) {
         var user = userService.getUserByChatId(Long.parseLong(body.get("chatId").toString()));
-        var group = groupService.getGroupsByTitle((String) body.get("groupName"));
+
         var statement = new Statement();
-        statement.setGroupId(group.get(0).getId());
+        statement.setGroupName((String) body.get("groupName"));
         statement.setUserId(user.getId());
         statement.setName((String) body.get("name"));
         statement.setSurname((String) body.get("surname"));

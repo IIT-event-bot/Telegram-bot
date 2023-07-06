@@ -56,9 +56,10 @@ async def start_message(message: Message):
     await message.answer(f'Привет, я бот института информационных технологий. Я помогу тебе узнать свое расписание и '
                          f'буду сообщать тебе о главных мероприятиях института. Нажми "Подать заявку на добавление" и'
                          f' заполни форму.', reply_markup=start_inline_keyboard())
-    await send_user_service_message(f'{{"type": "ADD", '
+    await send_user_service_message(f'{{"method": "ADD_USER", '
+                                    f'"body": {{'
                                           f'"username": "{message.chat.username}", '
-                                          f'"chat_id": {message.chat.id}}}')
+                                          f'"chatId": {message.chat.id}}}}}')
 
 
 async def application_is_approved(message: Message):

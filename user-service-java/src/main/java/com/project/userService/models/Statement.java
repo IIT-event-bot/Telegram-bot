@@ -1,5 +1,6 @@
 package com.project.userService.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,22 +19,26 @@ public class Statement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "surname")
+    @Column(name = "surname", nullable = false)
     private String surname;
 
-    @Column(name = "patronymic")
+    @Column(name = "patronymic", nullable = false)
     private String patronymic;
 
-    @Column(name = "group_id")
+    @Column(name = "group_id", nullable = false)
+    @JsonIgnore
     private long groupId;
 
-    @Column(name = "is_checked")
+    @Column(name = "is_checked", nullable = false)
     @JsonProperty("isChecked")
     private boolean isChecked;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private long userId;
+
+    @Transient
+    private String groupName;
 }

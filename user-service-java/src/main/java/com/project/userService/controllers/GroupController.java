@@ -3,6 +3,7 @@ package com.project.userService.controllers;
 import com.project.userService.models.Group;
 import com.project.userService.services.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +18,8 @@ public class GroupController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllGroups(@RequestParam("title") String title) {
-        return ResponseEntity.ok(service.getGroupsByTitle(title));
+    public ResponseEntity<?> getAllGroups(@RequestParam(value = "title", required = false) String title) {
+        return ResponseEntity.ok(service.getGroupsLikeTitle(title));
     }
 
     @GetMapping("/{groupId}")
@@ -29,7 +30,7 @@ public class GroupController {
     @PostMapping
     public ResponseEntity<?> createGroup(@RequestBody Group group) {
         service.createGroup(group);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{groupId}")

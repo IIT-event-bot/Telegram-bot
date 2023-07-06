@@ -43,7 +43,7 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
         if (groupName == null) {
             return getAllStudents();
         }
-        var group = groupService.getGroupsByTitle(groupName);
+        var group = groupService.getGroupsLikeTitle(groupName);
         List<Long> groupsId = group.stream().map(Group::getId).toList();
         return repository.getStudentsByGroupId(groupsId);
     }
@@ -51,8 +51,8 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
     @Override
     @Transactional
     public void deleteStudentById(long studentId) {
-        var student = repository.getStudentByGroupId(studentId);
-        userService.updateUserRole(student.getUserId(), Role.STUDENT);
+        var student = repository.getStudentById(studentId);
+        userService.updateUserRole(student.getUserId(), Role.USER);
         repository.deleteStudentById(studentId);
     }
 

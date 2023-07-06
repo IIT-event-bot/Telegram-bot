@@ -18,9 +18,20 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
             from groups
             where title like '%'||:#{#title}||'%'
             """, nativeQuery = true)
-    List<Group> getGroupByTitle(String title);
+    List<Group> getGroupLikeTitle(String title);
 
     @Modifying
     @Transactional
     void deleteGroupById(long groupId);
+
+    Group getGroupByTitle(String title);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            select *
+            from groups
+            where id in :#{#ids}
+            """, nativeQuery = true)
+    List<Group> getGroupsById(List<Long> ids);
 }

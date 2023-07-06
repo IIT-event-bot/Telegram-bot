@@ -1,5 +1,6 @@
 package com.project.userService.controllers;
 
+import com.project.userService.models.Statement;
 import com.project.userService.services.StatementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +27,10 @@ public class StatementController {
     }
 
     @PostMapping("/{statementId}/accept")
-    public ResponseEntity<?> acceptStatement(@PathVariable("statementId") long statementId) {
-        service.acceptStatement(statementId);
+    public ResponseEntity<?> acceptStatement(@PathVariable("statementId") long statementId,
+                                             @RequestBody Statement statement) {
+        statement.setId(statementId);
+        service.acceptStatement(statement);
         return ResponseEntity.ok().build();
     }
 

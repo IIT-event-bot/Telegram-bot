@@ -1,7 +1,5 @@
 from concurrent import futures
 
-import grpс
-
 import user_service_pb2
 import user_service_pb2_grpc
 from ..deps import ComponentsContainer
