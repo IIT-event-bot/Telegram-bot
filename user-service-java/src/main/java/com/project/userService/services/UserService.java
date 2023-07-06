@@ -13,4 +13,6 @@ public interface UserService {
     void updateUserRole(long userId, Role role);
 
     void saveUser(User user);
+
+    User getUserByChatId(long chatId);
 }

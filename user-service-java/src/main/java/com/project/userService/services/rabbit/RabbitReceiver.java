@@ -3,7 +3,10 @@ package com.project.userService.services.rabbit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.userService.config.RabbitConfig;
 import com.project.userService.models.RabbitMessage;
+import com.project.userService.models.Statement;
 import com.project.userService.models.User;
+import com.project.userService.services.GroupService;
+import com.project.userService.services.StatementService;
 import com.project.userService.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,8 @@ import java.util.Map;
 @Slf4j
 public class RabbitReceiver {
     private final UserService userService;
+    private final StatementService statementService;
+    private final GroupService groupService;
 
     @RabbitListener(queues = RabbitConfig.USER_SERVICE_QUEUE)
     public void userServiceQueue(Message message) {
@@ -36,8 +41,21 @@ public class RabbitReceiver {
     private void handleRabbitMessage(RabbitMessage message) {
         switch (message.method()) {
             case ADD_USER -> saveUserFromQueue(message.body());
-            case ADD_STATEMENT -> throw new IllegalArgumentException("Unimplemented method");
+            case ADD_STATEMENT -> saveStatementFromQueue(message.body());
         }
+    }
+
+    private void saveStatementFromQueue(Map<String, Object> body) {
+        var user = userService.getUserByChatId(Long.parseLong(body.get("chatId").toString()));
+        var group = groupService.getGroupsByTitle((String) body.get("groupName"));
+        var statement = new Statement();
+        statement.setGroupId(group.get(0).getId());
+        statement.setUserId(user.getId());
+        statement.setName((String) body.get("name"));
+        statement.setSurname((String) body.get("surname"));
+        statement.setPatronymic((String) body.get("patronymic"));
+
+        statementService.saveStatement(statement);
     }
 
     private void saveUserFromQueue(Map<String, Object> body) {

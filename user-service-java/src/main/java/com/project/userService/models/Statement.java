@@ -1,5 +1,6 @@
 package com.project.userService.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,6 +31,7 @@ public class Statement {
     private long groupId;
 
     @Column(name = "is_checked")
+    @JsonProperty("isChecked")
     private boolean isChecked;
 
     @Column(name = "user_id")

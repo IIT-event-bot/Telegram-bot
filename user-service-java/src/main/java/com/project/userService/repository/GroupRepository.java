@@ -16,7 +16,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query(value = """
             select *
             from groups
-            where title like '%:#{#title}%'
+            where title like '%'||:#{#title}||'%'
             """, nativeQuery = true)
     List<Group> getGroupByTitle(String title);
 

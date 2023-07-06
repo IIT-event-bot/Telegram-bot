@@ -57,6 +57,15 @@ public class StatementServiceImpl implements StatementService {
         repository.save(statement);
     }
 
+    @Override
+    public void saveStatement(Statement statement) {
+        var savedStatement = repository.getStatementByUserId(statement.getUserId());
+        if (savedStatement != null && statement.isChecked()){
+            throw new IllegalArgumentException("Statement is already exist");
+        }
+        repository.save(statement);
+    }
+
     private Student createStudentByStatement(Statement statement) {
         return new Student(statement.getId(),
                 statement.getName(),

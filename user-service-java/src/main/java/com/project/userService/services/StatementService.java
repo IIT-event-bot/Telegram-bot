@@ -14,4 +14,6 @@ public interface StatementService {
     void acceptStatement(long statementId);
 
     void dismissStatement(long statementId);
+
+    void saveStatement(Statement statement);
 }

@@ -11,6 +11,8 @@ import java.util.List;
 public interface StatementRepository extends JpaRepository<Statement, Long> {
     Statement getStatementById(long id);
 
+    Statement getStatementByUserId(long userId);
+
     @Modifying
     @Transactional
     @Query(value = """
