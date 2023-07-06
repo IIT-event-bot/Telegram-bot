@@ -46,7 +46,7 @@ public class UserServiceImpl extends com.project.userService.UserServiceGrpc.Use
     @Override
     public void updateUserRole(long userId, Role role) {
         var user = repository.getUserById(userId);
-        var savedRole = roleRepository.getRoleDtoByRole(role);
+        var savedRole = roleRepository.getRoleDtoByName(role);
         user.setRole(savedRole);
         repository.save(user);
     }
@@ -57,7 +57,7 @@ public class UserServiceImpl extends com.project.userService.UserServiceGrpc.Use
         if (savedUser != null) {
             return;
         }
-        var userRole = roleRepository.getRoleDtoByRole(Role.USER);
+        var userRole = roleRepository.getRoleDtoByName(Role.USER);
         user.setRole(userRole);
         repository.save(user);
     }
