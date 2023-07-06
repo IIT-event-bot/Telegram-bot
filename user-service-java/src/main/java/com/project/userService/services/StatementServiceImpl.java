@@ -69,7 +69,7 @@ public class StatementServiceImpl implements StatementService {
             throw new IllegalArgumentException("Statement already checked");
         }
         var group = groupService.getGroupByTitle(statement.getGroupName());
-        savedStatement.setName(statement.getName());
+        savedStatement.setName(statement.getName());//TODO сделать проверку существования
         savedStatement.setSurname(statement.getSurname());
         savedStatement.setPatronymic(statement.getPatronymic());
         savedStatement.setChecked(true);
