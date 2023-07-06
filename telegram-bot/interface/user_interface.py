@@ -2,6 +2,7 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, C
 from .Icon import *
 from .statement import *
 from .States import *
+from aiogram.dispatcher import FSMContext
 
 
 def start_inline_keyboard() -> InlineKeyboardMarkup:
@@ -70,19 +71,19 @@ async def create_statement(message: Message):
     await message.answer('Пример заявки...', reply=True)
 
 
-async def pars_statement(message: Message):
+async def pars_statement(message: Message, state: FSMContext):
     statement = message.text
     index = statement.find('_')
     statement_to_send = Statement(message.from_user.id, statement[:index], statement[index+1:])
-    States.finish.set()
+    await state.finish()
 
 
-async def pars_comment(message:Message):
+async def pars_comment(message:Message, state: FSMContext):
     comment = message.text
-    States.finish.set()
+    await state.finish()
 
 
-async def callback_query_statement(call: CallbackQuery):
+async def callback_query_statement(call: CallbackQuery, state):
     await call.message.edit_text(text='Отправь мне свое ФИО и группу в формате: "ФИО_группа".\nНапример: "Иванов Иван '
                                       'Иванович_ПрИ-200"\nПосле того как отправишь анкету нажми "Отправить заявку"',
                                  reply_markup=create_statement_inline_keyboard())
@@ -103,20 +104,24 @@ async def callback_query_mark(call: CallbackQuery):
     await States.comment.set()
 
     
-async def callback_query_send_comment(call: CallbackQuery):
+async def callback_query_send_comment(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(text='Комментарий успешно отправлен! ' + Icon.CHECK.value,
                                  reply_markup=student_main_inline_keyboard())
+    await state.finish()
 
 
-async def callback_query_cancel_comment(call: CallbackQuery):
+async def callback_query_cancel_comment(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(text='Отказ от комментария',
                                  reply_markup=student_main_inline_keyboard())
-    States.finish.set()
+    await state.finish()
 
 
 async def callback_query_confirmation_of_notification(call: CallbackQuery):
     print(call.from_user.id) #идентицикация пользователя, который подтвердил получение уведомления
 
 
-async def callback_query_cancel_statement(call: CallbackQuery):
-    States.finish.set()
+async def callback_query_cancel_statement(call: CallbackQuery, state: FSMContext):
+    await call.message.edit_text(text=f'Привет, я бот института информационных технологий. Я помогу тебе узнать свое расписание и '
+                         f'буду сообщать тебе о главных мероприятиях института. Нажми "Подать заявку на добавление" и'
+                         f' заполни форму.', reply_markup=start_inline_keyboard())
+    await state.finish()
