@@ -11,4 +11,6 @@ public interface UserService {
     List<User> getAllUsers();
 
     void updateUserRole(long userId, Role role);
+
+    void saveUser(User user);
 }

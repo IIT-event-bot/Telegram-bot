@@ -50,4 +50,15 @@ public class UserServiceImpl extends com.project.userService.UserServiceGrpc.Use
         user.setRole(savedRole);
         repository.save(user);
     }
+
+    @Override
+    public void saveUser(User user) {
+        var savedUser = repository.getUserByChatId(user.getChatId());
+        if (savedUser != null) {
+            return;
+        }
+        var userRole = roleRepository.getRoleDtoByRole(Role.USER);
+        user.setRole(userRole);
+        repository.save(user);
+    }
 }

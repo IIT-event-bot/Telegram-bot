@@ -11,7 +11,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class GroupServiceImpl extends com.project.groupService.GroupServiceGrpc.GroupServiceImplBase implements GroupService {
+public class GroupServiceImpl extends com.project.groupService.GroupServiceGrpc.GroupServiceImplBase
+        implements GroupService {
     private final GroupRepository repository;
 
     @Override
