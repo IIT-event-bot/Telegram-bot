@@ -7,6 +7,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ import java.util.Map;
 public class EventServiceImpl implements EventService {
     private final EventRepository repository;
     private final NotificationService notificationService;
+    @Value("${grpc.userservice.host}")
+    private String userServiceHost;
 
     @Override
     public List<Event> getAllEvents() {//TODO добавить фильтры
@@ -72,7 +75,8 @@ public class EventServiceImpl implements EventService {
 
     private void checkGroupExists(long groupId) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forTarget("localhost:8100")
+                .forAddress(userServiceHost, 8100)
+//                .forTarget("localhost:8100")
                 .usePlaintext()
                 .build();
 
@@ -82,17 +86,18 @@ public class EventServiceImpl implements EventService {
                 .newBuilder()
                 .setGroupId(groupId)
                 .build();
-        try {
+//        try {
             var response = stub.getGroupByGroupId(request);
-        } catch (io.grpc.StatusRuntimeException e) {
-            log.error(e.getMessage());
-            throw new IllegalArgumentException("Group with id " + groupId + " does not exist");
-        }
+//        } catch (io.grpc.StatusRuntimeException e) {
+//            log.error(e.getMessage());
+//            throw new IllegalArgumentException("Group with id " + groupId + " does not exist");
+//        }
     }
 
     private void checkStudentExists(Long userId) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forTarget("localhost:8100")
+                .forAddress(userServiceHost, 8100)
+//                .forTarget("localhost:8100")
                 .usePlaintext()
                 .build();
 
@@ -202,7 +207,8 @@ public class EventServiceImpl implements EventService {
 
     private Long getStudentChatId(Long studentId) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forTarget("localhost:8100")
+                .forAddress(userServiceHost, 8100)
+//                .forTarget("localhost:8100")
                 .usePlaintext()
                 .build();
 
@@ -223,7 +229,8 @@ public class EventServiceImpl implements EventService {
 
     private List<Long> getGroupStudentChatId(Long groupId) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forTarget("localhost:8100")
+                .forAddress(userServiceHost, 8100)
+//                .forTarget("localhost:8100")
                 .usePlaintext()
                 .build();
 

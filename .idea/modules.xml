@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/IIT-event-bot.iml" filepath="$PROJECT_DIR$/.idea/IIT-event-bot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/event-service-java/event-service.iml" filepath="$PROJECT_DIR$/event-service-java/event-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/event-service-java/event-service-java.iml" filepath="$PROJECT_DIR$/event-service-java/event-service-java.iml" />
+      <module fileurl="file://$PROJECT_DIR$/user-service-java/user-service.iml" filepath="$PROJECT_DIR$/user-service-java/user-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/user-service-java/user-service-java.iml" filepath="$PROJECT_DIR$/user-service-java/user-service-java.iml" />
     </modules>
   </component>
