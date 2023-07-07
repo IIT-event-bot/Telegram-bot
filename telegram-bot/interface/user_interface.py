@@ -7,8 +7,12 @@ import logging
 from logging import INFO
 
 logger = logging.getLogger()
+from aiogram.dispatcher import FSMContext
 
 from rabbit.rabbitmq import send_user_service_message
+from interface.Icon import *
+from interface.States import *
+from interface.statement import *
 
 
 def start_inline_keyboard() -> InlineKeyboardMarkup:
@@ -31,17 +35,20 @@ def help_inline_keyboard() -> InlineKeyboardMarkup:
 
 def confirmation_inline_keyboard() -> InlineKeyboardMarkup:
     confirmation_btn = InlineKeyboardButton('Уведомление о событии получено ' + Icon.CHECK.value, callback_data='confirmation')
+
+
+def confirmation_inline_keyboard(event_id) -> InlineKeyboardMarkup:
+    confirmation_btn = InlineKeyboardButton('Уведомление о событии получено ' + Icon.CHECK.value,
     return InlineKeyboardMarkup(row_width=2).add(confirmation_btn)
 
 
 def mark_inline_keyboard() -> InlineKeyboardMarkup:
-    one_star_btn = InlineKeyboardButton(Icon.STAR.value, callback_data='send_mark_1')
-    two_star_btn = InlineKeyboardButton(Icon.TWO_STAR.value, callback_data='send_mark_2')
-    three_star_btn = InlineKeyboardButton(Icon.THREE_STAR.value, callback_data='send_mark_3')
-    four_star_btn = InlineKeyboardButton(Icon.FOUR_STAR.value, callback_data='send_mark_4')
-    five_star_btn = InlineKeyboardButton(Icon.FIVE_STAR.value, callback_data='send_mark_5')
+    one_star_btn = InlineKeyboardButton(Icon.STAR.value, callback_data="mark:1")
+    two_star_btn = InlineKeyboardButton(Icon.TWO_STAR.value, callback_data='mark:2')
+    three_star_btn = InlineKeyboardButton(Icon.THREE_STAR.value, callback_data='mark:3')
+    four_star_btn = InlineKeyboardButton(Icon.FOUR_STAR.value, callback_data='mark:4')
+    five_star_btn = InlineKeyboardButton(Icon.FIVE_STAR.value, callback_data='mark:5')
     return InlineKeyboardMarkup(row_width=2).add(one_star_btn, two_star_btn, three_star_btn, four_star_btn,
-                                                 five_star_btn)
 
 
 def comment_inline_keyboard() -> InlineKeyboardMarkup:
@@ -93,6 +100,11 @@ async def pars_statement(message: Message, state: FSMContext):
 async def pars_comment(message:Message, state: FSMContext):
     comment = message.text
     await state.finish()
+
+
+async def pars_comment(message:Message, state: FSMContext):
+    comment = message.text
+    await state.finish()
     logger.info(f'user id: {message.from_user.id} спарсили комментарий')
 
 
@@ -109,7 +121,7 @@ async def callback_query_help(call: CallbackQuery):
     logger.info(f'user id: {call.from_user.id} /help')
 
 
-async def callback_query_send_statement(call: CallbackQuery):
+async def callback_query_send_statement(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(text='Заявка успешно отправлена! ' + Icon.CHECK.value)
     logger.info(f'user id: {call.from_user.id} отправили заявку')
 
@@ -148,6 +160,14 @@ async def callback_query_mark_five(call: CallbackQuery):
     await States.comment.set()
     logger.info(f'user id: {call.from_user.id} дал оценку 5')
 
+    state.finish()
+
+
+async def callback_query_mark(call: CallbackQuery):
+    await call.message.edit_text(text='Спасибо за оценку! Хочешь оставить комментарий? Напиши свой отзыв и нажми "Отправить комментарий"',
+                                 reply_markup=comment_inline_keyboard())
+    mark = int(call.data[5])
+    await States.comment.set()
 
 async def callback_query_send_comment(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(text='Комментарий успешно отправлен! ' + Icon.CHECK.value,
@@ -173,3 +193,8 @@ async def callback_query_cancel_statement(call: CallbackQuery, state: FSMContext
                          f' заполни форму.', reply_markup=start_inline_keyboard())
     await state.finish()
     logger.info(f'user id: {call.from_user.id} /назад')
+
+
+
+async def callback_query_confirmation_of_notification(call: CallbackQuery):
+    event_id = call.data[13:]
