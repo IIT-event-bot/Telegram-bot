@@ -86,12 +86,12 @@ public class EventServiceImpl implements EventService {
                 .newBuilder()
                 .setGroupId(groupId)
                 .build();
-//        try {
+        try {
             var response = stub.getGroupByGroupId(request);
-//        } catch (io.grpc.StatusRuntimeException e) {
-//            log.error(e.getMessage());
-//            throw new IllegalArgumentException("Group with id " + groupId + " does not exist");
-//        }
+        } catch (io.grpc.StatusRuntimeException e) {
+            log.error(e.getMessage());
+            throw new IllegalArgumentException("Group with id " + groupId + " does not exist");
+        }
     }
 
     private void checkStudentExists(Long userId) {
@@ -118,8 +118,21 @@ public class EventServiceImpl implements EventService {
     private void validateEvent(Event event) {
         if (event.getType().equals(EventType.INFO)) {
             event.setEventTime(LocalDateTime.now());
-        } else if (event.getEventTime().isBefore(LocalDateTime.now())) {
+        } else if (event.getEventTime() == null) {
             throw new IllegalArgumentException("Event with type not 'INFO' must be with eventTime");
+        } else if (event.getEventTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Event time is earlier than now");
+        }
+        if (event.isRepeat() && event.getRepeatTime().size() == 0) {
+            throw new IllegalArgumentException("Event has set flag 'isGroupEvent' and doesn't have repeat time");
+        }
+        if (event.isRepeat()) {
+            var now = LocalDateTime.now();
+            for (var repeatTime : event.getRepeatTime()) {
+                if (repeatTime.isBefore(now)) {
+                    throw new IllegalArgumentException("Event repeat time is earlier than now");
+                }
+            }
         }
         if (event.isGroupEvent() && event.getGroups().size() == 0) {
             throw new IllegalArgumentException("Event has set flag 'isGroupEvent' and doesn't have groups ids");
@@ -150,6 +163,11 @@ public class EventServiceImpl implements EventService {
         var eventsRepeat = repository.getEventsByRepeatTimeBetween(now, dayEnd);
         var allRepeats = getAllRepeatEvents(eventsRepeat);
         sendEvents(allRepeats);
+    }
+
+    @Scheduled(cron = "0 */1 * * * ?")
+    public void sendFeedback() {
+
     }
 
     private List<Event> getAllRepeatEvents(List<Event> events) {
