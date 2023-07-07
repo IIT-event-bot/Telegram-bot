@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +31,44 @@ public class EventServiceImpl implements EventService {
     private String userServiceHost;
 
     @Override
-    public List<Event> getAllEvents() {//TODO добавить фильтры
-        return repository.findAll();
+    public List<Event> getAllEvents(String date, String title, Long groupId) {
+        if (date != null && title != null && groupId != null) {
+            var eventDate = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            return repository.getEventsByFilter(title, eventDate, groupId);
+        }
+        List<Event> result = new ArrayList<>();
+        if (title != null) {
+            result.addAll(repository.getEventsByTitleLikeIgnoreCase(title));
+        }
+        if (date != null) {
+            result = filterEventsByDate(result, date);
+        }
+        if (groupId != null) {
+            result = filterEventsByGroupId(result, groupId);
+        }
+        return result;
+    }
+
+    private List<Event> filterEventsByGroupId(List<Event> events, Long groupId) {
+        if (events.size() == 0) {
+            events.addAll(repository.getEventsByGroupId(groupId));
+        } else {
+            events = events.stream().filter(x -> x.getGroups().contains(groupId)).collect(Collectors.toList());
+        }
+        return events;
+    }
+
+    private List<Event> filterEventsByDate(List<Event> events, String date) {
+        var eventDate = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        if (events.size() == 0) {
+            events.addAll(repository.getEventsByEventDate(eventDate));
+        } else {
+            events = events.stream().filter(x -> x.getEventTime().getDayOfMonth() == eventDate.getDayOfMonth()
+                            && x.getEventTime().getMonth() == eventDate.getMonth()
+                            && x.getEventTime().getYear() == eventDate.getYear())
+                    .collect(Collectors.toList());
+        }
+        return events;
     }
 
     @Override
@@ -76,7 +114,6 @@ public class EventServiceImpl implements EventService {
     private void checkGroupExists(long groupId) {
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress(userServiceHost, 8100)
-//                .forTarget("localhost:8100")
                 .usePlaintext()
                 .build();
 
@@ -97,7 +134,6 @@ public class EventServiceImpl implements EventService {
     private void checkStudentExists(Long userId) {
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress(userServiceHost, 8100)
-//                .forTarget("localhost:8100")
                 .usePlaintext()
                 .build();
 
@@ -239,7 +275,6 @@ public class EventServiceImpl implements EventService {
     private Long getStudentChatId(Long studentId) {
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress(userServiceHost, 8100)
-//                .forTarget("localhost:8100")
                 .usePlaintext()
                 .build();
 
@@ -261,7 +296,6 @@ public class EventServiceImpl implements EventService {
     private List<Long> getGroupStudentChatId(Long groupId) {
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress(userServiceHost, 8100)
-//                .forTarget("localhost:8100")
                 .usePlaintext()
                 .build();
 

@@ -5,7 +5,7 @@ import com.project.event.models.Event;
 import java.util.List;
 
 public interface EventService {
-    List<Event> getAllEvents();
+    List<Event> getAllEvents(String date, String title, Long groupId);
 
     Event getEventById(long id);
 

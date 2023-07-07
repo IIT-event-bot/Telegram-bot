@@ -42,8 +42,10 @@ public class EventController {
             )
     })
     @GetMapping
-    public ResponseEntity<?> getAllEvents() {
-        return ResponseEntity.ok(service.getAllEvents());
+    public ResponseEntity<?> getAllEvents(@RequestParam(value = "date", required = false) String date,
+                                          @RequestParam(value = "title", required = false) String title,
+                                          @RequestParam(value = "groupId", required = false) Long groupId) {
+        return ResponseEntity.ok(service.getAllEvents(date, title, groupId));
     }
 
 

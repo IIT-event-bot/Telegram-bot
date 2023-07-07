@@ -34,4 +34,39 @@ public interface EventRepository extends JpaRepository<Event, Long> {
               and event_time between :#{#from} and :#{#to}
             """, nativeQuery = true)
     List<Event> getEventByFeedbackTime(LocalDateTime from, LocalDateTime to);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            select *
+            from events
+            join practice.public.event_group eg
+                on events.id = eg.event_id
+            where title like '%'||:#{#title}||'%'
+              and to_date(event_time, 'dd-MM-yyyy') = :#{#date}
+              and eg.group_id = :#{#groupId}
+            """, nativeQuery = true)
+    List<Event> getEventsByFilter(String title, LocalDateTime date, Long groupId);
+
+    List<Event> getEventsByTitleLikeIgnoreCase(String title);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            select *
+            from events
+            where to_date(event_time, 'dd-MM-yyyy') = :#{#date}
+            """, nativeQuery = true)
+    List<Event> getEventsByEventDate(LocalDateTime date);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            select *
+            from events
+            join public.event_group eg
+                on events.id = eg.event_id
+            where eg.group_id = :#{#groupId}
+            """, nativeQuery = true)
+    List<Event> getEventsByGroupId(Long groupId);
 }
