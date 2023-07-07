@@ -1,8 +1,8 @@
 import logging
+import os
 
 import aioamqp
 from aioamqp.channel import Channel
-from pika.exchange_type import ExchangeType
 from service import notification_service as service
 
 logger = logging.getLogger()
@@ -32,7 +32,7 @@ async def callback(channel: Channel, body: bytes, envelope, properties):
 
 async def connect_to_broker():
     try:
-        transport, protocol = await aioamqp.connect(host='localhost',
+        transport, protocol = await aioamqp.connect(host=os.environ.get('RABBITMQ_HOST'),
                                                     port=5672,
                                                     login='guest',
                                                     password='guest')
@@ -43,7 +43,7 @@ async def connect_to_broker():
     global channel
     channel = await protocol.channel()
     logger.info('Rabbit starts')
-    await channel.exchange_declare(exchange_name=EXCHANGE, type_name=ExchangeType.topic.name)
+    await channel.exchange_declare(exchange_name=EXCHANGE, type_name="topic")
     await channel.queue(queue_name=QUEUE, durable=True)
     await channel.queue_bind(queue_name=QUEUE, exchange_name=EXCHANGE, routing_key=ROUTING_KEY)
     await channel.basic_consume(callback=callback, queue_name=QUEUE)

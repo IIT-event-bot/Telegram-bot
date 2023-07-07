@@ -1,17 +1,18 @@
 import asyncio
-from logging import INFO, WARNING
+import os
+from logging import WARNING
 
 from aiogram import Bot, Dispatcher
-from dotenv import load_dotenv, dotenv_values
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from dotenv import load_dotenv, dotenv_values
 
-from interface.user_interface import *
 from interface.States import *
+from interface.user_interface import *
 from rabbit.rabbitmq import *
 
 logger = logging.getLogger()
 config = dotenv_values()
-bot = Bot(config['TELEGRAM_BOT_TOKEN'], validate_token=True, parse_mode="HTML")
+bot = Bot(os.environ.get('TELEGRAM_BOT_TOKEN'), validate_token=True, parse_mode="HTML")
 
 
 def __config_logger():
@@ -26,7 +27,7 @@ def __config_logger():
 
 
 async def main():
-    dp = Dispatcher(bot=bot)
+    dp = Dispatcher(bot=bot, storage=MemoryStorage())
     dp.register_message_handler(start_message, commands=['start'])
     dp.register_message_handler(help_message, commands=['help'])
     dp.register_message_handler(pars_statement, state=States.statement)

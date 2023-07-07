@@ -1,10 +1,11 @@
 import json
+import os
 from datetime import datetime
 
 import redis
 from models.notification import Notification
 
-repository = redis.Redis(host='localhost', port=6379, db=0)
+repository = redis.Redis(host=os.environ.get('REDIS_HOST'), port=6379, db=0)
 QUEUE_NAME = 'notifications'
 
 

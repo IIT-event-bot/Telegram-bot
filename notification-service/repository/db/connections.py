@@ -38,8 +38,8 @@ class PostgresConnection(DBConnection):
 
     def _get_engine(self) -> Engine:
         try:
-            # db_url = f'postgresql+psycopg2://{os.environ["DB_USER_NAME"]}:{os.environ["DB_USER_PASSWORD"]}@{os.environ["DB_HOST"]}:{os.environ["DB_PORT"]}/{os.environ["DB_NAME"]}'
-            db_url = f'postgresql+psycopg2://{config["DB_USER_NAME"]}:{config["DB_USER_PASSWORD"]}@{config["DB_HOST"]}:{config["DB_PORT"]}/{config["DB_NAME"]}'
+            db_url = f'postgresql+psycopg2://{os.environ["DB_USER_NAME"]}:{os.environ["DB_USER_PASSWORD"]}@{os.environ["DB_HOST"]}:{os.environ["DB_PORT"]}/{os.environ["DB_NAME"]}'
+            # db_url = f'postgresql+psycopg2://{config["DB_USER_NAME"]}:{config["DB_USER_PASSWORD"]}@{config["DB_HOST"]}:{config["DB_PORT"]}/{config["DB_NAME"]}'
             engine = create_engine(db_url, echo=False)
             engine.connect()
 

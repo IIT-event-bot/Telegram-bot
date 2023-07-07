@@ -46,9 +46,9 @@ services:
     depends_on:
       - db
       - rabbitmq
-      -   userservice
+      - userservice
     links:
-      -   userservice
+      - userservice
     env_file:
       - .env
     restart: on-failure
@@ -56,11 +56,22 @@ services:
   notificationservice:
     container_name: event_bot_notification_service
     build:
-      context: telegram-bot
+      context: notification-service
       dockerfile: Dockerfile
     depends_on:
       - db
       - redis
+      - rabbitmq
+    env_file:
+      - .env
+    restart: on-failure
+
+  telegrambot:
+    container_name: event_telegram_bot
+    build:
+      context: telegram-bot
+      dockerfile: Dockerfile
+    depends_on:
       - rabbitmq
     env_file:
       - .env
