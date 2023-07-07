@@ -4,7 +4,6 @@ import logging
 import aioamqp
 from aioamqp.channel import Channel
 from main import bot
-from pika.exchange_type import ExchangeType
 
 logger = logging.getLogger()
 
@@ -39,6 +38,6 @@ async def connect_to_broker():
     global channel
     channel = await protocol.channel()
     logger.info('Rabbit starts')
-    await channel.exchange_declare(exchange_name=EXCHANGE, type_name=ExchangeType.topic.name)
+    await channel.exchange_declare(exchange_name=EXCHANGE, type_name="topic")
     await channel.queue(queue_name=QUEUE, durable=True)
     await channel.basic_consume(callback=callback, queue_name=QUEUE)

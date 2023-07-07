@@ -1,17 +1,11 @@
 version: '3.6'
 
-#networks:
-#  backend:
-#    driver: bridge
-
 services:
   db:
     image: postgres
     container_name: db_event_bot
     ports:
       - "2345:5432"
-#    networks:
-#      - backend
     env_file:
       - .env
     restart: on-failure
@@ -21,8 +15,6 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-#    networks:
-#      - backend
     healthcheck:
       test: [ "CMD", "curl", "-f", "https://localhost:15672" ]
       interval: 30s
@@ -37,8 +29,6 @@ services:
     ports:
       - "22000:8000"
       - "8100:8100"
-#    networks:
-#      - backend
     depends_on:
       - db
       - rabbitmq
@@ -52,9 +42,7 @@ services:
       context: event-service-java
       dockerfile: Dockerfile
     ports:
-      - "22001:8000"
-#    networks:
-#      - backend
+      - "22001:8001"
     depends_on:
       - db
       - rabbitmq
@@ -64,6 +52,23 @@ services:
     env_file:
       - .env
     restart: on-failure
+
+  notificationservice:
+    container_name: event_bot_notification_service
+    build:
+      context: telegram-bot
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    env_file:
+      - .env
+    restart: on-failure
+
+  redis:
+    image: redis
+    container_name: event_bot_redis
 
 #  nginx:
 #    build: nginx/.

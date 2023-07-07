@@ -9,7 +9,7 @@ from rabbit.rabbitmq import *
 
 logger = logging.getLogger()
 config = dotenv_values()
-bot = Bot(config['BOT_TOKEN'], validate_token=True, parse_mode="HTML")
+bot = Bot(config['TELEGRAM_BOT_TOKEN'], validate_token=True, parse_mode="HTML")
 
 
 def __config_logger():
@@ -39,7 +39,7 @@ async def main():
 
 if __name__ == '__main__':
     __config_logger()
-    load_dotenv('.env')
+    load_dotenv('../.env')
     loop = asyncio.get_event_loop()
     loop.run_until_complete(connect_to_broker())
     loop.run_until_complete(main())
