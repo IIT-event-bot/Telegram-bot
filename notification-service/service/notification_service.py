@@ -48,7 +48,7 @@ async def save_notification(notification: Notification) -> None:
                                   f'"type": "{notification.type}", '
                                   f'"text": "{notification.text}", '
                                   f'"title": "{notification.title}" }}')
-    elif notification.type == 'EVENT':
+    elif notification.type == 'EVENT' or notification.type == 'FEEDBACK':
         now = datetime.now()
         in_an_hour = now + timedelta(hours=1)
         if notification.send_time <= in_an_hour:

@@ -146,6 +146,9 @@ public class EventServiceImpl implements EventService {
         if (event.isStudentEvent()) {
             validateStudents(event.getStudents());
         }
+        if (!event.isStudentEvent() && !event.isGroupEvent()) {
+            throw new IllegalArgumentException("Event must be for students or for groups");
+        }
     }
 
     @Scheduled(cron = "0 0 0 * * ?")
@@ -165,9 +168,19 @@ public class EventServiceImpl implements EventService {
         sendEvents(allRepeats);
     }
 
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void sendFeedback() {
-
+        var now = LocalDateTime.now();
+        var dayAgo = now.minusDays(1);
+        var feedback = repository.getEventByFeedbackTime(dayAgo, now);
+        for (var event : feedback) {
+            var feedbackTime = event.getEventTime().plusDays(1);
+            event.setEventTime(feedbackTime);
+            var eventText = "Вчера прошло событие '" + event.getTitle() + "', оставьте, пожалуйста обратную связь по этому событию";
+            event.setText(eventText);
+            event.setType(EventType.FEEDBACK);
+        }
+        sendEvents(feedback);
     }
 
     private List<Event> getAllRepeatEvents(List<Event> events) {
@@ -219,7 +232,7 @@ public class EventServiceImpl implements EventService {
                     Map.of("chatId", student,
                             "text", event.getText(),
                             "send_time", event.getEventTime().toString()),
-                    EventType.EVENT);
+                    event.getType());
         }
     }
 

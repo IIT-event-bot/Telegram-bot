@@ -24,4 +24,14 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             where er.repeat_time between :#{#from} and :#{#to}
             """, nativeQuery = true)
     List<Event> getEventsByRepeatTimeBetween(LocalDateTime from, LocalDateTime to);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            select *
+            from events
+            where has_feedback
+              and event_time between :#{#from} and :#{#to}
+            """, nativeQuery = true)
+    List<Event> getEventByFeedbackTime(LocalDateTime from, LocalDateTime to);
 }

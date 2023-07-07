@@ -22,7 +22,7 @@ async def send_user_service_message(message):
 async def callback(channel: Channel, body: bytes, envelope, properties):
     json_body = str(body.decode('utf-8'))
     json_message = json.loads(json_body)
-    message_text = f'<b>{json_message["title"]}</b>\n{json_message["text"]}'
+    message_text = f'<b>{json_message["title"]}</b>\n{json_message["text"]}\n{json_message["type"]}'
     logger.info(f'Message type {json_message["type"]}')
     await bot.send_message(chat_id=json_message['chat_id'],
                            text=message_text)
