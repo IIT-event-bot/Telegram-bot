@@ -2,7 +2,7 @@ import logging
 
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 
-from interface.Statement import Statement
+from interface.statement import Statement
 
 logger = logging.getLogger()
 from aiogram.dispatcher import FSMContext
