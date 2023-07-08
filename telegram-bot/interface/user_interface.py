@@ -22,7 +22,7 @@ async def start_message(message: Message):
     """Отправка сообщение о добавлении нового пользователя"""
     await rabbit.send_message_to_user_service(
         f'{{"method": "ADD_USER", "body": {{ "username": "{message.chat.username}", "id": {message.chat.id} }} }}')
-    logger.info(f'user id: {message.from_user.id} /start')
+    # logger.info(f'user id: {message.from_user.id} /start')
 
 
 def start_inline_keyboard() -> InlineKeyboardMarkup:
@@ -34,12 +34,12 @@ def start_inline_keyboard() -> InlineKeyboardMarkup:
 async def help_message(message: Message):
     """сообщение о функциях команд /help"""
     await message.answer(f'Чем могу помочь?', reply_markup=help_inline_keyboard())
-    logger.info(f'user id: {message.from_user.id} /help')
+    # logger.info(f'user id: {message.from_user.id} /help')
 
 
 async def callback_query_help(call: CallbackQuery):
     await help_message(call.message)
-    logger.info(f'user id: {call.from_user.id} /help')
+    # logger.info(f'user id: {call.from_user.id} /help')
 
 
 def help_inline_keyboard() -> InlineKeyboardMarkup:
@@ -73,8 +73,8 @@ async def add_statement(message: Message, state: FSMContext):
     """парсинг заявки"""
     try:
         split = message.text.split()
-        name = split[0]
-        surname = split[1]
+        name = split[1]
+        surname = split[0]
         patronymic = split[2]
         group_name = split[3]
         if not re.match(pattern='[а-яА-Я]{3}-\d{3}', string=group_name):
@@ -98,8 +98,8 @@ async def add_statement(message: Message, state: FSMContext):
 
 def create_statement_inline_keyboard() -> InlineKeyboardMarkup:
     create_statement_btn = InlineKeyboardButton('Отправить заявку ➡', callback_data='send_statement')
-    # back_btn = InlineKeyboardButton('Назад', callback_data='cancel_statement')
-    return InlineKeyboardMarkup(row_width=2).add(create_statement_btn)
+    cancel_statement = InlineKeyboardButton('Отмена ❌', callback_data='cancel_statement')
+    return InlineKeyboardMarkup(row_width=1).add(create_statement_btn, cancel_statement)
 
 
 async def callback_query_send_statement(call: CallbackQuery, state: FSMContext):
@@ -153,6 +153,20 @@ async def add_comment(call: CallbackQuery, state: FSMContext):
     await States.comment.set()
 
 
+async def callback_query_edit_comment(call: CallbackQuery, state: FSMContext):
+    await call.message.edit_text('Напиши новый комментарий')
+    States.edit_comment.set()
+    message_id = call.message.message_id
+    await state.set_data({'message_id': message_id})
+
+
+async def edit_comment(message: Message, state: FSMContext):
+    data = await state.get_data('message_id')
+    message_id = data['message_id']
+    await message.bot.edit_message_text(text=message.text, chat_id=message.chat.id,
+                                        message_id=message_id, reply_markup=send_comment_inline_keyboard())
+
+
 async def parse_comment(message: Message, state: FSMContext):
     message_id: dict = await state.get_data('message_id')
     event_id: dict = await state.get_data('event_id')
@@ -174,7 +188,7 @@ def send_comment_inline_keyboard() -> InlineKeyboardMarkup:
 async def callback_query_cancel_comment(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(text='Отказ от комментария')
     await state.finish()
-    logger.info(f'user id: {call.from_user.id} отказался от комментария')
+    # logger.info(f'user id: {call.from_user.id} отказался от комментария')
 
 
 async def callback_query_send_comment(call: CallbackQuery, state: FSMContext):
@@ -193,7 +207,7 @@ async def callback_query_cancel_statement(call: CallbackQuery, state: FSMContext
              f'буду сообщать тебе о главных мероприятиях института. Нажми "Подать заявку на добавление" и'
              f' заполни форму.', reply_markup=start_inline_keyboard())
     await state.finish()
-    logger.info(f'user id: {call.from_user.id} /назад')
+    # logger.info(f'user id: {call.from_user.id} /назад')
 
 
 async def callback_query_check_notification(call: CallbackQuery):

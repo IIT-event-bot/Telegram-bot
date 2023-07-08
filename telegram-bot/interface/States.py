@@ -5,3 +5,5 @@ class States(StatesGroup):
     add_statement = State()
     comment = State()
     send_statement = State()
+    edit_statement = State()
+    edit_comment = State()

@@ -41,6 +41,8 @@ async def main():
     dp.register_callback_query_handler(callback_query_check_notification, lambda call: 'check' in call.data)
     dp.register_callback_query_handler(callback_query_mark, lambda call: 'mark' in call.data)
     dp.register_callback_query_handler(callback_query_cancel_statement, lambda call: call.data == 'cancel_statement')
+    # dp.register_callback_query_handler(callback_query_edit_statement, lambda call: 'edit_statement' in call.data)
+    # dp.register_callback_query_handler(callback_query_cancel_statement, lambda call: call.data == 'c')
     logger.info('Bot starts')
     await dp.start_polling()
 
