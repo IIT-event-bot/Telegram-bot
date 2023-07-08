@@ -32,11 +32,14 @@ class RabbitMQClient:
                 await bot.send_message(chat_id=json_message['chat_id'],
                                        text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
                                        reply_markup=ui.confirmation_inline_keyboard())
-            if json_message['type'] == 'EVENT':
+            elif json_message['type'] == 'SYS_INFO':
+                await bot.send_message(chat_id=json_message['chat_id'],
+                                       text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}')
+            elif json_message['type'] == 'EVENT':
                 await bot.send_message(chat_id=json_message['chat_id'],
                                        text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
                                        reply_markup=ui.confirmation_inline_keyboard())
-            if json_message['type'] == 'FEEDBACK':
+            elif json_message['type'] == 'FEEDBACK':
                 await bot.send_message(chat_id=json_message['chat_id'],
                                        text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
                                        reply_markup=ui.mark_inline_keyboard(json_message['event_id']))

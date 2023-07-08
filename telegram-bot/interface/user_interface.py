@@ -124,6 +124,13 @@ async def callback_query_send_statement(call: CallbackQuery, state: FSMContext):
     # await state.finish()
 
 
+async def parse_comment(message: Message, state: FSMContext):
+    await message.edit_text(f'Комментарий: {message.text}\n\nОтправить этот комментарий?',
+                            reply_markup=send_comment_inline_keyboard())
+    comment = message.text
+    logger.info(f'user id: {message.from_user.id} спарсили комментарий')
+
+
 def send_comment_inline_keyboard() -> InlineKeyboardMarkup:
     send = InlineKeyboardButton('Отправить комментарий ➡', callback_data='send_comment')
     cancel_sending = InlineKeyboardButton('Отмена ❌', callback_data='cancel_comment')
@@ -133,13 +140,6 @@ def send_comment_inline_keyboard() -> InlineKeyboardMarkup:
 async def add_comment(call: CallbackQuery, state):
     await call.message.edit_text('Отправьте комментарий на событие')
     await States.comment.set()
-
-
-async def parse_comment(message: Message, state: FSMContext):
-    await message.edit_text(f'Комментарий: {message.text}\n\nОтправить этот комментарий?',
-                            reply_markup=send_comment_inline_keyboard())
-    comment = message.text
-    logger.info(f'user id: {message.from_user.id} спарсили комментарий')
 
 
 async def callback_query_help(call: CallbackQuery):

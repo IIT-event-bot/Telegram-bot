@@ -20,7 +20,7 @@ public class RabbitNotificationServiceImpl implements NotificationService {
         ObjectMapper mapper = new ObjectMapper();
         var values = mapper.convertValue(object, new TypeReference<Map<String, Object>>() {
         });
-        values.put("type", "INFO");
+        values.put("type", "SYS_INFO");
         values.put("title", title);
         try {
             var message = mapper.writeValueAsString(values);

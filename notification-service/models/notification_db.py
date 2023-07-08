@@ -12,3 +12,4 @@ class NotificationDB(Base):
     text = Column(VARCHAR)
     title = Column(VARCHAR)
     send_time = Column(TIMESTAMP)
+    event_id = Column(INTEGER)

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
     private final StudentRepository repository;
     private final GroupService groupService;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     @Override
     public Student getStudentById(long id) {
@@ -54,6 +56,9 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
         var student = repository.getStudentById(studentId);
         userService.updateUserRole(student.getUserId(), Role.USER);
         repository.deleteStudentById(studentId);
+        notificationService.sendNotification("Удаление из системы", Map.of("chat_id", student.getUserId(),
+                "text", student.getSurname() + " " + student.getName() + " " + student.getPatronymic() + ", " +
+                        "вы были удалены из системы информирования"));
     }
 
     @Override

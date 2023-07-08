@@ -88,9 +88,9 @@ public class StatementServiceImpl implements StatementService {
         var student = createStudentByStatement(savedStatement);
         studentService.saveStudent(student);
 
-        notificationService.sendNotification("Добавление в систему", Map.of("chatId", user.getId(),
+        notificationService.sendNotification("Добавление в систему", Map.of("chat_id", user.getId(),
                 "text", savedStatement.getSurname() + " " + savedStatement.getName() + " " + savedStatement.getPatronymic() + ", " +
-                        "вы были добавлены в систему " +
+                        "вы были добавлены в систему информирования " +
                         "в группу " + group.getTitle()));
     }
 
@@ -103,14 +103,14 @@ public class StatementServiceImpl implements StatementService {
 
         var user = userService.getUserById(statement.getUserId());
 
-        notificationService.sendNotification("Отклонение заявки", Map.of("chatId", user.getId(),
+        notificationService.sendNotification("Отклонение заявки", Map.of("chat_id", user.getId(),
                 "text", "Ваша заявка была отклонена"));
     }
 
     @Override
     public void saveStatement(Statement statement) {
-        var savedStatement = repository.getStatementByUserId(statement.getUserId());
-        if (savedStatement != null && statement.isChecked()) {
+        var savedStatement = repository.getUncheckedStatementByUserId(statement.getUserId());
+        if (savedStatement != null && !statement.isChecked()) {
             throw new IllegalArgumentException("Statement is already exist");
         }
         var group = groupService.getGroupByTitle(statement.getGroupName());

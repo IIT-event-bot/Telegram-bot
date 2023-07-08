@@ -1,11 +1,10 @@
 import json
 import logging
 import os
+from typing import Any
 
 import aioamqp
 from aioamqp.channel import Channel
-
-from service import notification_service as service
 
 logger = logging.getLogger()
 
@@ -16,6 +15,7 @@ class RabbitMQClient:
     ROUTING_KEY = 'notification-routing-key'
 
     channel: Channel
+    service: Any
 
     async def send_message(self, message):
         await self.channel.publish(message,
@@ -27,8 +27,8 @@ class RabbitMQClient:
     async def __callback(self, channel: Channel, body: bytes, envelope, properties):
         try:
             json_body = str(body.decode('utf-8'))
-            notification = service.convert_json_to_notification(json_body)
-            await service.save_notification(notification=notification)
+            notification = self.service.convert_json_to_notification(json_body)
+            await self.service.save_notification(notification=notification)
         except Exception as e:
             logger.error(e)
         await self.channel.basic_client_ack(delivery_tag=envelope.delivery_tag)
@@ -53,3 +53,7 @@ class RabbitMQClient:
 
 
 instance_rabbit_client = RabbitMQClient()
+
+
+def get_instance() -> RabbitMQClient:
+    return instance_rabbit_client

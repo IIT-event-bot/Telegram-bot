@@ -5,8 +5,8 @@ from logging import INFO, WARNING
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 
-from rabbit.rabbitmq import instance_rabbit_client as rabbit
-from service.notification_service import check_event_time, check_event_on_next_hour
+from rabbit.rabbitmq import get_instance
+from service.notification_service import Service
 
 
 def __config_logger():
@@ -24,16 +24,19 @@ def __config_logger():
                         datefmt='%d-%m-%y - %H:%M:%S')
 
 
-def start_background_scheduler():
+def start_background_scheduler(service: Service):
     sch = BackgroundScheduler()
-    sch.add_job(check_event_time, 'interval', minutes=1)
-    sch.add_job(check_event_on_next_hour, 'interval', hours=1)
-    check_event_on_next_hour()
+    sch.add_job(service.check_event_time, 'interval', minutes=1)
+    sch.add_job(service.check_event_on_next_hour, 'interval', hours=1)
+    service.check_event_on_next_hour()
     sch.start()
 
 
 async def main():
-    start_background_scheduler()
+    rabbit = get_instance()
+    service = Service(rabbitmq=rabbit)
+    rabbit.service = service
+    start_background_scheduler(service)
     await rabbit.connect_to_broker()
 
 

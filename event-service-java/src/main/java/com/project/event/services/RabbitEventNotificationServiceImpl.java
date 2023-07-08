@@ -35,9 +35,10 @@ public class RabbitEventNotificationServiceImpl implements EventNotificationServ
         }
         for (var student : chatIds) {
             sendNotification(event.getTitle(),
-                    Map.of("chatId", student,
+                    Map.of("chat_id", student,
                             "text", event.getText(),
-                            "send_time", event.getEventTime().toString()),
+                            "send_time", event.getEventTime().toString(),
+                            "event_id", event.getId()),
                     event.getType());
         }
     }

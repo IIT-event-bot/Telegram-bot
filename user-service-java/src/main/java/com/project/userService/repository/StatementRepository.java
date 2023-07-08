@@ -11,7 +11,14 @@ import java.util.List;
 public interface StatementRepository extends JpaRepository<Statement, Long> {
     Statement getStatementById(long id);
 
-    Statement getStatementByUserId(long userId);
+    @Transactional
+    @Query(value = """
+            select *
+            from statements
+            where user_id = :#{#userId}
+              and is_checked = false
+            """, nativeQuery = true)
+    Statement getUncheckedStatementByUserId(long userId);
 
     @Modifying
     @Transactional
