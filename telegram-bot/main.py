@@ -1,12 +1,15 @@
 import asyncio
 from logging import WARNING, INFO
+import os
+from logging import WARNING, INFO
 
 from aiogram import Bot, Dispatcher
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from dotenv import load_dotenv, dotenv_values
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from interface.user_interface import *
 from rabbit.rabbitmq import *
+from interface.States import *
 
 logger = logging.getLogger()
 config = dotenv_values()
@@ -31,18 +34,21 @@ async def main():
 
     dp.register_message_handler(add_statement, state=States.add_statement)
     dp.register_message_handler(parse_comment, state=States.comment)
+    dp.register_message_handler(edit_statement, state=States.edit_statement)
+    dp.register_message_handler(edit_comment, state=States.edit_comment)
 
     dp.register_callback_query_handler(callback_query_statement, lambda call: call.data == 'create_statement')
     dp.register_callback_query_handler(callback_query_help, lambda call: call.data == 'help')
     dp.register_callback_query_handler(callback_query_send_statement, lambda call: call.data == 'send_statement')
     dp.register_callback_query_handler(callback_query_cancel_comment, lambda call: call.data == 'cancel_comment')
     dp.register_callback_query_handler(callback_query_send_comment, lambda call: call.data == 'send_comment')
-    dp.register_callback_query_handler(add_comment, lambda call: 'add_comment' in call.data)
-    dp.register_callback_query_handler(callback_query_check_notification, lambda call: 'check' in call.data)
+    dp.register_callback_query_handler(add_comment, lambda call: call.data == 'add_comment')
+    dp.register_callback_query_handler(callback_query_confirmation_of_notification,
+                                       lambda call: call.data == 'confirmation')
     dp.register_callback_query_handler(callback_query_mark, lambda call: 'mark' in call.data)
     dp.register_callback_query_handler(callback_query_cancel_statement, lambda call: call.data == 'cancel_statement')
-    # dp.register_callback_query_handler(callback_query_edit_statement, lambda call: 'edit_statement' in call.data)
-    # dp.register_callback_query_handler(callback_query_cancel_statement, lambda call: call.data == 'c')
+    dp.register_callback_query_handler(callback_query_edit_statement, lambda call: 'edit_statement' in call.data)
+    dp.register_callback_query_handler(callback_query_edit_comment,lambda call: call.data == 'edit_comment')
     logger.info('Bot starts')
     await dp.start_polling()
 

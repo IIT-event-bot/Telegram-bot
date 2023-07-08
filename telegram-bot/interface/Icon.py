@@ -1,6 +1,5 @@
 import enum
 
-
 class Icon(enum.Enum):
     STAR = "\u2B50"
     TWO_STAR = "\u2B50"*2
