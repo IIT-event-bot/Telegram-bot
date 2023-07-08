@@ -70,11 +70,9 @@ public class FeedbackServiceImpl implements FeedbackService {
         var event = new Event();
         event.setId(Long.parseLong(checkEventJson.get("event_id").toString()));
         var userId = Long.parseLong(checkEventJson.get("user_id").toString());
-
-        var student = studentService.getStudentByUserId(userId);
-        var checkEvent = new EventCheck(0L, student.id(), event);
-
         try {
+            var student = studentService.getStudentByUserId(userId);
+            var checkEvent = new EventCheck(0L, student.id(), event);
             checkedStudentRepository.save(checkEvent);
         } catch (Exception e) {
             log.error(e.getMessage());

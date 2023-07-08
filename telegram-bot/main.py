@@ -38,8 +38,7 @@ async def main():
     dp.register_callback_query_handler(callback_query_cancel_comment, lambda call: call.data == 'cancel_comment')
     dp.register_callback_query_handler(callback_query_send_comment, lambda call: call.data == 'send_comment')
     dp.register_callback_query_handler(add_comment, lambda call: 'add_comment' in call.data)
-    dp.register_callback_query_handler(callback_query_confirmation_of_notification,
-                                       lambda call: call.data == 'confirmation')
+    dp.register_callback_query_handler(callback_query_check_notification, lambda call: 'check' in call.data)
     dp.register_callback_query_handler(callback_query_mark, lambda call: 'mark' in call.data)
     dp.register_callback_query_handler(callback_query_cancel_statement, lambda call: call.data == 'cancel_statement')
     logger.info('Bot starts')

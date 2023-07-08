@@ -57,9 +57,9 @@ async def callback_query_statement(call: CallbackQuery, state: FSMContext):
     await state.set_data({'message_id': call.message.message_id})
 
 
-def confirmation_inline_keyboard() -> InlineKeyboardMarkup:
+def confirmation_inline_keyboard(event_id: int) -> InlineKeyboardMarkup:
     confirmation_btn = InlineKeyboardButton(f'Уведомление о событии получено {Icon.CHECK.value}',
-                                            callback_data='check')
+                                            callback_data=f'check:{event_id}')
     return InlineKeyboardMarkup().add(confirmation_btn)
 
 
@@ -187,10 +187,6 @@ async def callback_query_send_comment(call: CallbackQuery, state: FSMContext):
         f'{{ "method": "ADD_FEEDBACK", "body": {{ "event_id": {event_id}, "text": "{message_text}" }} }}')
 
 
-async def callback_query_confirmation_of_notification(call: CallbackQuery):
-    logger.info(f'user id: {call.from_user.id} подтвердил получение уведомления')
-
-
 async def callback_query_cancel_statement(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(
         text=f'Привет, я бот института информационных технологий. Я помогу тебе узнать свое расписание и '
@@ -200,5 +196,8 @@ async def callback_query_cancel_statement(call: CallbackQuery, state: FSMContext
     logger.info(f'user id: {call.from_user.id} /назад')
 
 
-async def callback_query_confirmation_of_notification(call: CallbackQuery):
-    event_id = call.data[13:]
+async def callback_query_check_notification(call: CallbackQuery):
+    event_id = call.data.split(':')[-1]
+    await call.message.edit_text(call.message.text)
+    await rabbit.send_message_to_event_service(
+        f'{{ "method": "CHECK_EVENT", "body": {{ "event_id": {event_id}, "user_id": "{call.from_user.id}" }} }}')
