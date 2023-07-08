@@ -1,15 +1,12 @@
 package com.project.event.services;
 
 import com.project.event.models.Event;
+import com.project.event.models.EventCheck;
 import com.project.event.models.EventType;
+import com.project.event.repositories.CheckedStudentRepository;
 import com.project.event.repositories.EventRepository;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,18 +14,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@EnableScheduling
 public class EventServiceImpl implements EventService {
     private final EventRepository repository;
-    private final NotificationService notificationService;
-    @Value("${grpc.userservice.host}")
-    private String userServiceHost;
+    private final EventNotificationService notificationService;
+    private final CheckedStudentRepository checkedStudentRepository;
+    private final StudentService studentService;
 
     @Override
     public List<Event> getAllEvents(String date, String title, Long groupId) {
@@ -89,11 +84,11 @@ public class EventServiceImpl implements EventService {
 
     private void sendEventIfTimeToday(Event event) {
         if (event.getType() == EventType.INFO) {
-            sendEvent(event);
+            notificationService.sendEvent(event);
             return;
         }
         if (event.getType() == EventType.EVENT && event.getEventTime().isBefore(LocalDateTime.now().plusDays(1))) {
-            sendEvent(event);
+            notificationService.sendEvent(event);
             return;
         }
         if (!event.isRepeat()) {
@@ -105,7 +100,7 @@ public class EventServiceImpl implements EventService {
                 continue;
             }
             event.setEventTime(repeat);
-            sendEvent(event);
+            notificationService.sendEvent(event);
         }
     }
 
@@ -126,55 +121,20 @@ public class EventServiceImpl implements EventService {
         sendEventIfTimeToday(savedEvent);
     }
 
+    @Override
+    public List<Long> getEventCheckedStudentId(long eventId) {
+        return checkedStudentRepository.getEventChecksByEventId(eventId).stream().map(EventCheck::getStudentsId).toList();
+    }
+
     private void validateStudents(List<Long> students) {
         for (var studentId : students) {
-            checkStudentExists(studentId);
+            studentService.getStudentById(studentId);
         }
     }
 
     private void validateGroups(List<Long> groups) {
         for (var group : groups) {
-            checkGroupExists(group);
-        }
-    }
-
-    private void checkGroupExists(long groupId) {
-        ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(userServiceHost, 8100)
-                .usePlaintext()
-                .build();
-
-        var stub = com.project.groupService.GroupServiceGrpc.newBlockingStub(channel);
-
-        var request = com.project.groupService.GroupServiceOuterClass.GroupRequest
-                .newBuilder()
-                .setGroupId(groupId)
-                .build();
-        try {
-            var response = stub.getGroupByGroupId(request);
-        } catch (io.grpc.StatusRuntimeException e) {
-            log.error(e.getMessage());
-            throw new IllegalArgumentException("Group with id " + groupId + " does not exist");
-        }
-    }
-
-    private void checkStudentExists(Long userId) {
-        ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(userServiceHost, 8100)
-                .usePlaintext()
-                .build();
-
-        var stub = com.project.studentService.StudentServiceGrpc.newBlockingStub(channel);
-
-        var request = com.project.studentService.StudentServiceOuterClass.StudentRequest
-                .newBuilder()
-                .setStudentId(userId)
-                .build();
-        try {
-            var response = stub.getStudentById(request);
-        } catch (io.grpc.StatusRuntimeException e) {
-            log.error(e.getMessage());
-            throw new IllegalArgumentException("Student with id " + userId + " does not exist");
+            studentService.getGroupById(group);
         }
     }
 
@@ -212,136 +172,5 @@ public class EventServiceImpl implements EventService {
         if (!event.isStudentEvent() && !event.isGroupEvent()) {
             throw new IllegalArgumentException("Event must be for students or for groups");
         }
-    }
-
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void sendEventsToday() {
-        var now = LocalDateTime.now();
-        var dayEnd = now.plusDays(1);
-        var eventsToday = repository.getEventsByEventTimeBetween(now, dayEnd);
-        sendEvents(eventsToday);
-    }
-
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void sendRepeatEvent() {
-        var now = LocalDateTime.now();
-        var dayEnd = now.plusDays(1);
-        var eventsRepeat = repository.getEventsByRepeatTimeBetween(now, dayEnd);
-        var allRepeats = getAllRepeatEvents(eventsRepeat);
-        sendEvents(allRepeats);
-    }
-
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void sendFeedback() {
-        var now = LocalDateTime.now();
-        var dayAgo = now.minusDays(1);
-        var feedback = repository.getEventByFeedbackTime(dayAgo, now);
-        for (var event : feedback) {
-            var feedbackTime = event.getEventTime().plusDays(1);
-            event.setEventTime(feedbackTime);
-            var eventText = "Вчера прошло событие '" + event.getTitle() + "', оставьте, пожалуйста обратную связь по этому событию";
-            event.setText(eventText);
-            event.setType(EventType.FEEDBACK);
-        }
-        sendEvents(feedback);
-    }
-
-    private List<Event> getAllRepeatEvents(List<Event> events) {
-        var now = LocalDateTime.now();
-        var dayEnd = now.plusDays(1);
-        List<Event> allRepeats = new ArrayList<>();
-        for (Event event : events) {
-            for (var repeatTime : event.getRepeatTime()) {
-                if (repeatTime.isAfter(now) && repeatTime.isBefore(dayEnd)) {
-                    var repeatEvent = new Event();
-                    repeatEvent.setId(event.getId());
-                    repeatEvent.setStudentEvent(event.isStudentEvent());
-                    repeatEvent.setStudents(event.getStudents());
-                    repeatEvent.setGroupEvent(event.isGroupEvent());
-                    repeatEvent.setGroups(event.getGroups());
-                    repeatEvent.setEventTime(repeatTime);
-                    repeatEvent.setTitle(event.getTitle());
-                    repeatEvent.setText(event.getText());
-
-                    allRepeats.add(repeatEvent);
-                }
-            }
-        }
-        return allRepeats;
-    }
-
-
-    private void sendEvents(List<Event> events) {
-        for (var event : events) {
-            log.info(event.getId() + " " + event.getTitle() + " at " + event.getEventTime());
-            sendEvent(event);
-        }
-    }
-
-    private void sendEvent(Event event) {
-        List<Long> chatIds = new ArrayList<>();
-        if (event.isGroupEvent()) {
-            for (var groupId : event.getGroups()) {
-                chatIds.addAll(getGroupStudentChatId(groupId));
-            }
-        }
-        if (event.isStudentEvent()) {
-            for (var studentId : event.getStudents()) {
-                chatIds.add(getStudentChatId(studentId));
-            }
-        }
-        for (var student : chatIds) {
-            notificationService.sendNotification(event.getTitle(),
-                    Map.of("chatId", student,
-                            "text", event.getText(),
-                            "send_time", event.getEventTime().toString()),
-                    event.getType());
-        }
-    }
-
-    private Long getStudentChatId(Long studentId) {
-        ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(userServiceHost, 8100)
-                .usePlaintext()
-                .build();
-
-        var stub = com.project.studentService.StudentServiceGrpc.newBlockingStub(channel);
-
-        var request = com.project.studentService.StudentServiceOuterClass.StudentRequest
-                .newBuilder()
-                .setStudentId(studentId)
-                .build();
-        try {
-            var response = stub.getUserByStudentId(request);
-            return response.getId();
-        } catch (io.grpc.StatusRuntimeException e) {
-            log.error(e.getMessage());
-            throw new IllegalArgumentException("Student with id " + studentId + " does not exist");
-        }
-    }
-
-    private List<Long> getGroupStudentChatId(Long groupId) {
-        ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(userServiceHost, 8100)
-                .usePlaintext()
-                .build();
-
-        var stub = com.project.studentService.StudentServiceGrpc.newBlockingStub(channel);
-
-        var request = com.project.studentService.StudentServiceOuterClass.GroupRequest
-                .newBuilder()
-                .setGroupId(groupId)
-                .build();
-        List<Long> ids = new ArrayList<>();
-        try {
-            var response = stub.getStudentsChatIdByGroupId(request);
-            while (response.hasNext()) {
-                var user = response.next();
-                ids.add(user.getId());
-            }
-        } catch (io.grpc.StatusRuntimeException e) {
-            log.error(e.getMessage());
-        }
-        return ids;
     }
 }

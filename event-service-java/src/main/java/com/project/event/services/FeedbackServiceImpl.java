@@ -2,10 +2,8 @@ package com.project.event.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.event.config.RabbitConfig;
-import com.project.event.models.Event;
-import com.project.event.models.EventGrade;
-import com.project.event.models.Feedback;
-import com.project.event.models.RabbitMessage;
+import com.project.event.models.*;
+import com.project.event.repositories.CheckedStudentRepository;
 import com.project.event.repositories.EventGradeRepository;
 import com.project.event.repositories.FeedbackRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +25,13 @@ import java.util.Map;
 public class FeedbackServiceImpl implements FeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final EventGradeRepository gradeRepository;
+    private final CheckedStudentRepository checkedStudentRepository;
+    private final StudentService studentService;
 
     @Override
     public EventGrade getEventGrade(long eventId) {
         var grades = gradeRepository.getEventGradesByEventId(eventId);
-        if (grades.size() == 0){
+        if (grades.size() == 0) {
             var grade = new EventGrade();
             grade.setGrade(0);
             return grade;
@@ -62,7 +62,18 @@ public class FeedbackServiceImpl implements FeedbackService {
         switch (rabbitMessage.method()) {
             case ADD_GRADE -> addGrade(rabbitMessage.body());
             case ADD_FEEDBACK -> addFeedback(rabbitMessage.body());
+            case CHECK_EVENT -> checkEvent(rabbitMessage.body());
         }
+    }
+
+    private void checkEvent(Map<String, Object> checkEventJson) {
+        var event = new Event();
+        event.setId(Long.parseLong(checkEventJson.get("event_id").toString()));
+        var userId = Long.parseLong(checkEventJson.get("user_id").toString());
+
+        var student = studentService.getStudentByUserId(userId);
+        var checkEvent = new EventCheck(0L, student.id(), event);
+        checkedStudentRepository.save(checkEvent);
     }
 
     private void addFeedback(Map<String, Object> feedbackJson) {

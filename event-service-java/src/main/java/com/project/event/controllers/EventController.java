@@ -132,4 +132,9 @@ public class EventController {
     public ResponseEntity<?> getEventGrade(@PathVariable("eventId") long eventId) {
         return ResponseEntity.ok(feedbackService.getEventGrade(eventId));
     }
+
+    @GetMapping("/{eventId}/checkedlist")
+    public ResponseEntity<?> getMarkedStudents(@PathVariable("eventId") long eventId) {
+        return ResponseEntity.ok(service.getEventCheckedStudentId(eventId));
+    }
 }

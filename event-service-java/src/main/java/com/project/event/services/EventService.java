@@ -14,4 +14,6 @@ public interface EventService {
     void deleteEventById(long eventId);
 
     void updateEvent(Event event);
+
+    List<Long> getEventCheckedStudentId(long eventId);
 }
