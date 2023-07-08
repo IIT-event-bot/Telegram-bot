@@ -83,7 +83,30 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public void createEvent(Event event) {
         validateEvent(event);
-        repository.save(event);
+        var savedEvent = repository.save(event);
+        sendEventIfTimeToday(savedEvent);
+    }
+
+    private void sendEventIfTimeToday(Event event) {
+        if (event.getType() == EventType.INFO) {
+            sendEvent(event);
+            return;
+        }
+        if (event.getType() == EventType.EVENT && event.getEventTime().isBefore(LocalDateTime.now().plusDays(1))) {
+            sendEvent(event);
+            return;
+        }
+        if (!event.isRepeat()) {
+            return;
+        }
+        var todayTime = LocalDateTime.now().plusDays(1);
+        for (var repeat : event.getRepeatTime()) {
+            if (!repeat.isBefore(todayTime)) {
+                continue;
+            }
+            event.setEventTime(repeat);
+            sendEvent(event);
+        }
     }
 
     @Override
@@ -99,7 +122,8 @@ public class EventServiceImpl implements EventService {
         if (savedEvent == null) {
             throw new IllegalArgumentException("Event with id " + event.getId() + " does not exist");
         }
-        repository.save(event);
+        savedEvent = repository.save(event);
+        sendEventIfTimeToday(savedEvent);
     }
 
     private void validateStudents(List<Long> students) {

@@ -88,7 +88,7 @@ public class StatementServiceImpl implements StatementService {
         studentService.saveStudent(student);
 
         notificationService.sendNotification("Добавление в систему", Map.of("chatId", user.getId(),
-                "text", savedStatement.getSurname() + " " + savedStatement.getName() + " " + savedStatement.getPatronymic() + "', " +
+                "text", savedStatement.getSurname() + " " + savedStatement.getName() + " " + savedStatement.getPatronymic() + ", " +
                         "вы были добавлены в систему " +
                         "группа " + group.getTitle()));
     }
