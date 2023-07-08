@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from models.notification import Notification
 from models.notification_db import NotificationDB
-from rabbit import rabbitmq as rabbit
+from rabbit.rabbitmq import instance_rabbit_client as rabbit
 from repository import notification_redis as redis_repository
 from repository import notification_repository as repository
 
@@ -13,7 +13,7 @@ logger = logging.getLogger()
 
 
 def check_event_time():
-    logger.info('Check sending time nearest events')
+    # logger.info('Check sending time nearest events')
     notifications = redis_repository.get_with_now_send_time_notifications()
     for notification in notifications:
         asyncio.run(rabbit.send_message(f'{{ "chat_id": {notification.chat_id},'
@@ -25,7 +25,6 @@ def check_event_time():
 def check_event_on_next_hour():
     logger.info('Check events on next hour')
     saved_notifications = repository.get_notification_on_hour()
-    # saved_notifications.sort(key=lambda x: x.send_time, reverse=False)
     notifications = []
     for saved_notification in saved_notifications:
         notification = Notification()
