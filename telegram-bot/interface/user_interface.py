@@ -37,6 +37,11 @@ async def help_message(message: Message):
     logger.info(f'user id: {message.from_user.id} /help')
 
 
+async def callback_query_help(call: CallbackQuery):
+    await help_message(call.message)
+    logger.info(f'user id: {call.from_user.id} /help')
+
+
 def help_inline_keyboard() -> InlineKeyboardMarkup:
     create_statement_btn = InlineKeyboardButton('Подать заявку на добавление', callback_data='create_statement')
     iit_contacts = InlineKeyboardButton('Контакты ИИТ', url='https://iit.csu.ru/')
@@ -58,26 +63,10 @@ def confirmation_inline_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup().add(confirmation_btn)
 
 
-def mark_inline_keyboard(event_id) -> InlineKeyboardMarkup:
-    one_star_btn = InlineKeyboardButton(Icon.STAR.value, callback_data=f'{event_id}:mark:1')
-    two_star_btn = InlineKeyboardButton(Icon.TWO_STAR.value, callback_data=f'{event_id}:mark:2')
-    three_star_btn = InlineKeyboardButton(Icon.THREE_STAR.value, callback_data=f'{event_id}:mark:3')
-    four_star_btn = InlineKeyboardButton(Icon.FOUR_STAR.value, callback_data=f'{event_id}:mark:4')
-    five_star_btn = InlineKeyboardButton(Icon.FIVE_STAR.value, callback_data=f'{event_id}:mark:5')
-    return InlineKeyboardMarkup(row_width=2).add(one_star_btn, two_star_btn, three_star_btn, four_star_btn,
-                                                 five_star_btn)
-
-
-def comment_inline_keyboard() -> InlineKeyboardMarkup:
-    write_comment_btn = InlineKeyboardButton('Оставить комментарий', callback_data='add_comment')
-    cancel_btn = InlineKeyboardButton('Нет', callback_data='cancel_comment')
-    return InlineKeyboardMarkup(row_width=2).add(write_comment_btn, cancel_btn)
-
-
-def student_main_inline_keyboard() -> InlineKeyboardMarkup:
-    get_schedule = InlineKeyboardButton('Получить расписание', callback_data='get_schedule')
-    notification_settings = InlineKeyboardButton('Настройка уведомлений', callback_data='notification_settings')
-    return InlineKeyboardMarkup(row_width=2).add(get_schedule, notification_settings)
+# def student_main_inline_keyboard() -> InlineKeyboardMarkup:
+#     get_schedule = InlineKeyboardButton('Получить расписание', callback_data='get_schedule')
+#     notification_settings = InlineKeyboardButton('Настройка уведомлений', callback_data='notification_settings')
+#     return InlineKeyboardMarkup(row_width=2).add(get_schedule, notification_settings)
 
 
 async def add_statement(message: Message, state: FSMContext):
@@ -124,37 +113,14 @@ async def callback_query_send_statement(call: CallbackQuery, state: FSMContext):
     # await state.finish()
 
 
-async def parse_comment(message: Message, state: FSMContext):
-    await message.edit_text(f'Комментарий: {message.text}\n\nОтправить этот комментарий?',
-                            reply_markup=send_comment_inline_keyboard())
-    comment = message.text
-    logger.info(f'user id: {message.from_user.id} спарсили комментарий')
-
-
-def send_comment_inline_keyboard() -> InlineKeyboardMarkup:
-    send = InlineKeyboardButton('Отправить комментарий ➡', callback_data='send_comment')
-    cancel_sending = InlineKeyboardButton('Отмена ❌', callback_data='cancel_comment')
-    return InlineKeyboardMarkup(row_width=2).add(send, cancel_sending)
-
-
-async def add_comment(call: CallbackQuery, state):
-    await call.message.edit_text('Отправьте комментарий на событие')
-    await States.comment.set()
-
-
-async def callback_query_help(call: CallbackQuery):
-    await help_message(call.message)
-    logger.info(f'user id: {call.from_user.id} /help')
-
-
 async def callback_query_mark(call: CallbackQuery):
-    await call.message.edit_text(
-        text='Спасибо за оценку! Хочешь оставить комментарий? Напиши свой отзыв и нажми "Отправить комментарий"',
-        reply_markup=comment_inline_keyboard())
-
+    """отправка сообщения об обратной связи"""
     split = call.data.split(':')
     grade = int(split[-1])
     event_id = int(split[0])
+    await call.message.edit_text(
+        text='Спасибо за оценку! Хочешь оставить комментарий? Напиши свой отзыв о событии',
+        reply_markup=comment_inline_keyboard(event_id))
     await rabbit.send_message_to_event_service(f'{{ "method": "ADD_GRADE", '
                                                f'"body": {{ '
                                                f'"event_id": {event_id}, '
@@ -163,21 +129,62 @@ async def callback_query_mark(call: CallbackQuery):
                                                f'}}')
 
 
-async def callback_query_send_comment(call: CallbackQuery, state: FSMContext):
-    await call.message.edit_text(text='Комментарий успешно отправлен! ' + Icon.CHECK.value,
-                                 # reply_markup=student_main_inline_keyboard()
-                                 )
-    # await state.finish()
+def mark_inline_keyboard(event_id) -> InlineKeyboardMarkup:
+    """кнопки для оценки события"""
+    one_star_btn = InlineKeyboardButton(Icon.STAR.value, callback_data=f'{event_id}:mark:1')
+    two_star_btn = InlineKeyboardButton(Icon.TWO_STAR.value, callback_data=f'{event_id}:mark:2')
+    three_star_btn = InlineKeyboardButton(Icon.THREE_STAR.value, callback_data=f'{event_id}:mark:3')
+    four_star_btn = InlineKeyboardButton(Icon.FOUR_STAR.value, callback_data=f'{event_id}:mark:4')
+    five_star_btn = InlineKeyboardButton(Icon.FIVE_STAR.value, callback_data=f'{event_id}:mark:5')
+    return InlineKeyboardMarkup(row_width=2).add(one_star_btn, two_star_btn, three_star_btn, four_star_btn,
+                                                 five_star_btn)
+
+
+def comment_inline_keyboard(event_id: int) -> InlineKeyboardMarkup:
+    write_comment_btn = InlineKeyboardButton('Оставить коммент.', callback_data=f'add_comment:{event_id}')
+    cancel_btn = InlineKeyboardButton('Не оставлять', callback_data='cancel_comment')
+    return InlineKeyboardMarkup(row_width=2).add(write_comment_btn, cancel_btn)
+
+
+async def add_comment(call: CallbackQuery, state: FSMContext):
+    event_id = int(call.data.split(':')[-1])
+    await call.message.edit_text('Отправьте комментарий на событие ✍')
+    await state.set_data({'event_id': event_id, 'message_id': call.message.message_id})
     await States.comment.set()
-    logger.info(f'user id: {call.from_user.id} отправили комментарий')
+
+
+async def parse_comment(message: Message, state: FSMContext):
+    message_id: dict = await state.get_data('message_id')
+    event_id: dict = await state.get_data('event_id')
+    await message.bot.edit_message_text(text=f'Комментарий: {message.text}\n\nОтправить этот комментарий?',
+                                        message_id=message_id['message_id'],
+                                        chat_id=message.chat.id,
+                                        reply_markup=send_comment_inline_keyboard())
+    # await state.set_state(States.comment)
+    await state.finish()
+    await state.set_data({'event_id': event_id['event_id'], 'message_text': message.text})
+
+
+def send_comment_inline_keyboard() -> InlineKeyboardMarkup:
+    send = InlineKeyboardButton('Отправить комментарий ➡', callback_data='send_comment')
+    cancel_sending = InlineKeyboardButton('Отмена ❌', callback_data='cancel_comment')
+    return InlineKeyboardMarkup(row_width=2).add(send, cancel_sending)
 
 
 async def callback_query_cancel_comment(call: CallbackQuery, state: FSMContext):
-    await call.message.edit_text(text='Отказ от комментария',
-                                 # reply_markup=student_main_inline_keyboard()
-                                 )
+    await call.message.edit_text(text='Отказ от комментария')
     await state.finish()
     logger.info(f'user id: {call.from_user.id} отказался от комментария')
+
+
+async def callback_query_send_comment(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data('event_id')
+    event_id = data['event_id']
+    message_text = data['message_text']
+    await call.message.edit_text(text='Комментарий успешно отправлен! ' + Icon.CHECK.value)
+    await state.finish()
+    await rabbit.send_message_to_event_service(
+        f'{{ "method": "ADD_FEEDBACK", "body": {{ "event_id": {event_id}, "text": "{message_text}" }} }}')
 
 
 async def callback_query_confirmation_of_notification(call: CallbackQuery):
