@@ -24,7 +24,6 @@ import java.util.Map;
 public class RabbitReceiver {
     private final UserService userService;
     private final StatementService statementService;
-    private final GroupService groupService;
 
     @RabbitListener(queues = RabbitConfig.USER_SERVICE_QUEUE)
     public void userServiceQueue(Message message) {

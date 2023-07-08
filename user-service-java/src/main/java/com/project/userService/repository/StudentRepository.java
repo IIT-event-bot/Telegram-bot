@@ -32,4 +32,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             where group_id = :#{#groupId}
             """, nativeQuery = true)
     List<Student> getStudentsByGroupId(long groupId);
+
+    Student getStudentByUserId(long userId);
 }

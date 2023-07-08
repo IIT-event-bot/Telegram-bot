@@ -22,8 +22,13 @@ message GroupRequest {
   int64 groupId = 1;
 }
 
+message UserRequest {
+  int64 id = 1;
+}
+
 service StudentService {
   rpc getUserByStudentId(StudentRequest) returns (UserResponse);
   rpc getStudentsChatIdByGroupId(GroupRequest) returns (stream UserResponse);
   rpc getStudentById(StudentRequest) returns (StudentResponse);
+  rpc getStudentByUserId(UserRequest) returns (StudentResponse);
 }

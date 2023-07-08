@@ -116,4 +116,21 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
         }
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void getStudentByUserId(StudentServiceOuterClass.UserRequest request,
+                                   StreamObserver<StudentServiceOuterClass.StudentResponse> responseObserver) {
+        var userId = request.getId();
+        var student = repository.getStudentByUserId(userId);
+
+        var response = StudentServiceOuterClass.StudentResponse.newBuilder()
+                .setId(student.getId())
+                .setName(student.getName())
+                .setSurname(student.getSurname())
+                .setPatronymic(student.getPatronymic())
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
 }

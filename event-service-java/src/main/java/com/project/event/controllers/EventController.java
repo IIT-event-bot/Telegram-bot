@@ -2,6 +2,7 @@ package com.project.event.controllers;
 
 import com.project.event.models.Event;
 import com.project.event.services.EventService;
+import com.project.event.services.FeedbackService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,10 +20,12 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Event service")
 public class EventController {
     private final EventService service;
+    private final FeedbackService feedbackService;
 
     @Autowired
-    public EventController(EventService service) {
+    public EventController(EventService service, FeedbackService feedbackService) {
         this.service = service;
+        this.feedbackService = feedbackService;
     }
 
     @Operation(summary = "Получение всех событий")
@@ -118,5 +121,15 @@ public class EventController {
     public ResponseEntity<?> deleteEvent(@PathVariable("eventId") long eventId) {
         service.deleteEventById(eventId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{eventId}/feedback")
+    public ResponseEntity<?> getEventFeedback(@PathVariable("eventId") long eventId) {
+        return ResponseEntity.ok(feedbackService.getEventFeedback(eventId));
+    }
+
+    @GetMapping("/{eventId}/grade")
+    public ResponseEntity<?> getEventGrade(@PathVariable("eventId") long eventId) {
+        return ResponseEntity.ok(feedbackService.getEventGrade(eventId));
     }
 }

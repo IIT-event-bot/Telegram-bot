@@ -32,6 +32,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<Event> getAllEvents(String date, String title, Long groupId) {
+        if (date == null && title == null && groupId == null) {
+            return repository.findAll();
+        }
         if (date != null && title != null && groupId != null) {
             var eventDate = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
             return repository.getEventsByFilter(title, eventDate, groupId);
