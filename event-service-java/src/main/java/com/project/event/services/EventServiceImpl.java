@@ -286,7 +286,7 @@ public class EventServiceImpl implements EventService {
                 .build();
         try {
             var response = stub.getUserByStudentId(request);
-            return response.getChatId();
+            return response.getId();
         } catch (io.grpc.StatusRuntimeException e) {
             log.error(e.getMessage());
             throw new IllegalArgumentException("Student with id " + studentId + " does not exist");
@@ -309,8 +309,8 @@ public class EventServiceImpl implements EventService {
         try {
             var response = stub.getStudentsChatIdByGroupId(request);
             while (response.hasNext()) {
-                var group = response.next();
-                ids.add(group.getChatId());
+                var user = response.next();
+                ids.add(user.getId());
             }
         } catch (io.grpc.StatusRuntimeException e) {
             log.error(e.getMessage());

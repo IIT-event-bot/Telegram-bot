@@ -87,7 +87,7 @@ public class StatementServiceImpl implements StatementService {
         var student = createStudentByStatement(savedStatement);
         studentService.saveStudent(student);
 
-        notificationService.sendNotification("Добавление в систему", Map.of("chatId", user.getChatId(),
+        notificationService.sendNotification("Добавление в систему", Map.of("chatId", user.getId(),
                 "text", savedStatement.getSurname() + " " + savedStatement.getName() + " " + savedStatement.getPatronymic() + "', " +
                         "вы были добавлены в систему " +
                         "группа " + group.getTitle()));
@@ -102,7 +102,7 @@ public class StatementServiceImpl implements StatementService {
 
         var user = userService.getUserById(statement.getUserId());
 
-        notificationService.sendNotification("Отклонение заявки", Map.of("chatId", user.getChatId(),
+        notificationService.sendNotification("Отклонение заявки", Map.of("chatId", user.getId(),
                 "text", "Ваша заявка была отклонена"));
     }
 

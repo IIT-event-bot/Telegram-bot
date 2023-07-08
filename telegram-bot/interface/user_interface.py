@@ -5,7 +5,7 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, C
 logger = logging.getLogger()
 from aiogram.dispatcher import FSMContext
 
-from rabbit.rabbitmq import send_user_service_message
+from rabbit.rabbitmq import instance_rabbit_client
 from interface.Icon import *
 from interface.States import *
 from interface.Statement import *
@@ -30,22 +30,18 @@ def help_inline_keyboard() -> InlineKeyboardMarkup:
 
 
 def confirmation_inline_keyboard() -> InlineKeyboardMarkup:
-    confirmation_btn = InlineKeyboardButton('Уведомление о событии получено ' + Icon.CHECK.value,
-                                            callback_data='confirmation')
-
-
-def confirmation_inline_keyboard(event_id) -> InlineKeyboardMarkup:
-    confirmation_btn = InlineKeyboardButton('Уведомление о событии получено ' + Icon.CHECK.value,)
-    return InlineKeyboardMarkup(row_width=2).add(confirmation_btn)
+    confirmation_btn = InlineKeyboardButton(f'Уведомление о событии получено {Icon.CHECK.value}', callback_data='check')
+    return InlineKeyboardMarkup().add(confirmation_btn)
 
 
 def mark_inline_keyboard() -> InlineKeyboardMarkup:
-    one_star_btn = InlineKeyboardButton(Icon.STAR.value.name, callback_data="mark:1")
-    two_star_btn = InlineKeyboardButton(Icon.TWO_STAR.value.name, callback_data='mark:2')
-    three_star_btn = InlineKeyboardButton(Icon.THREE_STAR.value.name, callback_data='mark:3')
-    four_star_btn = InlineKeyboardButton(Icon.FOUR_STAR.value.name, callback_data='mark:4')
-    five_star_btn = InlineKeyboardButton(Icon.FIVE_STAR.value.name, callback_data='mark:5')
-    return InlineKeyboardMarkup(row_width=2).add(one_star_btn, two_star_btn, three_star_btn, four_star_btn, five_star_btn)
+    one_star_btn = InlineKeyboardButton(Icon.STAR.value, callback_data="mark:1")
+    two_star_btn = InlineKeyboardButton(Icon.TWO_STAR.value, callback_data='mark:2')
+    three_star_btn = InlineKeyboardButton(Icon.THREE_STAR.value, callback_data='mark:3')
+    four_star_btn = InlineKeyboardButton(Icon.FOUR_STAR.value, callback_data='mark:4')
+    five_star_btn = InlineKeyboardButton(Icon.FIVE_STAR.value, callback_data='mark:5')
+    return InlineKeyboardMarkup(row_width=2).add(one_star_btn, two_star_btn, three_star_btn, four_star_btn,
+                                                 five_star_btn)
 
 
 def comment_inline_keyboard() -> InlineKeyboardMarkup:
@@ -64,10 +60,10 @@ async def start_message(message: Message):
     await message.answer(f'Привет, я бот института информационных технологий. Я помогу тебе узнать свое расписание и '
                          f'буду сообщать тебе о главных мероприятиях института. Нажми "Подать заявку на добавление" и'
                          f' заполни форму.', reply_markup=start_inline_keyboard())
-    await send_user_service_message(f'{{"method": "ADD_USER", '
-                                    f'"body": {{'
-                                    f'"username": "{message.chat.username}", '
-                                    f'"chatId": {message.chat.id}}}}}')
+    await instance_rabbit_client.send_user_service_message(f'{{"method": "ADD_USER", '
+                                                           f'"body": {{'
+                                                           f'"username": "{message.chat.username}", '
+                                                           f'"id": {message.chat.id}}}}}')
     logger.info(f'user id: {message.from_user.id} /start')
 
 

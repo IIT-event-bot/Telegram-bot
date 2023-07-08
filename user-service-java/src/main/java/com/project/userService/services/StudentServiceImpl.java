@@ -71,7 +71,6 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
 
         var response = StudentServiceOuterClass.UserResponse.newBuilder()
                 .setId(user.getId())
-                .setChatId(user.getChatId())
                 .setUsername(user.getUsername())
                 .build();
 
@@ -97,6 +96,7 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
     }
 
     @Transactional
+    @Override
     public void getStudentsChatIdByGroupId(StudentServiceOuterClass.GroupRequest request,
                                            StreamObserver<StudentServiceOuterClass.UserResponse> responseObserver) {
         var groupId = request.getGroupId();
@@ -110,7 +110,6 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
             var user = users.get(i);
             var response = StudentServiceOuterClass.UserResponse.newBuilder()
                     .setId(user.getId())
-                    .setChatId(user.getChatId())
                     .setUsername(user.getUsername())
                     .build();
             responseObserver.onNext(response);

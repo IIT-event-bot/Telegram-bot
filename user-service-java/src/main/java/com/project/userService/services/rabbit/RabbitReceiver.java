@@ -46,7 +46,7 @@ public class RabbitReceiver {
     }
 
     private void saveStatementFromQueue(Map<String, Object> body) {
-        var user = userService.getUserByChatId(Long.parseLong(body.get("chatId").toString()));
+        var user = userService.getUserById(Long.parseLong(body.get("id").toString()));
 
         var statement = new Statement();
         statement.setGroupName((String) body.get("groupName"));
@@ -60,7 +60,7 @@ public class RabbitReceiver {
 
     private void saveUserFromQueue(Map<String, Object> body) {
         var user = new User();
-        user.setChatId(Long.parseLong(body.get("chatId").toString()));
+        user.setId(Long.parseLong(body.get("id").toString()));
         user.setUsername((String) body.get("username"));
 
         userService.saveUser(user);

@@ -25,7 +25,6 @@ public class UserServiceImpl extends com.project.userService.UserServiceGrpc.Use
 
         var response = UserServiceOuterClass.UserResponse.newBuilder()
                 .setId(user.getId())
-                .setChatId(user.getChatId())
                 .setUsername(user.getUsername())
                 .build();
 
@@ -53,17 +52,12 @@ public class UserServiceImpl extends com.project.userService.UserServiceGrpc.Use
 
     @Override
     public void saveUser(User user) {
-        var savedUser = getUserByChatId(user.getChatId());
+        var savedUser = getUserById(user.getId());
         if (savedUser != null) {
             return;
         }
         var userRole = roleRepository.getRoleDtoByName(Role.USER);
         user.setRole(userRole);
         repository.save(user);
-    }
-
-    @Override
-    public User getUserByChatId(long chatId) {
-        return repository.getUserByChatId(chatId);
     }
 }
