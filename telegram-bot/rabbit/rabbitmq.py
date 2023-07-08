@@ -4,6 +4,7 @@ import os
 
 import aioamqp
 from aioamqp.channel import Channel
+
 from interface import user_interface as ui
 from main import bot
 
@@ -17,8 +18,11 @@ class RabbitMQClient:
 
     channel: Channel
 
-    async def send_user_service_message(self, message):
+    async def send_message_to_user_service(self, message):
         await self.channel.publish(message, exchange_name='service.user', routing_key='user-routing-key')
+
+    async def send_message_to_event_service(self, message):
+        await self.channel.publish(message, exchange_name='service.event', routing_key='event-routing-key')
 
     async def __callback(self, channel: Channel, body: bytes, envelope, properties):
         json_body = str(body.decode('utf-8'))
@@ -27,7 +31,7 @@ class RabbitMQClient:
             if json_message['type'] == 'INFO':
                 await bot.send_message(chat_id=json_message['chat_id'],
                                        text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
-                                       reply_markup=ui.student_main_inline_keyboard())
+                                       reply_markup=ui.confirmation_inline_keyboard())
             if json_message['type'] == 'EVENT':
                 await bot.send_message(chat_id=json_message['chat_id'],
                                        text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
@@ -35,7 +39,7 @@ class RabbitMQClient:
             if json_message['type'] == 'FEEDBACK':
                 await bot.send_message(chat_id=json_message['chat_id'],
                                        text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
-                                       reply_markup=ui.mark_inline_keyboard())
+                                       reply_markup=ui.mark_inline_keyboard(json_message['event_id']))
         except Exception as e:
             logger.error(e)
         await self.channel.basic_client_ack(delivery_tag=envelope.delivery_tag)

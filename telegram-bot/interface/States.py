@@ -2,5 +2,6 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
 class States(StatesGroup):
-    statement = State()
+    add_statement = State()
     comment = State()
+    send_statement = State()

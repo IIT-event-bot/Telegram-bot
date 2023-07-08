@@ -73,7 +73,12 @@ public class FeedbackServiceImpl implements FeedbackService {
 
         var student = studentService.getStudentByUserId(userId);
         var checkEvent = new EventCheck(0L, student.id(), event);
-        checkedStudentRepository.save(checkEvent);
+
+        try {
+            checkedStudentRepository.save(checkEvent);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 
     private void addFeedback(Map<String, Object> feedbackJson) {
@@ -81,7 +86,11 @@ public class FeedbackServiceImpl implements FeedbackService {
         event.setId(Long.parseLong(feedbackJson.get("event_id").toString()));
         var feedback = new Feedback(0L, (String) feedbackJson.get("text"), event);
 
-        feedbackRepository.save(feedback);
+        try {
+            feedbackRepository.save(feedback);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 
     private void addGrade(Map<String, Object> gradeJson) {
@@ -89,6 +98,10 @@ public class FeedbackServiceImpl implements FeedbackService {
         event.setId(Long.parseLong(gradeJson.get("event_id").toString()));
         var grade = new EventGrade(0L, Long.parseLong(gradeJson.get("grade").toString()), event);
 
-        gradeRepository.save(grade);
+        try {
+            gradeRepository.save(grade);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 }

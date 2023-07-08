@@ -1,6 +1,10 @@
-class Statement:
+from dataclasses import dataclass
 
-    def __init__(self, tg_id, name, group):
-        self.tg_id = tg_id
+
+@dataclass
+class Statement:
+    def __init__(self, name, surname, patronymic, group_name):
         self.name = name
-        self.group = group
+        self.surname = surname
+        self.patronymic = patronymic
+        self.group = group_name

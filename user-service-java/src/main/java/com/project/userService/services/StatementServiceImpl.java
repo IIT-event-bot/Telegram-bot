@@ -69,16 +69,17 @@ public class StatementServiceImpl implements StatementService {
             throw new IllegalArgumentException("Statement already checked");
         }
         var group = groupService.getGroupByTitle(statement.getGroupName());
-        if (savedStatement.getName() == null) {
+        if (statement.getName() != null) {
             savedStatement.setName(statement.getName());
         }
-        if (savedStatement.getSurname() == null) {
+        if (statement.getSurname() != null) {
             savedStatement.setSurname(statement.getSurname());
         }
-        if (savedStatement.getPatronymic() == null) {
+        if (statement.getPatronymic() != null) {
             savedStatement.setPatronymic(statement.getPatronymic());
         }
         savedStatement.setGroupId(group.getId());
+        savedStatement.setChecked(true);
         repository.save(savedStatement);
 
         userService.updateUserRole(savedStatement.getUserId(), Role.STUDENT);
@@ -90,7 +91,7 @@ public class StatementServiceImpl implements StatementService {
         notificationService.sendNotification("Добавление в систему", Map.of("chatId", user.getId(),
                 "text", savedStatement.getSurname() + " " + savedStatement.getName() + " " + savedStatement.getPatronymic() + ", " +
                         "вы были добавлены в систему " +
-                        "группа " + group.getTitle()));
+                        "в группу " + group.getTitle()));
     }
 
     @Override
