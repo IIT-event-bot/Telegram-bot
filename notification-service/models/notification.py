@@ -17,5 +17,5 @@ class Notification:
                f'"chat_id": {self.chat_id}, ' \
                f'"text": "{self.text}", ' \
                f'"title": "{self.title}",' \
-               f'"event_id": {self.event_id} ' \
+               f'"event_id": {self.event_id}, ' \
                f'"send_time": {str(int(self.send_time.timestamp()))}}}'

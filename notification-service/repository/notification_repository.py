@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 
+import pytz
+
 from models.notification_db import NotificationDB
 from sqlalchemy import and_
 
@@ -15,7 +17,7 @@ def save_notification(notification: NotificationDB) -> None:
 
 
 def get_notification_on_hour() -> list[NotificationDB]:
-    now = datetime.now()
+    now = datetime.utcnow() + timedelta(hours=5)
     in_an_hour = now + timedelta(hours=1)
     notifications = session.query(NotificationDB).filter(
         and_(NotificationDB.send_time <= in_an_hour, NotificationDB.send_time >= now)).all()

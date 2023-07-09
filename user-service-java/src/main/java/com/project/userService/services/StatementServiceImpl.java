@@ -68,7 +68,14 @@ public class StatementServiceImpl implements StatementService {
         if (savedStatement.isChecked()) {
             throw new IllegalArgumentException("Statement already checked");
         }
-        var group = groupService.getGroupByTitle(statement.getGroupName());
+        Group group;
+        if (statement.getGroupName() != null) {
+            group = groupService.getGroupByTitle(statement.getGroupName());
+            savedStatement.setGroupId(group.getId());
+        }else {
+            var savedGroup = savedStatement.getGroupId();
+            group = groupService.getGroupById(savedGroup);
+        }
         if (statement.getName() != null) {
             savedStatement.setName(statement.getName());
         }
@@ -78,7 +85,6 @@ public class StatementServiceImpl implements StatementService {
         if (statement.getPatronymic() != null) {
             savedStatement.setPatronymic(statement.getPatronymic());
         }
-        savedStatement.setGroupId(group.getId());
         savedStatement.setChecked(true);
         repository.save(savedStatement);
 

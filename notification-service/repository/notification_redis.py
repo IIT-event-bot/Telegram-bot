@@ -1,8 +1,9 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import redis
+
 from models.notification import Notification
 
 repository = redis.Redis(host=os.environ.get('REDIS_HOST'), port=6379, db=0)
@@ -26,7 +27,7 @@ def push_event_to_queue(notifications: list[Notification]) -> None:
 
     json_list.sort(key=lambda x: x['send_time'], reverse=False)
 
-    now = datetime.now()
+    now = datetime.utcnow() + timedelta(hours=5)
     for notification in json_list:
         send_time = datetime.fromtimestamp(notification['send_time'])
         if send_time.hour < now.hour or (send_time.hour == now.hour and send_time.minute < now.minute):
@@ -42,7 +43,7 @@ def clear_saved_notification():
 
 
 def get_with_now_send_time_notifications() -> list[Notification]:
-    now = datetime.now()
+    now = datetime.utcnow() + timedelta(hours=5)
     notifications = []
     while True:
         json_notification = repository.rpop(QUEUE_NAME)

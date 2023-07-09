@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,14 +89,18 @@ public class EventServiceImpl implements EventService {
             notificationService.sendEvent(event);
             return;
         }
-        if (event.getType() == EventType.EVENT && event.getEventTime().isBefore(LocalDateTime.now().plusDays(1))) {
+        if (event.getType() == EventType.EVENT
+                && event.getEventTime()
+                .isBefore(ZonedDateTime.now(ZoneId.of("Asia/Yekaterinburg"))
+                        .toLocalDateTime()
+                        .plusDays(1))) {
             notificationService.sendEvent(event);
             return;
         }
         if (!event.isRepeat()) {
             return;
         }
-        var todayTime = LocalDateTime.now().plusDays(1);
+        var todayTime = ZonedDateTime.now(ZoneId.of("Asia/Yekaterinburg")).toLocalDateTime().plusDays(1);
         for (var repeat : event.getRepeatTime()) {
             if (!repeat.isBefore(todayTime)) {
                 continue;
@@ -140,17 +146,17 @@ public class EventServiceImpl implements EventService {
 
     private void validateEvent(Event event) {
         if (event.getType().equals(EventType.INFO)) {
-            event.setEventTime(LocalDateTime.now());
+            event.setEventTime(ZonedDateTime.now(ZoneId.of("Asia/Yekaterinburg")).toLocalDateTime());
         } else if (event.getEventTime() == null) {
             throw new IllegalArgumentException("Event with type not 'INFO' must be with eventTime");
-        } else if (event.getEventTime().isBefore(LocalDateTime.now())) {
+        } else if (event.getEventTime().isBefore(ZonedDateTime.now(ZoneId.of("Asia/Yekaterinburg")).toLocalDateTime())) {
             throw new IllegalArgumentException("Event time is earlier than now");
         }
         if (event.isRepeat() && event.getRepeatTime().size() == 0) {
             throw new IllegalArgumentException("Event has set flag 'isGroupEvent' and doesn't have repeat time");
         }
         if (event.isRepeat()) {
-            var now = LocalDateTime.now();
+            var now = ZonedDateTime.now(ZoneId.of("Asia/Yekaterinburg")).toLocalDateTime();
             for (var repeatTime : event.getRepeatTime()) {
                 if (repeatTime.isBefore(now)) {
                     throw new IllegalArgumentException("Event repeat time is earlier than now");

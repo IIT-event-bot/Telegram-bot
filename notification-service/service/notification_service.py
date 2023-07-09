@@ -3,6 +3,8 @@ import json
 import logging
 from datetime import datetime, timedelta
 
+import pytz
+
 from models.notification import Notification
 from models.notification_db import NotificationDB
 from repository import notification_redis as redis_repository
@@ -56,9 +58,10 @@ class Service:
                                            f'"text": "{notification.text}", '
                                            f'"title": "{notification.title}" }}')
         elif notification.type == 'EVENT' or notification.type == 'FEEDBACK':
-            now = datetime.now()
+            now = datetime.utcnow() + timedelta(hours=5)
             in_an_hour = now + timedelta(hours=1)
-            if notification.send_time <= in_an_hour:
+            send_time = notification.send_time
+            if send_time <= in_an_hour:
                 notification.id = 0
                 redis_repository.push_event_to_queue([notification])
         else:

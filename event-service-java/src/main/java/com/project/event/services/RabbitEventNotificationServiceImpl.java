@@ -61,6 +61,7 @@ public class RabbitEventNotificationServiceImpl implements EventNotificationServ
         try {
             var message = mapper.writeValueAsString(values);
             rabbitTemplate.convertAndSend("service.notification", "notification-routing-key", message);
+            log.info("Event send to queue");
         } catch (Exception e) {
             log.error(e.getMessage());
         }
