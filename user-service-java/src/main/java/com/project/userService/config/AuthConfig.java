@@ -1,6 +1,5 @@
 package com.project.userService.config;
 
-import com.project.userService.models.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

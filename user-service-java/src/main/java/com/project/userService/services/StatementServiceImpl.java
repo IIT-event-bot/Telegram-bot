@@ -98,6 +98,9 @@ public class StatementServiceImpl implements StatementService {
     @Transactional
     public void dismissStatement(long statementId) {
         var statement = repository.getStatementById(statementId);
+        if (statement.isChecked()) {
+            throw new IllegalArgumentException("Statement already checked");
+        }
         statement.setChecked(true);
         repository.save(statement);
 

@@ -28,8 +28,9 @@ public class Session {
     @Column(name = "session_time")
     private LocalDateTime sessionTime;
 
-    @Column(name = "user_id", nullable = false)
-    private long userId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "is_expired")
     private boolean isExpired;

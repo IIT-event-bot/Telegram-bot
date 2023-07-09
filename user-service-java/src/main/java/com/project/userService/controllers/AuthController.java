@@ -10,13 +10,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
 
 @RestController
-//@CrossOrigin
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
@@ -39,11 +41,10 @@ public class AuthController {
                 token,
                 List.of(new SimpleGrantedAuthority(user.getRole().getName().name()))
         );
-//        Authentication auth = manager.authenticate(authUser);
         SecurityContextHolder.getContext().setAuthentication(authUser);
 
         response.addCookie(new Cookie("session-token", token));
-//        response.sendRedirect("http://127.0.0.1/");
+        response.sendRedirect("http://127.0.0.1/");
         return ResponseEntity.ok().build();
     }
 }

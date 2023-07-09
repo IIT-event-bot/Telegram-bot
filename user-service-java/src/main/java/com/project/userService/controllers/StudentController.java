@@ -1,6 +1,5 @@
 package com.project.userService.controllers;
 
-import com.project.userService.models.Group;
 import com.project.userService.models.Student;
 import com.project.userService.models.User;
 import com.project.userService.services.StudentService;
@@ -13,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -43,8 +43,10 @@ public class StudentController {
                     }
             )
     })
+    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @GetMapping
-    public ResponseEntity<?> getAllStudents(@RequestParam(value = "group", required = false) String groupName) {
+    public ResponseEntity<?> getAllStudents(@CookieValue("session-token") String token,
+                                            @RequestParam(value = "group", required = false) String groupName) {
         return ResponseEntity.ok(service.getStudentsByGroup(groupName));
     }
 
@@ -62,8 +64,10 @@ public class StudentController {
                     }
             )
     })
+    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @GetMapping("/{studentId}")
-    public ResponseEntity<?> getStudentById(@PathVariable("studentId") long studentId) {
+    public ResponseEntity<?> getStudentById(@CookieValue("session-token") String token,
+                                            @PathVariable("studentId") long studentId) {
         return ResponseEntity.ok(service.getStudentById(studentId));
     }
 
@@ -80,8 +84,10 @@ public class StudentController {
                     responseCode = "200"
             )
     })
+    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @PutMapping("/{studentId}")
-    public ResponseEntity<?> updateStudent(@PathVariable("studentId") long studentId,
+    public ResponseEntity<?> updateStudent(@CookieValue("session-token") String token,
+                                           @PathVariable("studentId") long studentId,
                                            @RequestBody Student student) {
         student.setId(studentId);
         service.updateStudent(student);
@@ -94,8 +100,10 @@ public class StudentController {
                     responseCode = "200"
             )
     })
+    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @DeleteMapping("/{studentId}")
-    public ResponseEntity<?> deleteStudentById(@PathVariable("studentId") long studentId) {
+    public ResponseEntity<?> deleteStudentById(@CookieValue("session-token") String token,
+                                               @PathVariable("studentId") long studentId) {
         service.deleteStudentById(studentId);
         return ResponseEntity.ok().build();
     }

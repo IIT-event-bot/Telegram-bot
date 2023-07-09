@@ -25,14 +25,13 @@ public class SessionServiceImpl implements SessionService {
         var now = LocalDateTime.now();
         var expiredTime = now.plusHours(1);
         expireUserSession(userId);
-        var session = new Session(0L, token, expiredTime, now, user.getId(), false);
+        var session = new Session(0L, token, expiredTime, now, user, false);
         return repository.save(session).getToken();
     }
 
     @Override
     public User getUserByToken(String token) {
-        var session = repository.getNotExpiredSessionByToken(token);
-        return userService.getUserById(session.getUserId());
+        return repository.getNotExpiredSessionByToken(token).getUser();
     }
 
     @Override
@@ -43,7 +42,7 @@ public class SessionServiceImpl implements SessionService {
         }
         var now = LocalDateTime.now();
         if (session.getExpiredTime().isBefore(now)) {
-            expireUserSession(session.getUserId());
+            expireUserSession(session.getUser().getId());
             return false;
         }
         return true;
