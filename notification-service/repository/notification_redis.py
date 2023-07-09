@@ -56,6 +56,7 @@ def get_with_now_send_time_notifications() -> list[Notification]:
             notification.id = notification_json['id']
             notification.send_time = notification_json['send_time']
             notification.type = notification_json['type']
+            notification.event_id = notification_json.get('event_id')
             notification.chat_id = notification_json['chat_id']
             notification.text = str(notification_json['text'])
             notification.title = str(notification_json['title'])

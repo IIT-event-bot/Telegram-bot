@@ -25,7 +25,8 @@ class Service:
             asyncio.run(self.rabbit.send_message(f'{{ "chat_id": {notification.chat_id},'
                                                  f'"type": "{notification.type}", '
                                                  f'"text": "{notification.text}", '
-                                                 f'"title": "{notification.title}" }}'))
+                                                 f'"title": "{notification.title}",'
+                                                 f'"event_id": {notification.event_id} }}'))
 
     def check_event_on_next_hour(self):
         logger.info('Check events on next hour')
