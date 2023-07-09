@@ -86,8 +86,8 @@ services:
 #    ports:
 #      - "80:80"
 #    depends_on:
-#      - event_bot_event_service
-#      - event_bot_user_service
+#      - eventservice
+#      - userservice
 #    links:
-#      - event_bot_event_service
-#      - event_bot_user_service
+#      - eventservice
+#      - userservice

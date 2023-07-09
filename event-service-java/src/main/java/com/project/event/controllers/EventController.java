@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/event")
+@CrossOrigin
 @Tag(name = "Event service")
 public class EventController {
     private final EventService service;
