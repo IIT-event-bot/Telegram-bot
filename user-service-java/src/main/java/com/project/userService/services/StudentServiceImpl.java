@@ -6,6 +6,7 @@ import com.project.userService.models.Role;
 import com.project.userService.models.Student;
 import com.project.userService.models.User;
 import com.project.userService.repository.StudentRepository;
+import com.project.userService.services.notification.TelegramNotificationService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
     private final StudentRepository repository;
     private final GroupService groupService;
     private final UserService userService;
-    private final NotificationService notificationService;
+    private final TelegramNotificationService notificationService;
 
     @Override
     public Student getStudentById(long id) {
@@ -56,9 +56,10 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
         var student = repository.getStudentById(studentId);
         userService.updateUserRole(student.getUserId(), Role.USER);
         repository.deleteStudentById(studentId);
-        notificationService.sendNotification("Удаление из системы", Map.of("chat_id", student.getUserId(),
-                "text", student.getSurname() + " " + student.getName() + " " + student.getPatronymic() + ", " +
-                        "вы были удалены из системы информирования"));
+        notificationService.sendNotification(student.getUserId(),
+                "Удаление из системы",
+                student.getSurname() + " " + student.getName() + " " + student.getPatronymic() + ", " +
+                        "вы были удалены из системы информирования");
     }
 
     @Override

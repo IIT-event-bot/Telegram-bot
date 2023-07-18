@@ -5,13 +5,13 @@ import com.project.userService.models.Role;
 import com.project.userService.models.Statement;
 import com.project.userService.models.Student;
 import com.project.userService.repository.StatementRepository;
+import com.project.userService.services.notification.TelegramNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +21,7 @@ public class StatementServiceImpl implements StatementService {
     private final UserService userService;
     private final StudentService studentService;
     private final GroupService groupService;
-    private final NotificationService notificationService;
+    private final TelegramNotificationService notificationService;
 
     @Override
     public Statement getStatementById(long id) {
@@ -72,7 +72,7 @@ public class StatementServiceImpl implements StatementService {
         if (statement.getGroupName() != null) {
             group = groupService.getGroupByTitle(statement.getGroupName());
             savedStatement.setGroupId(group.getId());
-        }else {
+        } else {
             var savedGroup = savedStatement.getGroupId();
             group = groupService.getGroupById(savedGroup);
         }
@@ -94,10 +94,11 @@ public class StatementServiceImpl implements StatementService {
         var student = createStudentByStatement(savedStatement);
         studentService.saveStudent(student);
 
-        notificationService.sendNotification("Добавление в систему", Map.of("chat_id", user.getId(),
-                "text", savedStatement.getSurname() + " " + savedStatement.getName() + " " + savedStatement.getPatronymic() + ", " +
-                        "вы были добавлены в систему информирования " +
-                        "в группу " + group.getTitle()));
+        notificationService.sendNotification(user.getId(),
+                "Добавление в систему",
+                savedStatement.getSurname() + " " + savedStatement.getName() + " " + savedStatement.getPatronymic() + ", " +
+                        "вы были добавлены в систему информирования, " +
+                        "в группу " + group.getTitle());
     }
 
     @Override
@@ -112,8 +113,9 @@ public class StatementServiceImpl implements StatementService {
 
         var user = userService.getUserById(statement.getUserId());
 
-        notificationService.sendNotification("Отклонение заявки", Map.of("chat_id", user.getId(),
-                "text", "Ваша заявка была отклонена"));
+        notificationService.sendNotification(user.getId(),
+                "Отклонение заявки",
+                "Ваша заявка была отклонена");
     }
 
     @Override
