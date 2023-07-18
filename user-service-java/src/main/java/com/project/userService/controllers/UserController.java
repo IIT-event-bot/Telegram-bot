@@ -42,9 +42,9 @@ public class UserController {
                     }
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @GetMapping
-    public ResponseEntity<?> getAllUsers(@CookieValue("session-token") String token) {
+    public ResponseEntity<?> getAllUsers(/*@CookieValue("session-token") String token*/) {
         return ResponseEntity.ok(service.getAllUsers());
     }
 
@@ -62,9 +62,9 @@ public class UserController {
                     }
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserById(@CookieValue("session-token") String token,
+    public ResponseEntity<?> getUserById(//@CookieValue("session-token") String token,
                                          @PathVariable("userId") long id) {
         return ResponseEntity.ok(service.getUserById(id));
     }

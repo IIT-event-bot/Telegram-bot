@@ -42,9 +42,9 @@ public class StatementController {
                     }
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @GetMapping
-    public ResponseEntity<?> getAllStatements(@CookieValue("session-token") String token,
+    public ResponseEntity<?> getAllStatements(//@CookieValue("session-token") String token,
                                               @RequestParam(value = "filter", required = false) String filter) {
         return ResponseEntity.ok(service.getStatementByFilter(filter));
     }
@@ -63,9 +63,9 @@ public class StatementController {
                     }
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @GetMapping("{statementId}")
-    public ResponseEntity<?> getStatementById(@CookieValue("session-token") String token,
+    public ResponseEntity<?> getStatementById(//@CookieValue("session-token") String token,
                                               @PathVariable("statementId") long statementId) {
         return ResponseEntity.ok(service.getStatementById(statementId));
     }
@@ -83,9 +83,9 @@ public class StatementController {
                     responseCode = "200"
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @PostMapping("/{statementId}/accept")
-    public ResponseEntity<?> acceptStatement(@CookieValue("session-token") String token,
+    public ResponseEntity<?> acceptStatement(//@CookieValue("session-token") String token,
                                              @PathVariable("statementId") long statementId,
                                              @RequestBody Statement statement) {
         statement.setId(statementId);
@@ -99,9 +99,9 @@ public class StatementController {
                     responseCode = "200"
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @PostMapping("/{statementId}/dismiss")
-    public ResponseEntity<?> dismissStatement(@CookieValue("session-token") String token,
+    public ResponseEntity<?> dismissStatement(//@CookieValue("session-token") String token,
                                               @PathVariable("statementId") long statementId) {
         service.dismissStatement(statementId);
         return ResponseEntity.ok().build();

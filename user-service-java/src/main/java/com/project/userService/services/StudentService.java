@@ -1,17 +1,18 @@
 package com.project.userService.services;
 
 import com.project.userService.models.Student;
+import com.project.userService.models.StudentDto;
 
 import java.util.List;
 
 public interface StudentService {
-    Student getStudentById(long id);
+    StudentDto getStudentById(long id);
 
     void saveStudent(Student student);
 
-    List<Student> getAllStudents();
+    List<StudentDto> getAllStudents();
 
-    List<Student> getStudentsByGroup(String groupName);
+    List<StudentDto> getStudentsByGroup(String groupName);
 
     void deleteStudentById(long studentId);
 

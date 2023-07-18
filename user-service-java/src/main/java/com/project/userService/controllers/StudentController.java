@@ -1,6 +1,7 @@
 package com.project.userService.controllers;
 
 import com.project.userService.models.Student;
+import com.project.userService.models.StudentDto;
 import com.project.userService.models.User;
 import com.project.userService.services.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,16 +37,16 @@ public class StudentController {
                                     mediaType = "application/json",
                                     array = @ArraySchema(
                                             schema = @Schema(
-                                                    implementation = Student.class
+                                                    implementation = StudentDto.class
                                             )
                                     )
                             )
                     }
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @GetMapping
-    public ResponseEntity<?> getAllStudents(@CookieValue("session-token") String token,
+    public ResponseEntity<?> getAllStudents(//@CookieValue("session-token") String token,
                                             @RequestParam(value = "group", required = false) String groupName) {
         return ResponseEntity.ok(service.getStudentsByGroup(groupName));
     }
@@ -58,15 +59,15 @@ public class StudentController {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(
-                                            implementation = User.class
+                                            implementation = StudentDto.class
                                     )
                             )
                     }
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @GetMapping("/{studentId}")
-    public ResponseEntity<?> getStudentById(@CookieValue("session-token") String token,
+    public ResponseEntity<?> getStudentById(//@CookieValue("session-token") String token,
                                             @PathVariable("studentId") long studentId) {
         return ResponseEntity.ok(service.getStudentById(studentId));
     }
@@ -75,7 +76,7 @@ public class StudentController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
                             schema = @Schema(
-                                    implementation = Student.class
+                                    implementation = StudentDto.class
                             )
                     )
             ))
@@ -84,9 +85,9 @@ public class StudentController {
                     responseCode = "200"
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @PutMapping("/{studentId}")
-    public ResponseEntity<?> updateStudent(@CookieValue("session-token") String token,
+    public ResponseEntity<?> updateStudent(//@CookieValue("session-token") String token,
                                            @PathVariable("studentId") long studentId,
                                            @RequestBody Student student) {
         student.setId(studentId);
@@ -100,9 +101,9 @@ public class StudentController {
                     responseCode = "200"
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @DeleteMapping("/{studentId}")
-    public ResponseEntity<?> deleteStudentById(@CookieValue("session-token") String token,
+    public ResponseEntity<?> deleteStudentById(//@CookieValue("session-token") String token,
                                                @PathVariable("studentId") long studentId) {
         service.deleteStudentById(studentId);
         return ResponseEntity.ok().build();

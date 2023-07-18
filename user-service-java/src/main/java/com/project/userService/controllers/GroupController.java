@@ -43,9 +43,9 @@ public class GroupController {
                     }
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @GetMapping
-    public ResponseEntity<?> getAllGroups(@CookieValue("session-token") String token,
+    public ResponseEntity<?> getAllGroups(//@CookieValue("session-token") String token,
                                           @RequestParam(value = "title", required = false) String title) {
         return ResponseEntity.ok(service.getGroupsLikeTitle(title));
     }
@@ -64,9 +64,9 @@ public class GroupController {
                     }
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @GetMapping("/{groupId}")
-    public ResponseEntity<?> getGroupById(@CookieValue("session-token") String token,
+    public ResponseEntity<?> getGroupById(//@CookieValue("session-token") String token,
                                           @PathVariable("groupId") long groupId) {
         return ResponseEntity.ok(service.getGroupById(groupId));
     }
@@ -84,9 +84,9 @@ public class GroupController {
                     responseCode = "201"
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @PostMapping
-    public ResponseEntity<?> createGroup(@CookieValue("session-token") String token,
+    public ResponseEntity<?> createGroup(//@CookieValue("session-token") String token,
                                          @RequestBody Group group) {
         service.createGroup(group);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -105,9 +105,9 @@ public class GroupController {
                     responseCode = "200"
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @PutMapping("/{groupId}")
-    public ResponseEntity<?> updateGroup(@CookieValue("session-token") String token,
+    public ResponseEntity<?> updateGroup(//@CookieValue("session-token") String token,
                                          @PathVariable("groupId") long groupId,
                                          @RequestBody Group group) {
         group.setId(groupId);
@@ -121,9 +121,9 @@ public class GroupController {
                     responseCode = "200"
             )
     })
-    @PreAuthorize("hasPermission(#token, 'MANAGER')")
+//    @PreAuthorize("hasPermission(#token, 'MANAGER')")
     @DeleteMapping("/{groupId}")
-    public ResponseEntity<?> deleteGroupById(@CookieValue("session-token") String token,
+    public ResponseEntity<?> deleteGroupById(//@CookieValue("session-token") String token,
                                              @PathVariable("groupId") long groupId) {
         service.deleteGroupById(groupId);
         return ResponseEntity.ok().build();

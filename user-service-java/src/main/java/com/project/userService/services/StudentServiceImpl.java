@@ -1,10 +1,7 @@
 package com.project.userService.services;
 
 import com.project.studentService.StudentServiceOuterClass;
-import com.project.userService.models.Group;
-import com.project.userService.models.Role;
-import com.project.userService.models.Student;
-import com.project.userService.models.User;
+import com.project.userService.models.*;
 import com.project.userService.repository.StudentRepository;
 import com.project.userService.services.notification.TelegramNotificationService;
 import io.grpc.stub.StreamObserver;
@@ -23,10 +20,12 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
     private final GroupService groupService;
     private final UserService userService;
     private final TelegramNotificationService notificationService;
+    private final StudentDtoMapper studentMapper;
 
     @Override
-    public Student getStudentById(long id) {
-        return repository.getStudentById(id);
+    public StudentDto getStudentById(long id) {
+        var student = repository.getStudentById(id);
+        return studentMapper.mapStudent(student);
     }
 
     @Override
@@ -36,18 +35,24 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
     }
 
     @Override
-    public List<Student> getAllStudents() {
-        return repository.findAll();
+    public List<StudentDto> getAllStudents() {
+        return repository.findAll()
+                .stream()
+                .map(studentMapper::mapStudent)
+                .toList();
     }
 
     @Override
-    public List<Student> getStudentsByGroup(String groupName) {
+    public List<StudentDto> getStudentsByGroup(String groupName) {
         if (groupName == null) {
             return getAllStudents();
         }
         var group = groupService.getGroupsLikeTitle(groupName);
         List<Long> groupsId = group.stream().map(Group::getId).toList();
-        return repository.getStudentsByGroupId(groupsId);
+        return repository.getStudentsByGroupId(groupsId)
+                .stream()
+                .map(studentMapper::mapStudent)
+                .toList();
     }
 
     @Override
@@ -72,7 +77,7 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
     public void getUserByStudentId(StudentServiceOuterClass.StudentRequest request,
                                    StreamObserver<StudentServiceOuterClass.UserResponse> responseObserver) {
         var studentId = request.getStudentId();
-        var student = getStudentById(studentId);
+        var student = repository.getStudentById(studentId);
         var user = userService.getUserById(student.getUserId());
 
         var response = StudentServiceOuterClass.UserResponse.newBuilder()
@@ -85,10 +90,11 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
     }
 
     @Override
+    @Transactional
     public void getStudentById(StudentServiceOuterClass.StudentRequest request,
                                StreamObserver<StudentServiceOuterClass.StudentResponse> responseObserver) {
         var studentId = request.getStudentId();
-        var student = getStudentById(studentId);
+        var student = repository.getStudentById(studentId);
 
         var response = StudentServiceOuterClass.StudentResponse.newBuilder()
                 .setId(student.getId())
@@ -124,6 +130,7 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
     }
 
     @Override
+    @Transactional
     public void getStudentByUserId(StudentServiceOuterClass.UserRequest request,
                                    StreamObserver<StudentServiceOuterClass.StudentResponse> responseObserver) {
         var userId = request.getId();
