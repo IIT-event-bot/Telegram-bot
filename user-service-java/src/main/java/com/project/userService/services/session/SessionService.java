@@ -1,4 +1,4 @@
-package com.project.userService.services;
+package com.project.userService.services.session;
 
 import com.project.userService.models.User;
 

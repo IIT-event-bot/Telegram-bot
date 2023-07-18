@@ -1,8 +1,9 @@
-package com.project.userService.services;
+package com.project.userService.services.session;
 
 import com.project.userService.models.Session;
 import com.project.userService.models.User;
 import com.project.userService.repository.SessionRepository;
+import com.project.userService.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

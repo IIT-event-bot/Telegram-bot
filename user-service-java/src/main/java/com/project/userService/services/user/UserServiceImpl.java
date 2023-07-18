@@ -1,4 +1,4 @@
-package com.project.userService.services;
+package com.project.userService.services.user;
 
 import com.project.userService.UserServiceOuterClass;
 import com.project.userService.models.Role;

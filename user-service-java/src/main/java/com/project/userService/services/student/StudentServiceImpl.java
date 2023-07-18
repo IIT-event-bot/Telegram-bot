@@ -1,8 +1,10 @@
-package com.project.userService.services;
+package com.project.userService.services.student;
 
 import com.project.studentService.StudentServiceOuterClass;
 import com.project.userService.models.*;
 import com.project.userService.repository.StudentRepository;
+import com.project.userService.services.group.GroupService;
+import com.project.userService.services.user.UserService;
 import com.project.userService.services.notification.TelegramNotificationService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,7 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
     @Override
     public StudentDto getStudentById(long id) {
         var student = repository.getStudentById(id);
-        return studentMapper.mapStudent(student);
+        return studentMapper.convert(student);
     }
 
     @Override
@@ -38,7 +40,7 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
     public List<StudentDto> getAllStudents() {
         return repository.findAll()
                 .stream()
-                .map(studentMapper::mapStudent)
+                .map(studentMapper::convert)
                 .toList();
     }
 
@@ -51,7 +53,7 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
         List<Long> groupsId = group.stream().map(Group::getId).toList();
         return repository.getStudentsByGroupId(groupsId)
                 .stream()
-                .map(studentMapper::mapStudent)
+                .map(studentMapper::convert)
                 .toList();
     }
 

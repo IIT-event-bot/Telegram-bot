@@ -1,8 +1,9 @@
-package com.project.userService.services;
+package com.project.userService.services.student;
 
 import com.project.userService.models.Student;
 import com.project.userService.models.StudentDto;
 
+@FunctionalInterface
 public interface StudentDtoMapper {
-    StudentDto mapStudent(Student student);
+    StudentDto convert(Student student);
 }

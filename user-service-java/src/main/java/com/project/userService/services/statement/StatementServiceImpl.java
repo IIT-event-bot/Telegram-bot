@@ -1,10 +1,10 @@
-package com.project.userService.services;
+package com.project.userService.services.statement;
 
-import com.project.userService.models.Group;
-import com.project.userService.models.Role;
-import com.project.userService.models.Statement;
-import com.project.userService.models.Student;
+import com.project.userService.models.*;
 import com.project.userService.repository.StatementRepository;
+import com.project.userService.services.group.GroupService;
+import com.project.userService.services.student.StudentService;
+import com.project.userService.services.user.UserService;
 import com.project.userService.services.notification.TelegramNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,24 +22,25 @@ public class StatementServiceImpl implements StatementService {
     private final StudentService studentService;
     private final GroupService groupService;
     private final TelegramNotificationService notificationService;
+    private final StatementDtoMapper statementMapper;
 
     @Override
-    public Statement getStatementById(long id) {
+    public StatementDto getStatementById(long id) {
         var statement = repository.getStatementById(id);
-        var group = groupService.getGroupById(statement.getGroupId());
-        statement.setGroupName(group.getTitle());
-        return statement;
+        return statementMapper.convert(statement);
     }
 
     @Override
-    public List<Statement> getAllStatements() {
+    public List<StatementDto> getAllStatements() {
         List<Statement> statements = repository.findAll();
-        injectStatementGroupName(statements);
-        return statements;
+        return statements
+                .stream()
+                .map(statementMapper::convert)
+                .toList();
     }
 
     @Override
-    public List<Statement> getStatementByFilter(String filter) {
+    public List<StatementDto> getStatementByFilter(String filter) {
         if (filter == null) {
             return this.getAllStatements();
         }
@@ -48,17 +49,10 @@ public class StatementServiceImpl implements StatementService {
         }
         boolean isChecked = filter.equals("checked");
         var statements = repository.getStatementByChecked(isChecked);
-        injectStatementGroupName(statements);
-        return statements;
-    }
-
-    private void injectStatementGroupName(List<Statement> statements) {
-        List<Long> groupsIds = statements.stream().map(Statement::getGroupId).toList();
-        List<Group> groups = groupService.getGroupsByIds(groupsIds);
-        for (var statement : statements) {
-            var group = groups.stream().filter(x -> x.getId() == statement.getGroupId()).findFirst().get();
-            statement.setGroupName(group.getTitle());
-        }
+        return statements
+                .stream()
+                .map(statementMapper::convert)
+                .toList();
     }
 
     @Override
@@ -76,15 +70,7 @@ public class StatementServiceImpl implements StatementService {
             var savedGroup = savedStatement.getGroupId();
             group = groupService.getGroupById(savedGroup);
         }
-        if (statement.getName() != null) {
-            savedStatement.setName(statement.getName());
-        }
-        if (statement.getSurname() != null) {
-            savedStatement.setSurname(statement.getSurname());
-        }
-        if (statement.getPatronymic() != null) {
-            savedStatement.setPatronymic(statement.getPatronymic());
-        }
+        updateSavedStatement(savedStatement, statement);
         savedStatement.setChecked(true);
         repository.save(savedStatement);
 
@@ -99,6 +85,18 @@ public class StatementServiceImpl implements StatementService {
                 savedStatement.getSurname() + " " + savedStatement.getName() + " " + savedStatement.getPatronymic() + ", " +
                         "вы были добавлены в систему информирования, " +
                         "в группу " + group.getTitle());
+    }
+
+    private void updateSavedStatement(Statement savedStatement, Statement newStatement) {
+        if (newStatement.getName() != null) {
+            savedStatement.setName(newStatement.getName());
+        }
+        if (newStatement.getSurname() != null) {
+            savedStatement.setSurname(newStatement.getSurname());
+        }
+        if (newStatement.getPatronymic() != null) {
+            savedStatement.setPatronymic(newStatement.getPatronymic());
+        }
     }
 
     @Override
@@ -124,8 +122,6 @@ public class StatementServiceImpl implements StatementService {
         if (savedStatement != null && !statement.isChecked()) {
             throw new IllegalArgumentException("Statement is already exist");
         }
-        var group = groupService.getGroupByTitle(statement.getGroupName());
-        statement.setGroupId(group.getId());
         repository.save(statement);
     }
 

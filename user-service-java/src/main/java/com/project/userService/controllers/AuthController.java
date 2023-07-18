@@ -1,6 +1,6 @@
 package com.project.userService.controllers;
 
-import com.project.userService.services.SessionService;
+import com.project.userService.services.session.SessionService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

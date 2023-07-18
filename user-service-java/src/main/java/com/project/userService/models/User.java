@@ -14,11 +14,7 @@ import lombok.Setter;
 @Entity
 public class User {
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
-//    @Column(name = "chat_id")
-//    private long chatId;
 
     @Column(name = "username")
     private String username;

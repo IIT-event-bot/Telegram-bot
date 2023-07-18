@@ -1,6 +1,6 @@
 package com.project.userService.utils;
 
-import com.project.userService.services.SessionService;
+import com.project.userService.services.session.SessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;

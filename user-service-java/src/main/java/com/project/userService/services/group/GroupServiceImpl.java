@@ -1,4 +1,4 @@
-package com.project.userService.services;
+package com.project.userService.services.group;
 
 import com.project.groupService.GroupServiceOuterClass;
 import com.project.userService.models.Group;

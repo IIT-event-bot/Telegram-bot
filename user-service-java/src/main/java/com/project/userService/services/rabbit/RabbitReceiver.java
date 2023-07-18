@@ -5,9 +5,9 @@ import com.project.userService.config.RabbitConfig;
 import com.project.userService.models.RabbitMessage;
 import com.project.userService.models.Statement;
 import com.project.userService.models.User;
-import com.project.userService.services.GroupService;
-import com.project.userService.services.StatementService;
-import com.project.userService.services.UserService;
+import com.project.userService.services.group.GroupService;
+import com.project.userService.services.statement.StatementService;
+import com.project.userService.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -24,6 +24,7 @@ import java.util.Map;
 public class RabbitReceiver {
     private final UserService userService;
     private final StatementService statementService;
+    private final GroupService groupService;
 
     @RabbitListener(queues = RabbitConfig.USER_SERVICE_QUEUE)
     public void userServiceQueue(Message message) {
@@ -46,9 +47,10 @@ public class RabbitReceiver {
 
     private void saveStatementFromQueue(Map<String, Object> body) {
         var user = userService.getUserById(Long.parseLong(body.get("id").toString()));
+        var group = groupService.getGroupByTitle((String) body.get("groupName"));
 
         var statement = new Statement();
-        statement.setGroupName((String) body.get("groupName"));
+        statement.setGroupId(group.getId());
         statement.setUserId(user.getId());
         statement.setName((String) body.get("name"));
         statement.setSurname((String) body.get("surname"));
