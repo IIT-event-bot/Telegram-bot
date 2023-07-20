@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EventServiceImpl implements EventService {
     private final EventRepository repository;
-    private final EventNotificationService notificationService;
+    private final TelegramEventNotificationService notificationService;
     private final CheckedStudentRepository checkedStudentRepository;
     private final StudentService studentService;
 

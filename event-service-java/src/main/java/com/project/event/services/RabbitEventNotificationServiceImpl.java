@@ -1,6 +1,5 @@
 package com.project.event.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.event.models.Event;
 import com.project.event.models.EventType;
@@ -9,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +16,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class RabbitEventNotificationServiceImpl implements EventNotificationService {
+public class RabbitEventNotificationServiceImpl implements TelegramEventNotificationService {
     private final RabbitTemplate rabbitTemplate;
     private final StudentService studentService;
 
@@ -33,35 +33,40 @@ public class RabbitEventNotificationServiceImpl implements EventNotificationServ
                 chatIds.add(studentService.getStudentChatIdById(studentId));
             }
         }
-        for (var student : chatIds) {
-            sendNotification(event.getTitle(),
-                    Map.of("chat_id", student,
-                            "text", event.getText(),
-                            "send_time", event.getEventTime().toString(),
-                            "event_id", event.getId()),
-                    event.getType());
+        for (var chatId : chatIds) {
+            sendNotification(
+                    chatId,
+                    event.getTitle(),
+                    event.getText(),
+                    event.getType(),
+                    event.getEventTime(),
+                    event.getId()
+            );
         }
     }
 
     @Override
     public void sendEvents(List<Event> events) {
         for (var event : events) {
-            log.info(event.getId() + " " + event.getTitle() + " at " + event.getEventTime());
             sendEvent(event);
         }
     }
 
     @Override
-    public <T> void sendNotification(String title, T object, EventType type) {
+    public void sendNotification(long chatId, String title, String text, EventType type, LocalDateTime time, long eventId) {
         ObjectMapper mapper = new ObjectMapper();
-        var values = mapper.convertValue(object, new TypeReference<Map<String, Object>>() {
-        });
-        values.put("type", type.name());
-        values.put("title", title);
+        Map<String, String> values = Map.of(
+                "type", type.name(),
+                "title", title,
+                "text", text,
+                "chat_id", String.valueOf(chatId),
+                "send_time", time.toString(),
+                "event_id", String.valueOf(eventId)
+        );
         try {
             var message = mapper.writeValueAsString(values);
             rabbitTemplate.convertAndSend("service.notification", "notification-routing-key", message);
-            log.info("Event send to queue");
+            log.info("Event send to queue to " + chatId);
         } catch (Exception e) {
             log.error(e.getMessage());
         }

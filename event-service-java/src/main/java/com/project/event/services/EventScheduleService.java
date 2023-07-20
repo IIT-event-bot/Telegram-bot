@@ -19,7 +19,7 @@ import java.util.List;
 @EnableScheduling
 public class EventScheduleService {
     private final EventRepository repository;
-    private final EventNotificationService notificationService;
+    private final TelegramEventNotificationService notificationService;
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void sendEventsToday() {
