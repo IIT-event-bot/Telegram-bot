@@ -2,6 +2,7 @@ package com.project.event.services;
 
 import com.project.event.models.Event;
 import com.project.event.models.EventCheck;
+import com.project.event.models.EventDto;
 import com.project.event.models.NotificationType;
 import com.project.event.repositories.CheckedStudentRepository;
 import com.project.event.repositories.EventRepository;
@@ -26,15 +27,22 @@ public class EventServiceImpl implements EventService {
     private final TelegramEventNotificationService notificationService;
     private final CheckedStudentRepository checkedStudentRepository;
     private final StudentService studentService;
+    private final EventDtoMapper dtoMapper;
 
     @Override
-    public List<Event> getAllEvents(String date, String title, Long groupId) {
+    public List<EventDto> getAllEvents(String date, String title, Long groupId) {
         if (date == null && title == null && groupId == null) {
-            return repository.findAll();
+            return repository.findAll()
+                    .stream()
+                    .map(dtoMapper::convert)
+                    .toList();
         }
         if (date != null && title != null && groupId != null) {
             var eventDate = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-            return repository.getEventsByFilter(title, eventDate, groupId);
+            return repository.getEventsByFilter(title, eventDate, groupId)
+                    .stream()
+                    .map(dtoMapper::convert)
+                    .toList();
         }
         List<Event> result = new ArrayList<>();
         if (title != null) {
@@ -46,7 +54,9 @@ public class EventServiceImpl implements EventService {
         if (groupId != null) {
             result = filterEventsByGroupId(result, groupId);
         }
-        return result;
+        return result.stream()
+                .map(dtoMapper::convert)
+                .toList();
     }
 
     private List<Event> filterEventsByGroupId(List<Event> events, Long groupId) {

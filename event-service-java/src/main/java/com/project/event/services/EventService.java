@@ -1,11 +1,12 @@
 package com.project.event.services;
 
 import com.project.event.models.Event;
+import com.project.event.models.EventDto;
 
 import java.util.List;
 
 public interface EventService {
-    List<Event> getAllEvents(String date, String title, Long groupId);
+    List<EventDto> getAllEvents(String date, String title, Long groupId);
 
     Event getEventById(long id);
 

@@ -1,6 +1,7 @@
 package com.project.event.controllers;
 
 import com.project.event.models.Event;
+import com.project.event.models.EventDto;
 import com.project.event.services.EventService;
 import com.project.event.services.FeedbackService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +39,7 @@ public class EventController {
                                     mediaType = "application/json",
                                     array = @ArraySchema(
                                             schema = @Schema(
-                                                    implementation = Event.class
+                                                    implementation = EventDto.class
                                             )
                                     )
                             )
