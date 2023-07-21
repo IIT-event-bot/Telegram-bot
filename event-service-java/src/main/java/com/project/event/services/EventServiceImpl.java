@@ -83,7 +83,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event getEventById(long id) {
-        return repository.getEventById(id);
+        Event event = repository.getEventById(id);
+        if (event == null){
+            throw new IllegalArgumentException("Event with id " + id + " does not exist");
+        }
+        return event;
     }
 
     @Override
