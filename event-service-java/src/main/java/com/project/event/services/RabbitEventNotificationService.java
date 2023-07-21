@@ -2,7 +2,7 @@ package com.project.event.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.event.models.Event;
-import com.project.event.models.EventType;
+import com.project.event.models.NotificationType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -16,7 +16,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class RabbitEventNotificationServiceImpl implements TelegramEventNotificationService {
+public class RabbitEventNotificationService implements TelegramEventNotificationService {
     private final RabbitTemplate rabbitTemplate;
     private final StudentService studentService;
 
@@ -53,14 +53,14 @@ public class RabbitEventNotificationServiceImpl implements TelegramEventNotifica
     }
 
     @Override
-    public void sendNotification(long chatId, String title, String text, EventType type, LocalDateTime time, long eventId) {
+    public void sendNotification(long chatId, String title, String text, NotificationType type, LocalDateTime sendTime, long eventId) {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> values = Map.of(
                 "type", type.name(),
                 "title", title,
                 "text", text,
                 "chat_id", String.valueOf(chatId),
-                "send_time", time.toString(),
+                "send_time", sendTime.toString(),
                 "event_id", String.valueOf(eventId)
         );
         try {

@@ -2,7 +2,7 @@ package com.project.event.services;
 
 import com.project.event.models.Event;
 import com.project.event.models.EventCheck;
-import com.project.event.models.EventType;
+import com.project.event.models.NotificationType;
 import com.project.event.repositories.CheckedStudentRepository;
 import com.project.event.repositories.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -85,11 +85,11 @@ public class EventServiceImpl implements EventService {
     }
 
     private void sendEventIfTimeToday(Event event) {
-        if (event.getType() == EventType.INFO) {
+        if (event.getType() == NotificationType.INFO) {
             notificationService.sendEvent(event);
             return;
         }
-        if (event.getType() == EventType.EVENT
+        if (event.getType() == NotificationType.EVENT
                 && event.getEventTime()
                 .isBefore(ZonedDateTime.now(ZoneId.of("Asia/Yekaterinburg"))
                         .toLocalDateTime()
@@ -145,7 +145,7 @@ public class EventServiceImpl implements EventService {
     }
 
     private void validateEvent(Event event) {
-        if (event.getType().equals(EventType.INFO)) {
+        if (event.getType().equals(NotificationType.INFO)) {
             event.setEventTime(ZonedDateTime.now(ZoneId.of("Asia/Yekaterinburg")).toLocalDateTime());
         } else if (event.getEventTime() == null) {
             throw new IllegalArgumentException("Event with type not 'INFO' must be with eventTime");

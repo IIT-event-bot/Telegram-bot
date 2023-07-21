@@ -1,6 +1,6 @@
 package com.project.event.models;
 
-public enum EventType {
+public enum NotificationType {
     INFO,
     EVENT,
     FEEDBACK

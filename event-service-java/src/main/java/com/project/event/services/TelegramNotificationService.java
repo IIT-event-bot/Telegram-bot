@@ -1,9 +1,9 @@
 package com.project.event.services;
 
-import com.project.event.models.EventType;
+import com.project.event.models.NotificationType;
 
 import java.time.LocalDateTime;
 
-public interface TelegramNotificationService {
-    void sendNotification(long chatId, String title, String text, EventType type, LocalDateTime time, long eventId);
+public interface TelegramNotificationService extends NotificationService {
+    void sendNotification(long chatId, String title, String text, NotificationType type, LocalDateTime sendTime, long eventId);
 }

@@ -1,7 +1,7 @@
 package com.project.event.services;
 
 import com.project.event.models.Event;
-import com.project.event.models.EventType;
+import com.project.event.models.NotificationType;
 import com.project.event.repositories.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +48,7 @@ public class EventScheduleService {
             event.setEventTime(feedbackTime);
             var eventText = "Вчера прошло событие '" + event.getTitle() + "', оставьте, пожалуйста обратную связь по этому событию";
             event.setText(eventText);
-            event.setType(EventType.FEEDBACK);
+            event.setType(NotificationType.FEEDBACK);
         }
         notificationService.sendEvents(feedback);
     }

@@ -49,7 +49,7 @@ public class Event {
 
     @Column(name = "type")
     @Enumerated(value = EnumType.STRING)
-    private EventType type;
+    private NotificationType type;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "event_student", joinColumns = @JoinColumn(name = "event_id"))
