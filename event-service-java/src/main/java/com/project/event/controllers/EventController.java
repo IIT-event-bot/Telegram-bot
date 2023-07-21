@@ -30,7 +30,7 @@ public class EventController {
         this.feedbackService = feedbackService;
     }
 
-    @Operation(summary = "Получение всех событий")
+    @Operation(summary = "Получение 10 событий, после параметра after ")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -47,10 +47,11 @@ public class EventController {
             )
     })
     @GetMapping
-    public ResponseEntity<?> getAllEvents(@RequestParam(value = "date", required = false) String date,
+    public ResponseEntity<?> getAllEvents(@RequestParam(value = "after", required = false, defaultValue = "0") long after,
+                                          @RequestParam(value = "date", required = false) String date,
                                           @RequestParam(value = "title", required = false) String title,
                                           @RequestParam(value = "groupId", required = false) Long groupId) {
-        return ResponseEntity.ok(service.getAllEvents(date, title, groupId));
+        return ResponseEntity.ok(service.getAllEvents(after, date, title, groupId));
     }
 
 

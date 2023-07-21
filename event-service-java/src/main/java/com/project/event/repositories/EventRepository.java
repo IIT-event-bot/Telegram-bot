@@ -17,6 +17,25 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Modifying
     @Transactional
     @Query(value = """
+            select events.id,
+                   events.event_time,
+                   events.has_feedback,
+                   events.is_group_event,
+                   events.is_student_event,
+                   events.text,
+                   events.title,
+                   events.type,
+                   events.is_repeat
+            from (select *, row_number() over () as row
+                  from events) as events
+            where row > :#{#after}
+            limit 10;
+            """, nativeQuery = true)
+    List<Event> findAll(long after);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
             select distinct events.*
             from events
             join event_repeat er

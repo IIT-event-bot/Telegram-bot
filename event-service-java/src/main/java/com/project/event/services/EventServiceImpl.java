@@ -30,9 +30,9 @@ public class EventServiceImpl implements EventService {
     private final EventDtoMapper dtoMapper;
 
     @Override
-    public List<EventDto> getAllEvents(String date, String title, Long groupId) {
+    public List<EventDto> getAllEvents(long after, String date, String title, Long groupId) {
         if (date == null && title == null && groupId == null) {
-            return repository.findAll()
+            return repository.findAll(after)
                     .stream()
                     .map(dtoMapper::convert)
                     .toList();

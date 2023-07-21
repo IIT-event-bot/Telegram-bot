@@ -51,17 +51,17 @@ public class Event {
     @Enumerated(value = EnumType.STRING)
     private NotificationType type;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "event_student", joinColumns = @JoinColumn(name = "event_id"))
     @Column(name = "student_id", nullable = false)
     private List<Long> students;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "event_group", joinColumns = @JoinColumn(name = "event_id"))
     @Column(name = "group_id", nullable = false)
     private List<Long> groups;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "event_repeat", joinColumns = @JoinColumn(name = "event_id"))
     @Column(name = "repeat_time", nullable = false)
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
