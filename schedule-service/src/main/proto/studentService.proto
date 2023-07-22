@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package com.project.studentService;
+
+message UserResponse {
+  int64 id = 1;
+  string username = 2;
+}
+
+message StudentResponse {
+  int64 id = 1;
+  string name = 2;
+  string surname = 3;
+  string patronymic = 4;
+}
+
+message StudentRequest {
+  int64 studentId = 1;
+}
+
+message GroupRequest {
+  int64 groupId = 1;
+}
+
+message UserRequest {
+  int64 id = 1;
+}
+
+service StudentService {
+  rpc getUserByStudentId(StudentRequest) returns (UserResponse);
+  rpc getStudentsChatIdByGroupId(GroupRequest) returns (stream UserResponse);
+  rpc getStudentById(StudentRequest) returns (StudentResponse);
+  rpc getStudentByUserId(UserRequest) returns (StudentResponse);
+}
