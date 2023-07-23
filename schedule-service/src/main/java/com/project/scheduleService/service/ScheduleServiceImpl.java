@@ -16,26 +16,26 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleDto getGroupSchedule(long groupId) {
-        throw new IllegalArgumentException("Not implemented method");
+        throw new RuntimeException("Not implemented method");
     }
 
     @Override
     public void updateSchedule(long groupId, ScheduleDto schedule) {
-        throw new IllegalArgumentException("Not implemented method");
+        throw new RuntimeException("Not implemented method");
     }
 
     @Override
     public void createSchedule(long groupId, ScheduleDto schedule) {
-        throw new IllegalArgumentException("Not implemented method");
+        throw new RuntimeException("Not implemented method");
     }
 
     @Override
     public void deleteSchedule(long id) {
-        throw new IllegalArgumentException("Not implemented method");
+        throw new RuntimeException("Not implemented method");
     }
 
     @Override
     public WeekDto getWeek(long groupId, String weekTitle) {
-        throw new IllegalArgumentException("Not implemented method");
+        throw new RuntimeException("Not implemented method");
     }
 }

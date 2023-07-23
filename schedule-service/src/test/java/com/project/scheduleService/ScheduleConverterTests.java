@@ -37,10 +37,10 @@ public class ScheduleConverterTests {
         return new ScheduleDto(
                 "ПрИ-302",
                 new WeekDto(
-                        "Первая неделя",
+                        WeekType.FIRST_WEEK.title,
                         List.of(
                                 new DayDto(
-                                        "Понедельник",
+                                        DayType.MONDAY.title,
                                         List.of(
                                                 new LessonDto(
                                                         1,
@@ -55,10 +55,10 @@ public class ScheduleConverterTests {
                         )
                 ),
                 new WeekDto(
-                        "Вторая неделя",
+                        WeekType.SECOND_WEEK.title,
                         List.of(
                                 new DayDto(
-                                        "Вторник",
+                                        DayType.TUESDAY.title,
                                         List.of(
                                                 new LessonDto(
                                                         2,
@@ -111,8 +111,21 @@ public class ScheduleConverterTests {
 
         Mockito.when(this.groupService.getGroupById(2)).thenReturn(new GroupDto(2, "ПрИ-302"));
 
-        var convert = this.dtoConverter.convert(schedule);
+        var convert = this.dtoConverter.convertSchedule(schedule);
 
         Assertions.assertEquals(dto, convert);
+    }
+
+    @Test
+    public void testWrongScheduleConvert() {
+        ScheduleDto dto = getDto();
+        Schedule schedule = getSchedule();
+        schedule.getLessons().get(0).setDayType(DayType.FRIDAY);
+
+        Mockito.when(this.groupService.getGroupById(2)).thenReturn(new GroupDto(2, "ПрИ-302"));
+
+        var convert = this.dtoConverter.convertSchedule(schedule);
+
+        Assertions.assertNotEquals(dto, convert);
     }
 }

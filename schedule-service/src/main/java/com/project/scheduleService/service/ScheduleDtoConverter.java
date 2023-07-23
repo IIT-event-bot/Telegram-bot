@@ -25,7 +25,7 @@ public class ScheduleDtoConverter implements ScheduleDtoMapper {
     private final GroupService groupService;
 
     @Override
-    public ScheduleDto convert(Schedule schedule) {
+    public ScheduleDto convertSchedule(Schedule schedule) {
         var group = groupService.getGroupById(schedule.getGroupId());
         return new ScheduleDto(
                 group.title(),
@@ -39,33 +39,40 @@ public class ScheduleDtoConverter implements ScheduleDtoMapper {
 
         return new WeekDto(
                 weekType.title,
-                convertLessons(lessons)
+                convertDays(lessons)
         );
     }
 
-    private List<DayDto> convertLessons(List<Lesson> lessons) {
+    @Override
+    public List<DayDto> convertDays(List<Lesson> lessons) {
         Map<DayType, List<Lesson>> lessonsGroup = lessons.stream().collect(groupingBy(Lesson::getDayType));
         List<DayDto> days = new ArrayList<>();
         for (var day : lessonsGroup.keySet()) {
             var dayLessons = lessonsGroup.get(day);
             days.add(new DayDto(
                     day.title,
-                    convertLessonsToDto(dayLessons)
+                    convertLessons(dayLessons)
             ));
         }
         return days;
     }
 
-    private List<LessonDto> convertLessonsToDto(List<Lesson> lessons) {
+    @Override
+    public List<LessonDto> convertLessons(List<Lesson> lessons) {
         return lessons.stream()
-                .map(lesson -> new LessonDto(
-                        lesson.getId(),
-                        lesson.getTitle(),
-                        lesson.getTeacher(),
-                        lesson.getAuditorium(),
-                        lesson.getTimeStart(),
-                        lesson.getTimeEnd()
-                ))
+                .map(this::convertLesson)
                 .toList();
+    }
+
+    @Override
+    public LessonDto convertLesson(Lesson lesson) {
+        return new LessonDto(
+                lesson.getId(),
+                lesson.getTitle(),
+                lesson.getTeacher(),
+                lesson.getAuditorium(),
+                lesson.getTimeStart(),
+                lesson.getTimeEnd()
+        );
     }
 }
