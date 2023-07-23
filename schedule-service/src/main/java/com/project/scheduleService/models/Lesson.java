@@ -33,4 +33,12 @@ public class Lesson {
 
     @Column(name = "time_end")
     private LocalTime timeEnd;
+
+    @Column(name = "week")
+    @Enumerated(EnumType.STRING)
+    private WeekType weekType;
+
+    @Column(name = "day")
+    @Enumerated(EnumType.STRING)
+    private DayType dayType;
 }

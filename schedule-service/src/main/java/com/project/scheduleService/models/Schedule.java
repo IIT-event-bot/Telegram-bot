@@ -19,6 +19,9 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "group_id")
+    private long groupId;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "schedule_id")
     private List<Lesson> lessons;
