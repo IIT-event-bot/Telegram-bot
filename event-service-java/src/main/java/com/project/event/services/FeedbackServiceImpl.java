@@ -36,7 +36,10 @@ public class FeedbackServiceImpl implements FeedbackService {
             grade.setGrade(0);
             return grade;
         }
-        var avg = grades.stream().mapToDouble(EventGrade::getGrade).average().getAsDouble();
+        var avg = grades.stream()
+                .mapToDouble(EventGrade::getGrade)
+                .average()
+                .getAsDouble();
         return new EventGrade(0, avg, grades.get(0).getEvent());
     }
 
