@@ -2,7 +2,7 @@ package com.project.scheduleService.service;
 
 import com.project.scheduleService.models.dto.ScheduleDto;
 import com.project.scheduleService.models.dto.WeekDto;
-import com.project.scheduleService.repositories.ScheduleRepository;
+import com.project.scheduleService.repositories.LessonRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class ScheduleServiceImpl implements ScheduleService {
-    private final ScheduleRepository repository;
+    private final LessonRepository repository;
     private final ScheduleDtoMapper dtoMapper;
 
     @Override

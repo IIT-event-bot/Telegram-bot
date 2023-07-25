@@ -2,7 +2,6 @@ package com.project.scheduleService;
 
 import com.project.scheduleService.models.DayType;
 import com.project.scheduleService.models.Lesson;
-import com.project.scheduleService.models.Schedule;
 import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.models.dto.*;
 import com.project.scheduleService.service.GroupServiceImpl;
@@ -75,31 +74,31 @@ public class ScheduleConverterTests {
         );
     }
 
-    private Schedule getSchedule() {
-        return new Schedule(
-                1,
-                2,
-                List.of(
-                        new Lesson(
-                                1,
-                                "title",
-                                "teacher",
-                                "auditorium",
-                                time,
-                                time.plusHours(1),
-                                WeekType.FIRST_WEEK,
-                                DayType.MONDAY
-                        ),
-                        new Lesson(
-                                2,
-                                "title",
-                                "teacher",
-                                "auditorium",
-                                time,
-                                time.plusHours(1),
-                                WeekType.SECOND_WEEK,
-                                DayType.TUESDAY
-                        )
+    private List<Lesson> getSchedule() {
+        return List.of(
+                new Lesson(
+                        1,
+                        "title",
+                        "teacher",
+                        "auditorium",
+                        time,
+                        time.plusHours(1),
+                        WeekType.FIRST_WEEK,
+                        DayType.MONDAY,
+                        List.of(1L),
+                        2L
+                ),
+                new Lesson(
+                        2,
+                        "title",
+                        "teacher",
+                        "auditorium",
+                        time,
+                        time.plusHours(1),
+                        WeekType.SECOND_WEEK,
+                        DayType.TUESDAY,
+                        List.of(1L),
+                        2L
                 )
         );
     }
@@ -107,7 +106,7 @@ public class ScheduleConverterTests {
     @Test
     public void testScheduleConverter() {
         ScheduleDto dto = getDto();
-        Schedule schedule = getSchedule();
+        List<Lesson> schedule = getSchedule();
 
         Mockito.when(this.groupService.getGroupById(2)).thenReturn(new GroupDto(2, "ПрИ-302"));
 
@@ -119,8 +118,8 @@ public class ScheduleConverterTests {
     @Test
     public void testWrongScheduleConvert() {
         ScheduleDto dto = getDto();
-        Schedule schedule = getSchedule();
-        schedule.getLessons().get(0).setDayType(DayType.FRIDAY);
+        List<Lesson> schedule = getSchedule();
+        schedule.get(0).setDayType(DayType.FRIDAY);
 
         Mockito.when(this.groupService.getGroupById(2)).thenReturn(new GroupDto(2, "ПрИ-302"));
 

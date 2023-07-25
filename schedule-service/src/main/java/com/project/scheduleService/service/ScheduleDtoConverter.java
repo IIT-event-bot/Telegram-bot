@@ -2,7 +2,6 @@ package com.project.scheduleService.service;
 
 import com.project.scheduleService.models.DayType;
 import com.project.scheduleService.models.Lesson;
-import com.project.scheduleService.models.Schedule;
 import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.models.dto.DayDto;
 import com.project.scheduleService.models.dto.LessonDto;
@@ -25,8 +24,11 @@ public class ScheduleDtoConverter implements ScheduleDtoMapper {
     private final GroupService groupService;
 
     @Override
-    public ScheduleDto convertSchedule(Schedule schedule) {
-        var group = groupService.getGroupById(schedule.getGroupId());
+    public ScheduleDto convertSchedule(List<Lesson> schedule) {
+        if (schedule.size() == 0) {
+            throw new IllegalArgumentException("Schedule not exists");
+        }
+        var group = groupService.getGroupById(schedule.get(0).getGroupId());
         return new ScheduleDto(
                 group.title(),
                 getWeekByType(schedule, WeekType.FIRST_WEEK),
@@ -34,8 +36,11 @@ public class ScheduleDtoConverter implements ScheduleDtoMapper {
         );
     }
 
-    private WeekDto getWeekByType(Schedule schedule, WeekType weekType) {
-        var lessons = schedule.getLessons().stream().filter(lesson -> lesson.getWeekType() == weekType).toList();
+    private WeekDto getWeekByType(List<Lesson> schedule, WeekType weekType) {
+        var lessons = schedule
+                .stream()
+                .filter(lesson -> lesson.getWeekType().equals(weekType))
+                .toList();
 
         return new WeekDto(
                 weekType.title,

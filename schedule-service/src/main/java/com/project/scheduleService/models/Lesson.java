@@ -1,5 +1,6 @@
 package com.project.scheduleService.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -41,4 +43,13 @@ public class Lesson {
     @Column(name = "day")
     @Enumerated(EnumType.STRING)
     private DayType dayType;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "lesson_user", joinColumns = @JoinColumn(name = "lesson_id"))
+    @Column(name = "user_id", nullable = false)
+    @JsonIgnore
+    private List<Long> localUsers;
+
+    @Column(name = "group_id")
+    private long groupId;
 }
