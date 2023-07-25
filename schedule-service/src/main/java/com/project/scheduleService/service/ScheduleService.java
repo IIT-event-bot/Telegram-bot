@@ -8,7 +8,7 @@ public interface ScheduleService {
 
     void updateSchedule(long groupId, ScheduleDto schedule);
 
-    void createSchedule(long groupId, ScheduleDto schedule);
+    void createSchedule(ScheduleDto schedule);
 
     void deleteSchedule(long groupId);
 

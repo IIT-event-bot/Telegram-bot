@@ -15,4 +15,6 @@ public interface ScheduleDtoMapper {
     LessonDto convertLesson(Lesson lesson);
 
     List<DayDto> convertDays(List<Lesson> lessons);
+
+    List<Lesson> convertSchedule(ScheduleDto schedule);
 }

@@ -36,10 +36,10 @@ public class ScheduleConverterTests {
         return new ScheduleDto(
                 "ПрИ-302",
                 new WeekDto(
-                        WeekType.FIRST_WEEK.title,
+                        WeekType.FIRST_WEEK.name(),
                         List.of(
                                 new DayDto(
-                                        DayType.MONDAY.title,
+                                        DayType.MONDAY.name(),
                                         List.of(
                                                 new LessonDto(
                                                         1,
@@ -47,17 +47,18 @@ public class ScheduleConverterTests {
                                                         "teacher",
                                                         "auditorium",
                                                         time,
-                                                        time.plusHours(1)
+                                                        time.plusHours(1),
+                                                        List.of(1L)
                                                 )
                                         )
                                 )
                         )
                 ),
                 new WeekDto(
-                        WeekType.SECOND_WEEK.title,
+                        WeekType.SECOND_WEEK.name(),
                         List.of(
                                 new DayDto(
-                                        DayType.TUESDAY.title,
+                                        DayType.TUESDAY.name(),
                                         List.of(
                                                 new LessonDto(
                                                         2,
@@ -65,7 +66,8 @@ public class ScheduleConverterTests {
                                                         "teacher",
                                                         "auditorium",
                                                         time,
-                                                        time.plusHours(1)
+                                                        time.plusHours(1),
+                                                        List.of()
                                                 )
                                         )
                                 )
@@ -97,7 +99,7 @@ public class ScheduleConverterTests {
                         time.plusHours(1),
                         WeekType.SECOND_WEEK,
                         DayType.TUESDAY,
-                        List.of(1L),
+                        List.of(),
                         2L
                 )
         );
@@ -126,5 +128,17 @@ public class ScheduleConverterTests {
         var convert = this.dtoConverter.convertSchedule(schedule);
 
         Assertions.assertNotEquals(dto, convert);
+    }
+
+    @Test
+    public void testConvertScheduleToLessons() {
+        List<Lesson> lessons = getSchedule();
+        ScheduleDto scheduleDto = getDto();
+
+        Mockito.when(this.groupService.getGroupByTitle("ПрИ-302")).thenReturn(new GroupDto(2, "ПрИ-302"));
+
+        var convert = dtoConverter.convertSchedule(scheduleDto);
+
+        Assertions.assertEquals(lessons.get(0), convert.get(0));
     }
 }

@@ -11,6 +11,11 @@ message GroupRequest {
   int64 groupId = 1;
 }
 
+message GroupTitleRequest {
+  string title = 1;
+}
+
 service GroupService {
   rpc getGroupByGroupId(GroupRequest) returns (GroupResponse);
+  rpc getGroupByTitle(GroupTitleRequest) returns (GroupResponse);
 }

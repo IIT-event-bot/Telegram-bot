@@ -43,7 +43,7 @@ public class ScheduleDtoConverter implements ScheduleDtoMapper {
                 .toList();
 
         return new WeekDto(
-                weekType.title,
+                weekType.name(),
                 convertDays(lessons)
         );
     }
@@ -55,11 +55,52 @@ public class ScheduleDtoConverter implements ScheduleDtoMapper {
         for (var day : lessonsGroup.keySet()) {
             var dayLessons = lessonsGroup.get(day);
             days.add(new DayDto(
-                    day.title,
+                    day.name(),
                     convertLessons(dayLessons)
             ));
         }
         return days;
+    }
+
+    @Override
+    public List<Lesson> convertSchedule(ScheduleDto schedule) {
+        var group = groupService.getGroupByTitle(schedule.groupName());
+        var lessons = convertWeekToLesson(schedule.firstWeek(), group.id());
+        lessons.addAll(convertWeekToLesson(schedule.secondWeek(), group.id()));
+        return lessons;
+    }
+
+    private List<Lesson> convertWeekToLesson(WeekDto week, long groupId) {
+        return convertDaysToLesson(week.days(), WeekType.valueOf(week.title()), groupId);
+    }
+
+    private List<Lesson> convertDaysToLesson(List<DayDto> days, WeekType weekType, long groupId) {
+        List<Lesson> lessons = new ArrayList<>();
+        for (DayDto day : days) {
+            lessons.addAll(convertLessonDtoToLesson(day.lessons(), weekType, DayType.valueOf(day.title()), groupId));
+        }
+        return lessons;
+    }
+
+    private List<Lesson> convertLessonDtoToLesson(List<LessonDto> lessons, WeekType weekType, DayType dayType, long groupId) {
+        return lessons.stream()
+                .map(lesson -> convertLesson(lesson, weekType, dayType, groupId))
+                .toList();
+    }
+
+    private Lesson convertLesson(LessonDto lesson, WeekType weekType, DayType dayType, long groupId) {
+        return Lesson.builder()
+                .id(lesson.id())
+                .title(lesson.title())
+                .teacher(lesson.teacher())
+                .auditorium(lesson.auditorium())
+                .timeStart(lesson.timeStart())
+                .timeEnd(lesson.timeEnd())
+                .weekType(weekType)
+                .dayType(dayType)
+                .groupId(groupId)
+                .localUsers(lesson.localUsers())
+                .build();
     }
 
     @Override
@@ -71,13 +112,15 @@ public class ScheduleDtoConverter implements ScheduleDtoMapper {
 
     @Override
     public LessonDto convertLesson(Lesson lesson) {
+        var group = groupService.getGroupById(lesson.getId());
         return new LessonDto(
                 lesson.getId(),
                 lesson.getTitle(),
                 lesson.getTeacher(),
                 lesson.getAuditorium(),
                 lesson.getTimeStart(),
-                lesson.getTimeEnd()
+                lesson.getTimeEnd(),
+                lesson.getLocalUsers()
         );
     }
 }

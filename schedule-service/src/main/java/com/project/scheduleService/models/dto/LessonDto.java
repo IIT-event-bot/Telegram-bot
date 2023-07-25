@@ -1,6 +1,7 @@
 package com.project.scheduleService.models.dto;
 
 import java.time.LocalTime;
+import java.util.List;
 
 public record LessonDto(
         long id,
@@ -8,6 +9,7 @@ public record LessonDto(
         String teacher,
         String auditorium,
         LocalTime timeStart,
-        LocalTime timeEnd
+        LocalTime timeEnd,
+        List<Long> localUsers
 ) {
 }

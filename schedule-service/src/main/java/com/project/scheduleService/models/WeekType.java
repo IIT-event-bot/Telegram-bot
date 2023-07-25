@@ -1,12 +1,7 @@
 package com.project.scheduleService.models;
 
 public enum WeekType {
-    FIRST_WEEK("Первая неделя"),
-    SECOND_WEEK("Вторая неделя")
+    FIRST_WEEK,
+    SECOND_WEEK
     ;
-    public final String title;
-
-    WeekType(String title) {
-        this.title = title;
-    }
 }

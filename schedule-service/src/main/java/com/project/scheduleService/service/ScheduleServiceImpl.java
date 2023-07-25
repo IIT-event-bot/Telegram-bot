@@ -16,17 +16,18 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleDto getGroupSchedule(long groupId) {
-        throw new RuntimeException("Not implemented method");
+        var lessons = repository.getAllByGroupId(groupId);
+        return dtoMapper.convertSchedule(lessons);
     }
 
     @Override
     public void updateSchedule(long groupId, ScheduleDto schedule) {
-        throw new RuntimeException("Not implemented method");
+
     }
 
     @Override
-    public void createSchedule(long groupId, ScheduleDto schedule) {
-        throw new RuntimeException("Not implemented method");
+    public void createSchedule(ScheduleDto schedule) {
+
     }
 
     @Override
