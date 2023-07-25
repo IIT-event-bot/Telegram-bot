@@ -46,7 +46,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @Transactional
     public WeekDto getWeek(long groupId, String weekTitle) {
-        WeekType weekType = WeekType.valueOf(weekTitle);
+        WeekType weekType = WeekType.valueOf(weekTitle.toUpperCase());
         var lessons = repository.getAllByGroupIdAndWeekType(groupId, weekType);
         return dtoMapper.convertWeek(lessons, weekType);
     }

@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 public class GroupServiceImpl implements GroupService {
     @Override
     public GroupDto getGroupById(long id) {
-        throw new RuntimeException("Not implemented method");
+        return new GroupDto(1, "ПрИ-301");//TODO
     }
 
     @Override
     public GroupDto getGroupByTitle(String title) {
-        throw new RuntimeException("Not implemented method");
+        return new GroupDto(1, title);//TODO
     }
 }
