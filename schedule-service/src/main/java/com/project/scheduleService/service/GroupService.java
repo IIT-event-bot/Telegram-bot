@@ -4,5 +4,6 @@ import com.project.scheduleService.models.dto.GroupDto;
 
 public interface GroupService {
     GroupDto getGroupById(long id);
+
     GroupDto getGroupByTitle(String title);
 }

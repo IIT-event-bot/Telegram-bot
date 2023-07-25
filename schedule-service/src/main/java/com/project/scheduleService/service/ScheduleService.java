@@ -6,7 +6,7 @@ import com.project.scheduleService.models.dto.WeekDto;
 public interface ScheduleService {
     ScheduleDto getGroupSchedule(long groupId);
 
-    void updateSchedule(long groupId, ScheduleDto schedule);
+    void updateSchedule(ScheduleDto schedule);
 
     void createSchedule(ScheduleDto schedule);
 

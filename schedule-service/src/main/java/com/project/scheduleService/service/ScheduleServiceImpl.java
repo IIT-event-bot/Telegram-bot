@@ -1,11 +1,13 @@
 package com.project.scheduleService.service;
 
+import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.models.dto.ScheduleDto;
 import com.project.scheduleService.models.dto.WeekDto;
 import com.project.scheduleService.repositories.LessonRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,28 +17,37 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleDtoMapper dtoMapper;
 
     @Override
+    @Transactional
     public ScheduleDto getGroupSchedule(long groupId) {
         var lessons = repository.getAllByGroupId(groupId);
         return dtoMapper.convertSchedule(lessons);
     }
 
     @Override
-    public void updateSchedule(long groupId, ScheduleDto schedule) {
-
+    @Transactional
+    public void updateSchedule(ScheduleDto schedule) {
+        var lessons = dtoMapper.convertSchedule(schedule);
+        repository.saveAll(lessons);
     }
 
     @Override
+    @Transactional
     public void createSchedule(ScheduleDto schedule) {
-
+        var lessons = dtoMapper.convertSchedule(schedule);
+        repository.saveAll(lessons);
     }
 
     @Override
+    @Transactional
     public void deleteSchedule(long id) {
-        throw new RuntimeException("Not implemented method");
+        repository.deleteByGroupId(id);
     }
 
     @Override
+    @Transactional
     public WeekDto getWeek(long groupId, String weekTitle) {
-        throw new RuntimeException("Not implemented method");
+        WeekType weekType = WeekType.valueOf(weekTitle);
+        var lessons = repository.getAllByGroupIdAndWeekType(groupId, weekType);
+        return dtoMapper.convertWeek(lessons, weekType);
     }
 }

@@ -31,12 +31,13 @@ public class ScheduleDtoConverter implements ScheduleDtoMapper {
         var group = groupService.getGroupById(schedule.get(0).getGroupId());
         return new ScheduleDto(
                 group.title(),
-                getWeekByType(schedule, WeekType.FIRST_WEEK),
-                getWeekByType(schedule, WeekType.SECOND_WEEK)
+                convertWeek(schedule, WeekType.FIRST_WEEK),
+                convertWeek(schedule, WeekType.SECOND_WEEK)
         );
     }
 
-    private WeekDto getWeekByType(List<Lesson> schedule, WeekType weekType) {
+    @Override
+    public WeekDto convertWeek(List<Lesson> schedule, WeekType weekType) {
         var lessons = schedule
                 .stream()
                 .filter(lesson -> lesson.getWeekType().equals(weekType))
@@ -112,7 +113,6 @@ public class ScheduleDtoConverter implements ScheduleDtoMapper {
 
     @Override
     public LessonDto convertLesson(Lesson lesson) {
-        var group = groupService.getGroupById(lesson.getId());
         return new LessonDto(
                 lesson.getId(),
                 lesson.getTitle(),

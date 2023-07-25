@@ -33,10 +33,9 @@ public class ScheduleController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{groupId}")
-    public ResponseEntity<?> updateSchedule(@PathVariable("groupId") long groupId,
-                                            @RequestBody ScheduleDto schedule) {
-        service.updateSchedule(groupId, schedule);
+    @PutMapping
+    public ResponseEntity<?> updateSchedule(@RequestBody ScheduleDto schedule) {
+        service.updateSchedule(schedule);
         return ResponseEntity.ok().build();
     }
 
