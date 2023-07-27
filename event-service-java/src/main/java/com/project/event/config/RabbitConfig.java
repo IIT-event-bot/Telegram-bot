@@ -15,7 +15,7 @@ public class RabbitConfig {
     public static final String EXCHANGE = "service.event";
     public static final String ROUTING_KEY = "event-routing-key";
 
-    @Value("${rabbitmq.host}")
+    @Value("${spring.rabbitmq.host}")
     private String host;
 
     @Bean

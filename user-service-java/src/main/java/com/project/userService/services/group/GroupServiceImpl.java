@@ -64,6 +64,21 @@ public class GroupServiceImpl extends com.project.groupService.GroupServiceGrpc.
     }
 
     @Override
+    public void getGroupByTitle(GroupServiceOuterClass.GroupTitleRequest request,
+                                StreamObserver<GroupServiceOuterClass.GroupResponse> responseObserver) {
+        var title = request.getTitle();
+        var group = getGroupByTitle(title);
+
+        var response = GroupServiceOuterClass.GroupResponse.newBuilder()
+                .setId(group.getId())
+                .setTitle(group.getTitle())
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void updateGroup(Group group) {
         repository.save(group);
     }

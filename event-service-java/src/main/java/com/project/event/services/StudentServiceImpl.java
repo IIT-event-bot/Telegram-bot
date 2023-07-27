@@ -18,11 +18,13 @@ import java.util.List;
 public class StudentServiceImpl implements StudentService {
     @Value("${grpc.userservice.host}")
     private String userServiceHost;
+    @Value("${grpc.userservice.port}")
+    private int userServicePort;
 
     @Override
     public List<Long> getStudentChatIdByGroupId(Long groupId) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(userServiceHost, 8100)
+                .forAddress(userServiceHost, userServicePort)
                 .usePlaintext()
                 .build();
 
@@ -48,7 +50,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Long getStudentChatIdById(Long studentId) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(userServiceHost, 8100)
+                .forAddress(userServiceHost, userServicePort)
                 .usePlaintext()
                 .build();
 
@@ -70,7 +72,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentDto getStudentById(Long studentId) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(userServiceHost, 8100)
+                .forAddress(userServiceHost, userServicePort)
                 .usePlaintext()
                 .build();
 
@@ -92,7 +94,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public GroupDto getGroupById(Long groupId) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(userServiceHost, 8100)
+                .forAddress(userServiceHost, userServicePort)
                 .usePlaintext()
                 .build();
 
@@ -114,7 +116,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentDto getStudentByUserId(Long userId) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(userServiceHost, 8100)
+                .forAddress(userServiceHost, userServicePort)
                 .usePlaintext()
                 .build();
 
