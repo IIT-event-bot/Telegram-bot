@@ -53,7 +53,12 @@ public class RabbitEventNotificationService implements TelegramEventNotification
     }
 
     @Override
-    public void sendNotification(long chatId, String title, String text, NotificationType type, LocalDateTime sendTime, long eventId) {
+    public void sendNotification(long chatId,
+                                 String title,
+                                 String text,
+                                 NotificationType type,
+                                 LocalDateTime sendTime,
+                                 long eventId) {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> values = Map.of(
                 "type", type.name(),
