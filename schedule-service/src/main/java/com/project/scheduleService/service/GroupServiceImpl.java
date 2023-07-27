@@ -3,12 +3,15 @@ package com.project.scheduleService.service;
 import com.project.scheduleService.models.dto.GroupDto;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.project.groupService.GroupServiceGrpc;
 import com.project.groupService.GroupServiceOuterClass;
+
+import static io.grpc.Status.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +39,7 @@ public class GroupServiceImpl implements GroupService {
         try {
             var response = stub.getGroupByGroupId(request);
             return new GroupDto(response.getId(), response.getTitle());
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
             throw new IllegalArgumentException("Group with id does not exist");
         }
@@ -59,9 +62,18 @@ public class GroupServiceImpl implements GroupService {
         try {
             var response = stub.getGroupByTitle(request);
             return new GroupDto(response.getId(), response.getTitle());
-        }catch (Exception e){
+        } catch (StatusRuntimeException e) {
             log.error(e.getMessage());
-            throw new IllegalArgumentException("Group with id does not exist");
+            if (e.getStatus().equals(UNKNOWN)) {
+                throw new IllegalArgumentException("Group with title '" + title + "' does not exists");
+            }
+            if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
+                throw new RuntimeException("Group service not available");
+            }
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException();
         }
     }
 }
