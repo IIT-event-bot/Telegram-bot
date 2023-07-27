@@ -1,5 +1,7 @@
 package com.project.scheduleService.service;
 
+import com.project.groupService.GroupServiceGrpc;
+import com.project.groupService.GroupServiceOuterClass;
 import com.project.scheduleService.models.dto.GroupDto;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -8,10 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.project.groupService.GroupServiceGrpc;
-import com.project.groupService.GroupServiceOuterClass;
 
-import static io.grpc.Status.*;
+import static io.grpc.Status.UNAVAILABLE;
+import static io.grpc.Status.UNKNOWN;
 
 @Service
 @RequiredArgsConstructor
@@ -39,9 +40,18 @@ public class GroupServiceImpl implements GroupService {
         try {
             var response = stub.getGroupByGroupId(request);
             return new GroupDto(response.getId(), response.getTitle());
+        } catch (StatusRuntimeException e) {
+            if (e.getStatus().equals(UNKNOWN)) {
+                throw new IllegalArgumentException("Group with id '" + id + "' does not exists");
+            }
+            if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
+                throw new RuntimeException("Group service not available");
+            }
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new IllegalArgumentException("Group with id does not exist");
+            throw new RuntimeException();
         }
     }
 
@@ -63,13 +73,13 @@ public class GroupServiceImpl implements GroupService {
             var response = stub.getGroupByTitle(request);
             return new GroupDto(response.getId(), response.getTitle());
         } catch (StatusRuntimeException e) {
-            log.error(e.getMessage());
-            if (e.getStatus().equals(UNKNOWN)) {
+            if (e.getStatus().getCode().equals(UNKNOWN.getCode())) {
                 throw new IllegalArgumentException("Group with title '" + title + "' does not exists");
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
                 throw new RuntimeException("Group service not available");
             }
+            log.error(e.getMessage());
             throw e;
         } catch (Exception e) {
             log.error(e.getMessage());

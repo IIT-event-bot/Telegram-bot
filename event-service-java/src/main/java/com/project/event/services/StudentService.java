@@ -8,7 +8,7 @@ import java.util.List;
 public interface StudentService {
     List<Long> getStudentChatIdByGroupId(Long groupId);
 
-    Long getStudentChatIdById(Long studentId);
+    Long getChatIdByStudentId(Long studentId);
 
     StudentDto getStudentById(Long studentId);
 

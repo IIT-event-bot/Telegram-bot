@@ -30,7 +30,7 @@ public class RabbitEventNotificationService implements TelegramEventNotification
         }
         if (event.isStudentEvent()) {
             for (var studentId : event.getStudents()) {
-                chatIds.add(studentService.getStudentChatIdById(studentId));
+                chatIds.add(studentService.getChatIdByStudentId(studentId));
             }
         }
         for (var chatId : chatIds) {
