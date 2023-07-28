@@ -2,6 +2,7 @@ package com.project.scheduleService.service;
 
 import com.project.scheduleService.models.AcademicYear;
 import com.project.scheduleService.models.DayType;
+import com.project.scheduleService.models.Lesson;
 import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.repositories.AcademicYearRepository;
 import com.project.scheduleService.repositories.LessonRepository;
@@ -15,6 +16,10 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.groupingBy;
 
 
 @Service
@@ -29,9 +34,13 @@ public class SchedulerScheduleNotification {
     @Scheduled(cron = "*/5 * * * * *")
     public void sendSchedule() {
         var dayType = getTodayType();
-        log.info(dayType.name());
         var weekType = getWeekTypeToday();
-        log.info(weekType.name());
+        var lessonsToday = lessonRepository.getAllByWeekTypeAndDayType(weekType, dayType);
+        Map<Long, List<Lesson>> groupLessons = lessonsToday.stream().collect(groupingBy(Lesson::getGroupId));
+        for (Long groupId : groupLessons.keySet()) {
+            var lessons = groupLessons.get(groupId);
+            notificationService.sendSchedule(lessons);
+        }
     }
 
     private WeekType getWeekTypeToday() {
