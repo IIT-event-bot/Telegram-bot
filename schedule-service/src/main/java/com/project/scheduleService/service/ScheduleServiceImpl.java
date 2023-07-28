@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -21,6 +24,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     public ScheduleDto getGroupSchedule(long groupId) {
         var lessons = repository.getAllByGroupId(groupId);
         return dtoMapper.convertSchedule(lessons);
+    }
+
+    @Override
+    public ScheduleDto getScheduleOnDate(LocalDateTime date) {
+        throw new RuntimeException("Not implemented method");
     }
 
     @Override
@@ -49,5 +57,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         WeekType weekType = WeekType.valueOf(weekTitle.toUpperCase());
         var lessons = repository.getAllByGroupIdAndWeekType(groupId, weekType);
         return dtoMapper.convertWeek(lessons, weekType);
+    }
+
+    @Override
+    public void setStartAcademicYear(LocalDate date) {
+        throw new RuntimeException("Not implemented method");
     }
 }

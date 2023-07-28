@@ -3,8 +3,6 @@ import json
 import logging
 from datetime import datetime, timedelta
 
-import pytz
-
 from models.notification import Notification
 from models.notification_db import NotificationDB
 from repository import notification_redis as redis_repository
@@ -86,6 +84,7 @@ class Service:
         notification.text = json_notification['text']
         notification.title = json_notification['title']
         notification.event_id = json_notification.get('event_id')
+
         if json_notification.get('send_time') is not None and notification.type != 'INFO':
             notification.send_time = datetime.fromisoformat(json_notification['send_time'])
         elif notification.type == 'INFO' or notification.type == 'SYS_INFO':

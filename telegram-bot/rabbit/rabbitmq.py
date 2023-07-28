@@ -43,6 +43,9 @@ class RabbitMQClient:
                 await bot.send_message(chat_id=json_message['chat_id'],
                                        text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
                                        reply_markup=ui.mark_inline_keyboard(json_message['event_id']))
+            elif json_message['type'] == 'SCHEDULE':
+                await bot.send_message(chat_id=json_message['chat_id'],
+                                       text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}')
         except Exception as e:
             logger.error(e)
         await self.channel.basic_client_ack(delivery_tag=envelope.delivery_tag)
