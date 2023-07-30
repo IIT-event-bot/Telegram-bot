@@ -26,6 +26,7 @@ public class UserServiceImpl implements UserService {
 
     @Value("${grpc.userservice.port}")
     private int port;
+
     @Override
     public List<UserDto> getUserIdByGroupId(long groupId) {
         ManagedChannel channel = ManagedChannelBuilder

@@ -23,7 +23,9 @@ def push_event_to_queue(notifications: list[Notification]) -> None:
         n_json_bytes = bytes(notification.toJSON().encode('utf-8'))
         if n_json_bytes in saved:
             continue
-        json_list.append(json.loads(n_json_bytes))
+        strload = n_json_bytes.decode('utf-8')
+        load = json.loads(n_json_bytes)
+        json_list.append(load)
 
     json_list.sort(key=lambda x: x['send_time'], reverse=False)
 

@@ -31,7 +31,7 @@ public class SchedulerScheduleNotification {
     private final AcademicYearRepository academicYearRepository;
     private final ScheduleTelegramNotificationService notificationService;
 
-    @Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     public void sendSchedule() {
         var dayType = getTodayType();
         var weekType = getWeekTypeToday();
@@ -39,6 +39,7 @@ public class SchedulerScheduleNotification {
         Map<Long, List<Lesson>> groupLessons = lessonsToday.stream().collect(groupingBy(Lesson::getGroupId));
         for (Long groupId : groupLessons.keySet()) {
             var lessons = groupLessons.get(groupId);
+            log.info(weekType.name() + " " + dayType.name());
             notificationService.sendSchedule(lessons);
         }
     }

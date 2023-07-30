@@ -42,7 +42,7 @@ public class Lesson {
     @Enumerated(EnumType.STRING)
     private DayType dayType;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "lesson_user", joinColumns = @JoinColumn(name = "lesson_id"))
     @Column(name = "user_id", nullable = false)
     @JsonIgnore

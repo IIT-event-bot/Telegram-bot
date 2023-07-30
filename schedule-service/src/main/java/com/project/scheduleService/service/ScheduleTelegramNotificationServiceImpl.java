@@ -2,6 +2,7 @@ package com.project.scheduleService.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.scheduleService.models.Lesson;
+import com.project.scheduleService.models.dto.GroupDto;
 import com.project.scheduleService.models.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,21 +28,34 @@ public class ScheduleTelegramNotificationServiceImpl implements ScheduleTelegram
         if (lessons.size() == 0) {
             return;
         }
-        var group = groupService.getGroupById(lessons.get(0).getGroupId());
-        var users = userService.getUserIdByGroupId(group.id());
+        GroupDto group = groupService.getGroupById(lessons.get(0).getGroupId());
+        List<UserDto> users = userService.getUserIdByGroupId(group.id());
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Yekaterinburg"));
         for (UserDto user : users) {
             for (Lesson lesson : lessons) {
-                this.sendNotification(user.id(),
-                        "Скоро начнется пара",
-                        "<b>Пара</b>: " + lesson.getTitle() + "\n" +
-                                "<b>Преподаватель:</b> " + lesson.getTeacher() + "\n" +
-                                "<b>Начало пары:</b> " + lesson.getTimeStart() + "\n" +
-                                "<b>Конец пары:</b> " + lesson.getTimeEnd() + "\n" +
-                                "<b>Аудитория</b> : " + lesson.getAuditorium(),
-                        LocalDateTime.of(today, lesson.getTimeEnd()));
+                sendLesson(user, lesson, today);
             }
         }
+    }
+
+    private void sendLesson(UserDto user, Lesson lesson, LocalDate sendDate) {
+        LocalDateTime sendTime = LocalDateTime.of(sendDate, lesson.getTimeStart());
+        sendNotification(user.id(), lesson, sendTime);
+        for (Long userId : lesson.getLocalUsers()) {
+            sendNotification(userId, lesson, sendTime);
+        }
+    }
+
+    private void sendNotification(Long userId, Lesson lesson, LocalDateTime sendTime) {
+        this.sendNotification(
+                userId,
+                "Скоро начнется пара",
+                "<b>Пара</b>: " + lesson.getTitle() + /*"\n" +*/
+                        "<b>Преподаватель:</b> " + lesson.getTeacher() + /*"\n" +*/
+                        "<b>Начало пары:</b> " + lesson.getTimeStart() + /*"\n" +*/
+                        "<b>Конец пары:</b> " + lesson.getTimeEnd() + /*"\n" +*/
+                        "<b>Аудитория</b> : " + lesson.getAuditorium(),
+                sendTime);
     }
 
     @Override
