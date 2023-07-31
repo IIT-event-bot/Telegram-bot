@@ -31,7 +31,7 @@ public class SchedulerScheduleNotification {
     private final AcademicYearRepository academicYearRepository;
     private final ScheduleTelegramNotificationService notificationService;
 
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "0 10 0 * * *")
     public void sendSchedule() {
         var dayType = getTodayType();
         var weekType = getWeekTypeToday();

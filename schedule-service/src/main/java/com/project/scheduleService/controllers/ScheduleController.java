@@ -1,10 +1,13 @@
 package com.project.scheduleService.controllers;
 
+import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.models.dto.ScheduleDto;
 import com.project.scheduleService.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/schedule")
@@ -42,6 +45,13 @@ public class ScheduleController {
     @DeleteMapping("/{groupId}")
     public ResponseEntity<?> deleteSchedule(@PathVariable("groupId") long groupId) {
         service.deleteSchedule(groupId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/academicYear")
+    public ResponseEntity<?> setStartAcademicYear(@RequestParam LocalDate date,
+                                                  @RequestParam WeekType weekType) {
+        service.setStartAcademicYear(date, weekType);
         return ResponseEntity.ok().build();
     }
 }

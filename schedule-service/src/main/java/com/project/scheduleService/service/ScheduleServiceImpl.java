@@ -1,8 +1,10 @@
 package com.project.scheduleService.service;
 
+import com.project.scheduleService.models.AcademicYear;
 import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.models.dto.ScheduleDto;
 import com.project.scheduleService.models.dto.WeekDto;
+import com.project.scheduleService.repositories.AcademicYearRepository;
 import com.project.scheduleService.repositories.LessonRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +21,7 @@ import java.time.LocalDateTime;
 public class ScheduleServiceImpl implements ScheduleService {
     private final LessonRepository repository;
     private final ScheduleDtoMapper dtoMapper;
+    private final AcademicYearRepository academicYearRepository;
 
     @Override
     @Transactional
@@ -59,8 +63,21 @@ public class ScheduleServiceImpl implements ScheduleService {
         return dtoMapper.convertWeek(lessons, weekType);
     }
 
+    @Transactional
     @Override
-    public void setStartAcademicYear(LocalDate date) {
-        throw new RuntimeException("Not implemented method");
+    public void setStartAcademicYear(LocalDate date, WeekType weekType) {
+        int semesterNumber = LocalDate.now().getMonthValue() < Month.SEPTEMBER.getValue()
+                ? 1
+                : 2;
+        AcademicYear savedAcademicYear = academicYearRepository
+                .getAcademicYearByDateStartAndSemesterNumber(LocalDate.now().getYear(), semesterNumber);
+        if (savedAcademicYear != null) {
+            savedAcademicYear.setDateStart(date);
+            savedAcademicYear.setWeekType(weekType);
+            academicYearRepository.save(savedAcademicYear);
+            return;
+        }
+        AcademicYear academicYear = new AcademicYear(0L, date, weekType, semesterNumber);
+        academicYearRepository.save(academicYear);
     }
 }
