@@ -35,11 +35,11 @@ public class SchedulerScheduleNotification {
     public void sendSchedule() {
         var dayType = getTodayType();
         var weekType = getWeekTypeToday();
+        log.info("Sending schedule on week " + weekType.name() + " day " + dayType.name());
         var lessonsToday = lessonRepository.getAllByWeekTypeAndDayType(weekType, dayType);
         Map<Long, List<Lesson>> groupLessons = lessonsToday.stream().collect(groupingBy(Lesson::getGroupId));
         for (Long groupId : groupLessons.keySet()) {
             var lessons = groupLessons.get(groupId);
-            log.info(weekType.name() + " " + dayType.name());
             notificationService.sendSchedule(lessons);
         }
     }
@@ -51,12 +51,12 @@ public class SchedulerScheduleNotification {
         if (semesterStart.getWeekType().equals(WeekType.SECOND_WEEK)) {
             differenceWeek++;
         }
-        return WeekType.values()[differenceWeek % 2];
+        return WeekType.get(differenceWeek % 2);
     }
 
     private DayType getTodayType() {
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Yekaterinburg"));
-        return DayType.values()[today.getDayOfWeek().getValue() - 1];
+        return DayType.get(today.getDayOfWeek().getValue() - 1);
     }
 
     private AcademicYear getStartSemesterDate() {

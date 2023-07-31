@@ -26,7 +26,7 @@ class RabbitMQClient:
 
     async def __callback(self, channel: Channel, body: bytes, envelope, properties):
         json_body = str(body.decode('utf-8'))
-        json_message = json.loads(json_body)
+        json_message = json.loads(json_body, strict=False)
         try:
             if json_message['type'] == 'INFO':
                 await bot.send_message(chat_id=json_message['chat_id'],

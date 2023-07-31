@@ -50,10 +50,10 @@ public class ScheduleTelegramNotificationServiceImpl implements ScheduleTelegram
         this.sendNotification(
                 userId,
                 "Скоро начнется пара",
-                "<b>Пара</b>: " + lesson.getTitle() + /*"\n" +*/
-                        "<b>Преподаватель:</b> " + lesson.getTeacher() + /*"\n" +*/
-                        "<b>Начало пары:</b> " + lesson.getTimeStart() + /*"\n" +*/
-                        "<b>Конец пары:</b> " + lesson.getTimeEnd() + /*"\n" +*/
+                "<b>Пара</b>: " + lesson.getTitle() + "\n" +
+                        "<b>Преподаватель:</b> " + lesson.getTeacher() + "\n" +
+                        "<b>Начало пары:</b> " + lesson.getTimeStart() + "\n" +
+                        "<b>Конец пары:</b> " + lesson.getTimeEnd() + "\n" +
                         "<b>Аудитория</b> : " + lesson.getAuditorium(),
                 sendTime);
     }

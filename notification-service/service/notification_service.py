@@ -23,8 +23,9 @@ class Service:
             asyncio.run(self.rabbit.send_message(f'{{ "chat_id": {notification.chat_id},'
                                                  f'"type": "{notification.type}", '
                                                  f'"text": "{notification.text}", '
-                                                 f'"title": "{notification.title}",'
-                                                 f'"event_id": {notification.event_id} }}'))
+                                                 f'"title": "{notification.title}"'
+                                                 # f'"event_id": {notification.event_id} '
+                                                 f'}}'))
 
     def check_event_on_next_hour(self):
         logger.info('Check events on next hour')
@@ -83,10 +84,11 @@ class Service:
         notification.chat_id = int(json_notification['chat_id'])
         notification.text = json_notification['text']
         notification.title = json_notification['title']
-        if json_notification.get('event_id') is not None:
-            notification.event_id = json_notification.get('event_id')
-        else:
-            notification.event_id = -1
+
+        # if json_notification.get('event_id') is not None:
+        #     notification.event_id = json_notification.get('event_id')
+        # else:
+        #     notification.event_id = -1
 
         if json_notification.get('send_time') is not None and notification.type != 'INFO':
             notification.send_time = datetime.fromisoformat(json_notification['send_time'])

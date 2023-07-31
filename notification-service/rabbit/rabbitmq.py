@@ -21,7 +21,7 @@ class RabbitMQClient:
         await self.channel.publish(message,
                                    exchange_name='service.telegram',
                                    routing_key='telegram-routing-key')
-        message_json = json.loads(message)
+        message_json = json.loads(message, strict=False)
         logger.info(f"Send notification [ type: {message_json['type']}, user: {message_json['chat_id']} ]")
 
     async def __callback(self, channel: Channel, body: bytes, envelope, properties):

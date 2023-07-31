@@ -23,8 +23,7 @@ def push_event_to_queue(notifications: list[Notification]) -> None:
         n_json_bytes = bytes(notification.toJSON().encode('utf-8'))
         if n_json_bytes in saved:
             continue
-        strload = n_json_bytes.decode('utf-8')
-        load = json.loads(n_json_bytes)
+        load = json.loads(n_json_bytes, strict=False)
         json_list.append(load)
 
     json_list.sort(key=lambda x: x['send_time'], reverse=False)
@@ -53,12 +52,12 @@ def get_with_now_send_time_notifications() -> list[Notification]:
             break
         notification_json = json.loads(json_notification)
         notification_time = datetime.fromtimestamp(notification_json['send_time'])
-        if notification_time.minute == now.minute:
-            notification = Notification()
+        if notification_time.minute <= now.minute:
+            notification: Notification = Notification()
             notification.id = notification_json['id']
             notification.send_time = notification_json['send_time']
             notification.type = notification_json['type']
-            notification.event_id = notification_json.get('event_id')
+            # notification.event_id = notification_json.get('event_id')
             notification.chat_id = notification_json['chat_id']
             notification.text = str(notification_json['text'])
             notification.title = str(notification_json['title'])
