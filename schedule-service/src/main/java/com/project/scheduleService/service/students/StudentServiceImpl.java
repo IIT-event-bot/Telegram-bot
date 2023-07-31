@@ -67,7 +67,7 @@ public class StudentServiceImpl implements StudentService {
                 log.error(errorMessage);
                 errorNotificationService.sendNotification(
                         adminChatId,
-                        "Сервис не доступен",
+                        "Сервис не доступен!",
                         "Сервис студентов не доступен",
                         LocalDateTime.now());
                 throw new RuntimeException(errorMessage);
@@ -105,7 +105,7 @@ public class StudentServiceImpl implements StudentService {
                 log.error(errorMessage);
                 errorNotificationService.sendNotification(
                         adminChatId,
-                        "Сервис не доступен",
+                        "Сервис не доступен!",
                         "Сервис студентов не доступен",
                         LocalDateTime.now());
                 throw new RuntimeException(errorMessage);

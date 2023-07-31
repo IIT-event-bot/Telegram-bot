@@ -56,7 +56,7 @@ public class GroupServiceImpl implements GroupService {
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
                 errorNotificationService.sendNotification(
                         adminChatId,
-                        "Сервис не доступен",
+                        "Сервис не доступен!",
                         "Сервис групп не доступен",
                         LocalDateTime.now());
                 throw new RuntimeException("Group service not available");
@@ -93,7 +93,7 @@ public class GroupServiceImpl implements GroupService {
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
                 errorNotificationService.sendNotification(
                         adminChatId,
-                        "Сервис не доступен",
+                        "Сервис не доступен!",
                         "Сервис групп не доступен",
                         LocalDateTime.now());
                 throw new RuntimeException("Group service not available");

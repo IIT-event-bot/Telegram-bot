@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
@@ -69,6 +70,9 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
     @Override
     @Transactional
     public void createSchedule(ScheduleDto schedule) {
+        if (getAcademicYear() == null) {
+            throw new IllegalArgumentException("You can't create schedule without academic year");
+        }
         var lessons = dtoMapper.convertSchedule(schedule);
         checkLocalStudentExists(lessons);
         repository.saveAll(lessons);
@@ -90,11 +94,14 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
     @Override
     public void setStartAcademicYear(LocalDate date, WeekType weekType) {
         int semesterNumber = getSemesterNumber();
+        date = validateAcademicYearStartDate(date);
         checkAcademicYearDate(date, semesterNumber);
         AcademicYear savedAcademicYear = academicYearRepository
                 .getAcademicYearByDateStartAndSemesterNumber(LocalDate.now().getYear(), semesterNumber);
         if (savedAcademicYear != null) {
-            updateAcademicYear(date, weekType);
+            savedAcademicYear.setDateStart(date);
+            savedAcademicYear.setWeekType(weekType);
+            academicYearRepository.save(savedAcademicYear);
             return;
         }
         AcademicYear academicYear = new AcademicYear(0L, date, weekType, semesterNumber);
@@ -112,6 +119,7 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
     @Override
     public void updateAcademicYear(LocalDate date, WeekType weekType) {
         int semesterNumber = getSemesterNumber();
+        date = validateAcademicYearStartDate(date);
         checkAcademicYearDate(date, semesterNumber);
         AcademicYear savedAcademicYear = academicYearRepository
                 .getAcademicYearByDateStartAndSemesterNumber(LocalDate.now().getYear(), semesterNumber);
@@ -120,8 +128,15 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
         academicYearRepository.save(savedAcademicYear);
     }
 
+    private LocalDate validateAcademicYearStartDate(LocalDate date) {
+        if (date.getDayOfWeek().getValue() > DayOfWeek.MONDAY.getValue()) {
+            date = date.minusDays(date.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
+        }
+        return date;
+    }
+
     private int getSemesterNumber() {
-        return LocalDate.now().getMonthValue() < Month.SEPTEMBER.getValue()
+        return LocalDate.now().getMonthValue() >= Month.SEPTEMBER.getValue()
                 ? 1
                 : 2;
     }
