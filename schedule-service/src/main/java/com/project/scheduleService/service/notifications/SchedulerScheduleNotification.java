@@ -29,7 +29,7 @@ public class SchedulerScheduleNotification {
     private final AcademicYearService academicYearService;
     private final ScheduleTelegramNotificationService notificationService;
 
-    @Scheduled(cron = "0 10 0 * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     public void sendSchedule() {
         var dayType = getTodayType();
         var weekType = getWeekTypeToday();

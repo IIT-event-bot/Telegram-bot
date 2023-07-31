@@ -3,25 +3,34 @@ package com.project.scheduleService.service.students;
 import com.project.groupService.GroupServiceGrpc;
 import com.project.groupService.GroupServiceOuterClass;
 import com.project.scheduleService.models.dto.GroupDto;
+import com.project.scheduleService.service.notifications.TelegramNotificationService;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 import static io.grpc.Status.UNAVAILABLE;
 import static io.grpc.Status.UNKNOWN;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class GroupServiceImpl implements GroupService {
     @Value("${grpc.userservice.host}")
     private String userServiceHost;
     @Value("${grpc.userservice.port}")
     private int userServicePort;
+    @Value("${admin.chat.id}")
+    private long adminChatId;
+    private final TelegramNotificationService errorNotificationService;
+
+    public GroupServiceImpl(@Qualifier("errorTelegramNotificationService") TelegramNotificationService errorNotificationService) {
+        this.errorNotificationService = errorNotificationService;
+    }
 
     @Override
     public GroupDto getGroupById(long id) {
@@ -45,6 +54,11 @@ public class GroupServiceImpl implements GroupService {
                 throw new IllegalArgumentException("Group with id '" + id + "' does not exists");
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
+                errorNotificationService.sendNotification(
+                        adminChatId,
+                        "Сервис не доступен",
+                        "Сервис групп не доступен",
+                        LocalDateTime.now());
                 throw new RuntimeException("Group service not available");
             }
             log.error(e.getMessage());
@@ -77,6 +91,11 @@ public class GroupServiceImpl implements GroupService {
                 throw new IllegalArgumentException("Group with title '" + title + "' does not exists");
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
+                errorNotificationService.sendNotification(
+                        adminChatId,
+                        "Сервис не доступен",
+                        "Сервис групп не доступен",
+                        LocalDateTime.now());
                 throw new RuntimeException("Group service not available");
             }
             log.error(e.getMessage());

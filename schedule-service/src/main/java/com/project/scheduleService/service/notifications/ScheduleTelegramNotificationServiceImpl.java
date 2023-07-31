@@ -66,15 +66,16 @@ public class ScheduleTelegramNotificationServiceImpl implements ScheduleTelegram
                                  String text,
                                  LocalDateTime sendTime) {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, String> values = Map.of(
+        Map<String, Object> values = Map.of(
                 "type", "SCHEDULE",
                 "title", title,
-                "chat_id", String.valueOf(chatId),
+                "chat_id", chatId,
                 "text", text,
                 "send_time", sendTime.toString());
         try {
             var message = mapper.writeValueAsString(values);
             rabbitTemplate.convertAndSend("service.notification", "notification-routing-key", message);
+            log.info("Message sending to queue to chat " + chatId);
         } catch (Exception e) {
             log.error(e.getMessage());
         }

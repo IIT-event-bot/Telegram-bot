@@ -127,9 +127,9 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
     }
 
     private void checkAcademicYearDate(LocalDate date, int semesterType) {
-        if (semesterType == 1 && date.getMonthValue() < Month.SEPTEMBER.getValue()
-                || semesterType == 2 && date.getMonthValue() >= Month.SEPTEMBER.getValue()
-                || date.getYear() < LocalDate.now().getYear()) {
+        if ((semesterType == 1 && date.getMonthValue() < Month.SEPTEMBER.getValue())
+                || (semesterType == 2 && date.getMonthValue() >= Month.SEPTEMBER.getValue())
+                || (date.getYear() < LocalDate.now().getYear())) {
             throw new IllegalArgumentException("You can't change last semester");
         }
     }
