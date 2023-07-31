@@ -2,8 +2,8 @@ package com.project.scheduleService.controllers;
 
 import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.models.dto.ScheduleDto;
-import com.project.scheduleService.service.AcademicYearService;
-import com.project.scheduleService.service.ScheduleService;
+import com.project.scheduleService.service.schedule.AcademicYearService;
+import com.project.scheduleService.service.schedule.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

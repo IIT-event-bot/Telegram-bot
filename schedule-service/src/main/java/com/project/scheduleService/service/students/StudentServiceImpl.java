@@ -1,4 +1,4 @@
-package com.project.scheduleService.service;
+package com.project.scheduleService.service.students;
 
 import com.project.scheduleService.models.dto.UserDto;
 import io.grpc.ManagedChannel;
@@ -20,7 +20,7 @@ import static io.grpc.Status.UNKNOWN;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class StudentServiceImpl implements StudentService {
     @Value("${grpc.userservice.host}")
     private String host;
 
@@ -56,6 +56,39 @@ public class UserServiceImpl implements UserService {
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
                 final String errorMessage = "Group service not available";
+                log.error(errorMessage);
+                throw new RuntimeException(errorMessage);
+            }
+            log.error(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public UserDto getStudentChatIdById(long studentId) {
+        ManagedChannel channel = ManagedChannelBuilder
+                .forAddress(host, port)
+                .usePlaintext()
+                .build();
+
+        var stub = com.project.studentService.StudentServiceGrpc.newBlockingStub(channel);
+
+        var request = com.project.studentService.StudentServiceOuterClass.StudentRequest
+                .newBuilder()
+                .setStudentId(studentId)
+                .build();
+        try {
+            var response = stub.getUserByStudentId(request);
+            return new UserDto(response.getId(), response.getUsername());
+        } catch (StatusRuntimeException e) {
+            if (e.getStatus().equals(UNKNOWN)) {
+                throw new IllegalArgumentException("Student with id '" + studentId + "' does not exists");
+            }
+            if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
+                final String errorMessage = "Student service not available";
                 log.error(errorMessage);
                 throw new RuntimeException(errorMessage);
             }

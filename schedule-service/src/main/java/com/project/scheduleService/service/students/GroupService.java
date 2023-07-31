@@ -1,4 +1,4 @@
-package com.project.scheduleService.service;
+package com.project.scheduleService.service.students;
 
 import com.project.scheduleService.models.dto.GroupDto;
 

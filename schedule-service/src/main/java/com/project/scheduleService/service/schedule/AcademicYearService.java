@@ -1,4 +1,4 @@
-package com.project.scheduleService.service;
+package com.project.scheduleService.service.schedule;
 
 import com.project.scheduleService.models.AcademicYear;
 import com.project.scheduleService.models.WeekType;

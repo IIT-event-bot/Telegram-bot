@@ -1,4 +1,4 @@
-package com.project.scheduleService.service;
+package com.project.scheduleService.service.schedule;
 
 import com.project.scheduleService.models.AcademicYear;
 import com.project.scheduleService.models.DayType;
@@ -8,6 +8,7 @@ import com.project.scheduleService.models.dto.ScheduleDto;
 import com.project.scheduleService.models.dto.WeekDto;
 import com.project.scheduleService.repositories.AcademicYearRepository;
 import com.project.scheduleService.repositories.LessonRepository;
+import com.project.scheduleService.service.students.StudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
     private final LessonRepository repository;
     private final ScheduleDtoMapper dtoMapper;
     private final AcademicYearRepository academicYearRepository;
+    private final StudentService studentService;
 
     @Override
     @Transactional
@@ -51,6 +53,7 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
         var lessons = dtoMapper.convertSchedule(schedule);
         var savedSchedule = repository.getAllByGroupId(lessons.get(0).getGroupId());
         deleteIfNotExist(savedSchedule, lessons);
+        checkLocalStudentExists(lessons);
         repository.saveAll(lessons);
     }
 
@@ -67,6 +70,7 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
     @Transactional
     public void createSchedule(ScheduleDto schedule) {
         var lessons = dtoMapper.convertSchedule(schedule);
+        checkLocalStudentExists(lessons);
         repository.saveAll(lessons);
     }
 
@@ -127,6 +131,14 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
                 || semesterType == 2 && date.getMonthValue() >= Month.SEPTEMBER.getValue()
                 || date.getYear() < LocalDate.now().getYear()) {
             throw new IllegalArgumentException("You can't change last semester");
+        }
+    }
+
+    private void checkLocalStudentExists(List<Lesson> lessons) {
+        for (Lesson lesson : lessons) {
+            for (Long localUser : lesson.getLocalUsers()) {
+                studentService.getStudentChatIdById(localUser);
+            }
         }
     }
 }

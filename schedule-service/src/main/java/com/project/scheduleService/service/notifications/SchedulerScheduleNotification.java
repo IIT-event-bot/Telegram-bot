@@ -1,9 +1,10 @@
-package com.project.scheduleService.service;
+package com.project.scheduleService.service.notifications;
 
 import com.project.scheduleService.models.DayType;
 import com.project.scheduleService.models.Lesson;
 import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.repositories.LessonRepository;
+import com.project.scheduleService.service.schedule.AcademicYearService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;

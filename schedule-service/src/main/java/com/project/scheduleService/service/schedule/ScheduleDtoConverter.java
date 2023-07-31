@@ -1,4 +1,4 @@
-package com.project.scheduleService.service;
+package com.project.scheduleService.service.schedule;
 
 import com.project.scheduleService.models.DayType;
 import com.project.scheduleService.models.Lesson;
@@ -7,6 +7,7 @@ import com.project.scheduleService.models.dto.DayDto;
 import com.project.scheduleService.models.dto.LessonDto;
 import com.project.scheduleService.models.dto.ScheduleDto;
 import com.project.scheduleService.models.dto.WeekDto;
+import com.project.scheduleService.service.students.GroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

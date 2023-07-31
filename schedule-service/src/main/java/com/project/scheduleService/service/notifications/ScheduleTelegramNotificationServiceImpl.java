@@ -1,9 +1,11 @@
-package com.project.scheduleService.service;
+package com.project.scheduleService.service.notifications;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.scheduleService.models.Lesson;
 import com.project.scheduleService.models.dto.GroupDto;
 import com.project.scheduleService.models.dto.UserDto;
+import com.project.scheduleService.service.students.GroupService;
+import com.project.scheduleService.service.students.StudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -21,7 +23,7 @@ import java.util.Map;
 public class ScheduleTelegramNotificationServiceImpl implements ScheduleTelegramNotificationService {
     private final RabbitTemplate rabbitTemplate;
     private final GroupService groupService;
-    private final UserService userService;
+    private final StudentService studentService;
 
     @Override
     public void sendSchedule(List<Lesson> lessons) {
@@ -29,7 +31,7 @@ public class ScheduleTelegramNotificationServiceImpl implements ScheduleTelegram
             return;
         }
         GroupDto group = groupService.getGroupById(lessons.get(0).getGroupId());
-        List<UserDto> users = userService.getUserIdByGroupId(group.id());
+        List<UserDto> users = studentService.getUserIdByGroupId(group.id());
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Yekaterinburg"));
         for (UserDto user : users) {
             for (Lesson lesson : lessons) {

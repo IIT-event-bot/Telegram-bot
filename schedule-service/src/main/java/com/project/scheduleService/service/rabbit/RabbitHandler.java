@@ -1,4 +1,4 @@
-package com.project.scheduleService.service;
+package com.project.scheduleService.service.rabbit;
 
 import com.project.scheduleService.config.RabbitConfig;
 import lombok.extern.slf4j.Slf4j;
