@@ -31,7 +31,9 @@ public class SchedulerScheduleNotification {
 
     @Scheduled(cron = "0 30 0 * * *")
     public void sendSchedule() {
-
+        if (LocalDate.now().isBefore(academicYearService.getAcademicYear().getDateStart())) {
+            return;
+        }
         var dayType = getTodayType();
         var weekType = getWeekTypeToday();
         log.info("Sending schedule on week " + weekType.name() + " day " + dayType.name());
