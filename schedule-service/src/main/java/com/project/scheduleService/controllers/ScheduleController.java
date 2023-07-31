@@ -2,6 +2,7 @@ package com.project.scheduleService.controllers;
 
 import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.models.dto.ScheduleDto;
+import com.project.scheduleService.service.AcademicYearService;
 import com.project.scheduleService.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +14,12 @@ import java.time.LocalDate;
 @RequestMapping("/api/schedule")
 public class ScheduleController {
     private final ScheduleService service;
+    private final AcademicYearService academicYearService;
 
     @Autowired
-    public ScheduleController(ScheduleService service) {
+    public ScheduleController(ScheduleService service, AcademicYearService academicYearService) {
         this.service = service;
+        this.academicYearService = academicYearService;
     }
 
     @GetMapping("/{groupId}")
@@ -24,9 +27,9 @@ public class ScheduleController {
         return ResponseEntity.ok(service.getGroupSchedule(groupId));
     }
 
-    @GetMapping("/{groupId}/{weekTitle}")
+    @GetMapping("/{groupId}/{weekType}")
     public ResponseEntity<?> getWeek(@PathVariable("groupId") long groupId,
-                                     @PathVariable("weekTitle") String weekTitle) {
+                                     @PathVariable("weekType") WeekType weekTitle) {
         return ResponseEntity.ok(service.getWeek(groupId, weekTitle));
     }
 
@@ -51,7 +54,19 @@ public class ScheduleController {
     @PostMapping("/academicYear")
     public ResponseEntity<?> setStartAcademicYear(@RequestParam LocalDate date,
                                                   @RequestParam WeekType weekType) {
-        service.setStartAcademicYear(date, weekType);
+        academicYearService.setStartAcademicYear(date, weekType);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/academicYear")
+    public ResponseEntity<?> updateAcademicYear(@RequestParam LocalDate date,
+                                                @RequestParam WeekType weekType) {
+        academicYearService.updateAcademicYear(date, weekType);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/academicYear")
+    public ResponseEntity<?> getAcademicYear() {
+        return ResponseEntity.ok(academicYearService.getAcademicYear());
     }
 }

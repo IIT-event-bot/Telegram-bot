@@ -18,7 +18,7 @@ import java.time.Month;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ScheduleServiceImpl implements ScheduleService {
+public class ScheduleServiceImpl implements ScheduleService, AcademicYearService {
     private final LessonRepository repository;
     private final ScheduleDtoMapper dtoMapper;
     private final AcademicYearRepository academicYearRepository;
@@ -57,8 +57,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     @Transactional
-    public WeekDto getWeek(long groupId, String weekTitle) {
-        WeekType weekType = WeekType.valueOf(weekTitle.toUpperCase());
+    public WeekDto getWeek(long groupId, WeekType weekType) {
         var lessons = repository.getAllByGroupIdAndWeekType(groupId, weekType);
         return dtoMapper.convertWeek(lessons, weekType);
     }
@@ -66,18 +65,48 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     @Override
     public void setStartAcademicYear(LocalDate date, WeekType weekType) {
-        int semesterNumber = LocalDate.now().getMonthValue() < Month.SEPTEMBER.getValue()
-                ? 1
-                : 2;
+        int semesterNumber = getSemesterNumber();
+        checkAcademicYearDate(date, semesterNumber);
         AcademicYear savedAcademicYear = academicYearRepository
                 .getAcademicYearByDateStartAndSemesterNumber(LocalDate.now().getYear(), semesterNumber);
         if (savedAcademicYear != null) {
-            savedAcademicYear.setDateStart(date);
-            savedAcademicYear.setWeekType(weekType);
-            academicYearRepository.save(savedAcademicYear);
+            updateAcademicYear(date, weekType);
             return;
         }
         AcademicYear academicYear = new AcademicYear(0L, date, weekType, semesterNumber);
         academicYearRepository.save(academicYear);
+    }
+
+    @Override
+    public AcademicYear getAcademicYear() {
+        int semesterNumber = getSemesterNumber();
+        return academicYearRepository
+                .getAcademicYearByDateStartAndSemesterNumber(LocalDate.now().getYear(), semesterNumber);
+    }
+
+    @Transactional
+    @Override
+    public void updateAcademicYear(LocalDate date, WeekType weekType) {
+        int semesterNumber = getSemesterNumber();
+        checkAcademicYearDate(date, semesterNumber);
+        AcademicYear savedAcademicYear = academicYearRepository
+                .getAcademicYearByDateStartAndSemesterNumber(LocalDate.now().getYear(), semesterNumber);
+        savedAcademicYear.setDateStart(date);
+        savedAcademicYear.setWeekType(weekType);
+        academicYearRepository.save(savedAcademicYear);
+    }
+
+    private int getSemesterNumber() {
+        return LocalDate.now().getMonthValue() < Month.SEPTEMBER.getValue()
+                ? 1
+                : 2;
+    }
+
+    private void checkAcademicYearDate(LocalDate date, int semesterType) {
+        if (semesterType == 1 && date.getMonthValue() < Month.SEPTEMBER.getValue()
+                || semesterType == 2 && date.getMonthValue() >= Month.SEPTEMBER.getValue()
+                || date.getYear() < LocalDate.now().getYear()) {
+            throw new IllegalArgumentException("You can't change last semester");
+        }
     }
 }

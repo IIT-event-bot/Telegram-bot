@@ -4,7 +4,6 @@ import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.models.dto.ScheduleDto;
 import com.project.scheduleService.models.dto.WeekDto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public interface ScheduleService {
@@ -18,7 +17,5 @@ public interface ScheduleService {
 
     void deleteSchedule(long groupId);
 
-    WeekDto getWeek(long groupId, String weekTitle);
-
-    void setStartAcademicYear(LocalDate date, WeekType weekType);
+    WeekDto getWeek(long groupId, WeekType weekType);
 }
