@@ -1,15 +1,17 @@
 package com.project.scheduleService.service;
 
+import com.project.scheduleService.models.Lesson;
 import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.models.dto.ScheduleDto;
 import com.project.scheduleService.models.dto.WeekDto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 
 public interface ScheduleService {
     ScheduleDto getGroupSchedule(long groupId);
 
-    ScheduleDto getScheduleOnDate(LocalDateTime date);
+    List<Lesson> getScheduleOnDate(LocalDate date);
 
     void updateSchedule(ScheduleDto schedule);
 

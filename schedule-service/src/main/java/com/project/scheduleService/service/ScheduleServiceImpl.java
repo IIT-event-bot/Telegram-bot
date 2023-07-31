@@ -1,6 +1,7 @@
 package com.project.scheduleService.service;
 
 import com.project.scheduleService.models.AcademicYear;
+import com.project.scheduleService.models.DayType;
 import com.project.scheduleService.models.Lesson;
 import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.models.dto.ScheduleDto;
@@ -13,8 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -33,8 +34,15 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
     }
 
     @Override
-    public ScheduleDto getScheduleOnDate(LocalDateTime date) {
-        throw new RuntimeException("Not implemented method");
+    public List<Lesson> getScheduleOnDate(LocalDate date) {
+        var day = DayType.get(date.getDayOfWeek().getValue() - 1);
+        var semesterStart = getAcademicYear();
+        int differenceWeek = (int) semesterStart.getDateStart().until(date, ChronoUnit.WEEKS);
+        if (semesterStart.getWeekType().equals(WeekType.SECOND_WEEK)) {
+            differenceWeek++;
+        }
+        var week = WeekType.get(differenceWeek % 2);
+        return repository.getAllByWeekTypeAndDayType(week, day);
     }
 
     @Override
@@ -63,7 +71,6 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
     }
 
     @Override
-    @Transactional
     public void deleteSchedule(long id) {
         repository.deleteByGroupId(id);
     }
