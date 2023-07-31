@@ -1,6 +1,7 @@
 package com.project.scheduleService.service;
 
 import com.project.scheduleService.models.AcademicYear;
+import com.project.scheduleService.models.Lesson;
 import com.project.scheduleService.models.WeekType;
 import com.project.scheduleService.models.dto.ScheduleDto;
 import com.project.scheduleService.models.dto.WeekDto;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +41,18 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
     @Transactional
     public void updateSchedule(ScheduleDto schedule) {
         var lessons = dtoMapper.convertSchedule(schedule);
+        var savedSchedule = repository.getAllByGroupId(lessons.get(0).getGroupId());
+        deleteIfNotExist(savedSchedule, lessons);
         repository.saveAll(lessons);
+    }
+
+    private void deleteIfNotExist(List<Lesson> lessonList1, List<Lesson> lessonList2) {
+        for (Lesson lesson : lessonList1) {
+            boolean isExist = lessonList2.stream().anyMatch(l -> l.getId() == lesson.getId());
+            if (!isExist) {
+                repository.delete(lesson);
+            }
+        }
     }
 
     @Override
