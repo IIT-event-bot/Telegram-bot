@@ -7,6 +7,9 @@
         <option value="$PROJECT_DIR$/user-service-java/pom.xml" />
         <option value="$PROJECT_DIR$/event-service-java/pom.xml" />
         <option value="$PROJECT_DIR$/schedule-service/pom.xml" />
+        <option value="$PROJECT_DIR$/schedule-service-kotlin/pom.xml" />
+        <option value="$PROJECT_DIR$/event-service/pom.xml" />
+        <option value="$PROJECT_DIR$/notification-service-kotlin/pom.xml" />
       </list>
     </option>
   </component>

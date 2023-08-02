@@ -24,7 +24,7 @@ services:
   userservice:
     container_name: event_bot_user_service
     build:
-      context: user-service-java
+      context: user-service
       dockerfile: Dockerfile
     ports:
       - "22000:8000"
@@ -39,7 +39,7 @@ services:
   eventservice:
     container_name: event_bot_event_service
     build:
-      context: event-service-java
+      context: event-service
       dockerfile: Dockerfile
     ports:
       - "22001:8001"
