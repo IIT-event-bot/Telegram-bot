@@ -64,13 +64,7 @@ public class StudentServiceImpl implements StudentService {
                 throw new IllegalArgumentException(errorMessage);
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
-                errorNotificationService.sendNotification(adminChatId,
-                        "Сервис не доступен!",
-                        "Сервис групп не доступен",
-                        LocalDateTime.now());
-                final String errorMessage = "Group service not available";
-                log.error(errorMessage);
-                throw new RuntimeException(errorMessage);
+                handleUnavailableGrpcService("Group service not available");
             }
             log.error(e.getMessage());
             throw e;
@@ -103,13 +97,7 @@ public class StudentServiceImpl implements StudentService {
                 throw new IllegalArgumentException(errorMessage);
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
-                errorNotificationService.sendNotification(adminChatId,
-                        "Сервис не доступен!",
-                        "Сервис групп не доступен",
-                        LocalDateTime.now());
-                final String errorMessage = "Student service not available";
-                log.error(errorMessage);
-                throw new RuntimeException(errorMessage);
+                handleUnavailableGrpcService("Student service not available");
             }
             log.error(e.getMessage());
             throw e;
@@ -142,13 +130,7 @@ public class StudentServiceImpl implements StudentService {
                 throw new IllegalArgumentException(errorMessage);
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
-                errorNotificationService.sendNotification(adminChatId,
-                        "Сервис не доступен!",
-                        "Сервис студентов не доступен",
-                        LocalDateTime.now());
-                final String errorMessage = "Student service not available";
-                log.error(errorMessage);
-                throw new RuntimeException(errorMessage);
+                handleUnavailableGrpcService("Student service not available");
             }
             log.error(e.getMessage());
             throw e;
@@ -181,13 +163,7 @@ public class StudentServiceImpl implements StudentService {
                 throw new IllegalArgumentException(errorMessage);
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
-                errorNotificationService.sendNotification(adminChatId,
-                        "Сервис не доступен!",
-                        "Сервис групп не доступен",
-                        LocalDateTime.now());
-                final String errorMessage = "Group service not available";
-                log.error(errorMessage);
-                throw new RuntimeException(errorMessage);
+                handleUnavailableGrpcService("Group service not available");
             }
             log.error(e.getMessage());
             throw e;
@@ -220,13 +196,7 @@ public class StudentServiceImpl implements StudentService {
                 throw new IllegalArgumentException(errorMessage);
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
-                errorNotificationService.sendNotification(adminChatId,
-                        "Сервис не доступен!",
-                        "Сервис пользователей не доступен",
-                        LocalDateTime.now());
-                final String errorMessage = "Student service not available";
-                log.error(errorMessage);
-                throw new RuntimeException(errorMessage);
+                handleUnavailableGrpcService("Student service not available");
             }
             log.error(e.getMessage());
             throw e;
@@ -234,5 +204,14 @@ public class StudentServiceImpl implements StudentService {
             log.error(e.getMessage());
             throw new RuntimeException();
         }
+    }
+
+    private void handleUnavailableGrpcService(final String errorMessage) {
+        errorNotificationService.sendNotification(adminChatId,
+                "Сервис не доступен!",
+                errorMessage,
+                LocalDateTime.now());
+        log.error(errorMessage);
+        throw new RuntimeException(errorMessage);
     }
 }

@@ -22,7 +22,6 @@ public class ErrorNotificationService implements TelegramNotificationService {
                 "title", title,
                 "chat_id", chatId,
                 "text", text,
-                "send_time", sendTime.toString(),
                 "type", "SYS_INFO"
         );
         try {
