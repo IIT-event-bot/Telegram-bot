@@ -2,15 +2,18 @@ package com.project.event.services.student;
 
 import com.project.event.models.dto.GroupDto;
 import com.project.event.models.dto.StudentDto;
+import com.project.event.services.notification.TelegramNotificationService;
 import com.project.studentService.StudentServiceGrpc;
 import com.project.studentService.StudentServiceOuterClass;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +27,14 @@ public class StudentServiceImpl implements StudentService {
     private String userServiceHost;
     @Value("${grpc.userservice.port}")
     private int userServicePort;
+    @Value("${admin.chat.id}")
+    private long adminChatId;
+
+    private final TelegramNotificationService errorNotificationService;
+
+    public StudentServiceImpl(@Qualifier("errorNotificationService") TelegramNotificationService errorNotificationService) {
+        this.errorNotificationService = errorNotificationService;
+    }
 
     @Override
     public List<Long> getStudentChatIdByGroupId(Long groupId) {
@@ -53,6 +64,10 @@ public class StudentServiceImpl implements StudentService {
                 throw new IllegalArgumentException(errorMessage);
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
+                errorNotificationService.sendNotification(adminChatId,
+                        "Сервис не доступен!",
+                        "Сервис групп не доступен",
+                        LocalDateTime.now());
                 final String errorMessage = "Group service not available";
                 log.error(errorMessage);
                 throw new RuntimeException(errorMessage);
@@ -88,6 +103,10 @@ public class StudentServiceImpl implements StudentService {
                 throw new IllegalArgumentException(errorMessage);
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
+                errorNotificationService.sendNotification(adminChatId,
+                        "Сервис не доступен!",
+                        "Сервис групп не доступен",
+                        LocalDateTime.now());
                 final String errorMessage = "Student service not available";
                 log.error(errorMessage);
                 throw new RuntimeException(errorMessage);
@@ -123,6 +142,10 @@ public class StudentServiceImpl implements StudentService {
                 throw new IllegalArgumentException(errorMessage);
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
+                errorNotificationService.sendNotification(adminChatId,
+                        "Сервис не доступен!",
+                        "Сервис студентов не доступен",
+                        LocalDateTime.now());
                 final String errorMessage = "Student service not available";
                 log.error(errorMessage);
                 throw new RuntimeException(errorMessage);
@@ -158,6 +181,10 @@ public class StudentServiceImpl implements StudentService {
                 throw new IllegalArgumentException(errorMessage);
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
+                errorNotificationService.sendNotification(adminChatId,
+                        "Сервис не доступен!",
+                        "Сервис групп не доступен",
+                        LocalDateTime.now());
                 final String errorMessage = "Group service not available";
                 log.error(errorMessage);
                 throw new RuntimeException(errorMessage);
@@ -193,6 +220,10 @@ public class StudentServiceImpl implements StudentService {
                 throw new IllegalArgumentException(errorMessage);
             }
             if (e.getStatus().getCode().equals(UNAVAILABLE.getCode())) {
+                errorNotificationService.sendNotification(adminChatId,
+                        "Сервис не доступен!",
+                        "Сервис пользователей не доступен",
+                        LocalDateTime.now());
                 final String errorMessage = "Student service not available";
                 log.error(errorMessage);
                 throw new RuntimeException(errorMessage);

@@ -90,10 +90,10 @@ class Service:
         # else:
         #     notification.event_id = -1
 
-        if json_notification.get('send_time') is not None and notification.type != 'INFO':
-            notification.send_time = datetime.fromisoformat(json_notification['send_time'])
-        elif notification.type == 'INFO' or notification.type == 'SYS_INFO':
+        if notification.type == 'INFO' or notification.type == 'SYS_INFO':
             notification.send_time = datetime.now()
+        elif json_notification.get('send_time') is not None:
+            notification.send_time = datetime.fromisoformat(json_notification['send_time'])
         else:
             raise Exception('Notification with type not INFO must be with send_time parameter')
 
