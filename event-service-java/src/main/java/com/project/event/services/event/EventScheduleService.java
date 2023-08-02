@@ -1,8 +1,9 @@
-package com.project.event.services;
+package com.project.event.services.event;
 
 import com.project.event.models.Event;
-import com.project.event.models.NotificationType;
+import com.project.event.models.utils.NotificationType;
 import com.project.event.repositories.EventRepository;
+import com.project.event.services.notification.TelegramEventNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;

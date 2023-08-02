@@ -66,7 +66,7 @@ public class ScheduleTelegramNotificationServiceImpl implements ScheduleTelegram
                                  String text,
                                  LocalDateTime sendTime) {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> values = Map.of(
+        Map<String, ?> values = Map.of(
                 "type", "SCHEDULE",
                 "title", title,
                 "chat_id", chatId,

@@ -1,9 +1,9 @@
 package com.project.event.controllers;
 
 import com.project.event.models.Event;
-import com.project.event.models.EventDto;
-import com.project.event.services.EventService;
-import com.project.event.services.FeedbackService;
+import com.project.event.models.dto.EventDto;
+import com.project.event.services.event.EventService;
+import com.project.event.services.feedback.FeedbackService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;

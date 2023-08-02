@@ -1,7 +1,7 @@
-package com.project.event.services;
+package com.project.event.services.event;
 
 import com.project.event.models.Event;
-import com.project.event.models.EventDto;
+import com.project.event.models.dto.EventDto;
 
 import java.util.List;
 

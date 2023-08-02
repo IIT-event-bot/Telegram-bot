@@ -1,4 +1,4 @@
-package com.project.event.models;
+package com.project.event.models.utils;
 
 public enum RabbitMessageMethodType {
     ADD_GRADE,

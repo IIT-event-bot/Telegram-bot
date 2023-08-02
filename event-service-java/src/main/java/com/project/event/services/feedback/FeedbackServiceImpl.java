@@ -1,11 +1,13 @@
-package com.project.event.services;
+package com.project.event.services.feedback;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.event.config.RabbitConfig;
 import com.project.event.models.*;
+import com.project.event.models.utils.RabbitMessage;
 import com.project.event.repositories.CheckedStudentRepository;
 import com.project.event.repositories.EventGradeRepository;
 import com.project.event.repositories.FeedbackRepository;
+import com.project.event.services.student.StudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;

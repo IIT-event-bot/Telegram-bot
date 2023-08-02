@@ -1,6 +1,6 @@
 package com.project.event.controllers;
 
-import com.project.event.models.ErrorMessage;
+import com.project.event.models.utils.ErrorMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

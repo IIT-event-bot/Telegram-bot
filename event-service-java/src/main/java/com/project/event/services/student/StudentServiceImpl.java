@@ -1,7 +1,7 @@
-package com.project.event.services;
+package com.project.event.services.student;
 
-import com.project.event.models.GroupDto;
-import com.project.event.models.StudentDto;
+import com.project.event.models.dto.GroupDto;
+import com.project.event.models.dto.StudentDto;
 import com.project.studentService.StudentServiceGrpc;
 import com.project.studentService.StudentServiceOuterClass;
 import io.grpc.ManagedChannel;
