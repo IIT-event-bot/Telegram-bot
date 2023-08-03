@@ -24,8 +24,22 @@ class NotificationServiceImpl(
     override fun saveNotification(notification: Notification) {
         if (notification.type == NotificationType.INFO || notification.type == NotificationType.SYS_INFO) {
             notification.sendTime = LocalDateTime.now(ZoneId.of("Asia/Yekaterinburg"))
-            sendNotification(notification)
-        } else if (notification.sendTime!!.isBefore(LocalDateTime.now(ZoneId.of("Asia/Yekaterinburg")).plusHours(1))) {
+            val savedNotification = repository.save(notification)
+            sendNotification(savedNotification)
+            return
+        }
+        if ((notification.type == NotificationType.EVENT || notification.type == NotificationType.FEEDBACK)
+            && notification.sendTime == null
+        ) {
+            throw IllegalArgumentException("Notification with type not 'INFO' or 'SYS_INFO' must be with 'sendTime' parameter")
+        }
+        if ((notification.type == NotificationType.EVENT || notification.type == NotificationType.FEEDBACK)
+            && notification.eventId == null
+        ) {
+            throw IllegalArgumentException("Notification with type 'EVENT' or 'FEEDBACK' must be with 'eventId' parameter")
+        }
+        val inHour = LocalDateTime.now(ZoneId.of("Asia/Yekaterinburg")).plusHours(1)
+        if (notification.sendTime!!.isBefore(inHour)) {
             notificationQueue.pushNotificationToQueue(notification)
         }
         repository.save(notification)

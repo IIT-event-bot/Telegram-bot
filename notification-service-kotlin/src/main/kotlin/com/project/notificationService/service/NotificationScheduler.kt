@@ -31,7 +31,7 @@ class NotificationScheduler(
         for (n in notifications) {
             service.sendNotification(n)
         }
-        log.info("Sending notification on time")
+        log.info("Sending notification...")
     }
 
     companion object {
