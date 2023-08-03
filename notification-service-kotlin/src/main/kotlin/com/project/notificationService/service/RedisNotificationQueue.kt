@@ -5,7 +5,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.project.notificationService.models.Notification
 import com.project.notificationService.models.NotificationDto
-import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
@@ -14,7 +13,6 @@ import java.time.ZoneId
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 class RedisNotificationQueue(
     private val redisTemplate: RedisTemplate<String, Any>,
     private val dtoMapper: NotificationDtoConverter
@@ -49,7 +47,7 @@ class RedisNotificationQueue(
             val notificationJson: String = redisTemplate.opsForList().rightPop(QUEUE_NAME)?.toString() ?: break
             val notificationDto: NotificationDto = mapper.readValue<NotificationDto>(notificationJson)
             val notification = dtoMapper.map(notificationDto)
-            if (notification.sendTime.isAfterMinute(now)) {
+            if (notification.sendTime!!.isAfterMinute(now)) {
                 redisTemplate.opsForList().rightPush(QUEUE_NAME, notificationJson)
                 break
             }

@@ -35,7 +35,7 @@ class RabbitConfig {
 
     @Bean
     fun userServiceQueue(): Queue {
-        return Queue(USER_SERVICE_QUEUE, true, false, false)
+        return Queue(NOTIFICATION_SERVICE_QUEUE, true, false, false)
     }
 
     @Bean
@@ -49,8 +49,8 @@ class RabbitConfig {
     }
 
     companion object {
-        const val USER_SERVICE_QUEUE = "user-service"
-        const val EXCHANGE = "service.user"
-        const val ROUTING_KEY = "user-routing-key"
+        const val NOTIFICATION_SERVICE_QUEUE = "send-notification"
+        const val EXCHANGE = "service.notification"
+        const val ROUTING_KEY = "notification-routing-key"
     }
 }

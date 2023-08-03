@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong
 class NotificationScheduler(private val notificationQueue: NotificationQueueService) {
     val counter: AtomicLong = AtomicLong()
 
-//    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "0 0 */1 * * *")
     @Transactional
     @Synchronized
     fun saveNotificationOnHour() {
@@ -34,10 +34,9 @@ class NotificationScheduler(private val notificationQueue: NotificationQueueServ
                 null
             )
         )
-        log.info("Send notification to queue")
     }
 
-    @Scheduled(cron = "*/30 * * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     @Transactional
     @Synchronized
     fun sendNotificationOnTime() {

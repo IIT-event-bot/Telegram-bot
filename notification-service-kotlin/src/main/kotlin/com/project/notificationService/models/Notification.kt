@@ -34,7 +34,7 @@ data class Notification(
 
     @Column(name = "send_time", nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
-    val sendTime: LocalDateTime,
+    var sendTime: LocalDateTime?,
 
     @Column(name = "event_id")
     val eventId: Long?
