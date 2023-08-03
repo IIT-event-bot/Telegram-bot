@@ -5,18 +5,23 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.project.notificationService.models.Notification
 import com.project.notificationService.models.NotificationDto
-import lombok.extern.slf4j.Slf4j
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 @Service
-@Slf4j
 class RedisNotificationQueue(
     private val redisTemplate: RedisTemplate<String, Any>,
     private val dtoMapper: NotificationDtoConverter
 ) : NotificationQueueService {
+    override fun pushNotificationsToQueue(notifications: List<Notification>) {
+        for (n in notifications) {
+            pushNotificationToQueue(n)
+        }
+    }
+
+    @Synchronized
     override fun pushNotificationToQueue(notification: Notification) {
         val mapper: ObjectMapper = jacksonObjectMapper()
         val dto = dtoMapper.map(notification)

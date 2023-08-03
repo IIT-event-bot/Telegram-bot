@@ -16,7 +16,7 @@ class NotificationDtoMapper : NotificationDtoConverter {
             chatId = notification.chatId,
             text = notification.text,
             title = notification.title,
-            sendTime = notification.sendTime.toEpochSecond(ZoneOffset.of("+5")),
+            sendTime = notification.sendTime!!.toEpochSecond(ZoneOffset.of("+5")),
             eventId = notification.eventId
         )
     }

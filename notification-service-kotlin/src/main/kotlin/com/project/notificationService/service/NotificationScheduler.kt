@@ -1,39 +1,26 @@
 package com.project.notificationService.service
 
-import com.project.notificationService.models.Notification
-import com.project.notificationService.models.NotificationType
-import jakarta.transaction.Transactional
-import lombok.RequiredArgsConstructor
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.util.Random
-import java.util.concurrent.atomic.AtomicLong
 
 @Service
-@RequiredArgsConstructor
 @EnableScheduling
-class NotificationScheduler(private val notificationQueue: NotificationQueueService) {
-    val counter: AtomicLong = AtomicLong()
-
+class NotificationScheduler(
+    private val service: NotificationService,
+    private val notificationQueue: NotificationQueueService
+) {
     @Scheduled(cron = "0 0 */1 * * *")
     @Transactional
     @Synchronized
     fun saveNotificationOnHour() {
-        notificationQueue.pushNotificationToQueue(
-            Notification(
-                counter.incrementAndGet(),
-                NotificationType.SYS_INFO,
-                1234,
-                "text",
-                "title",
-                LocalDateTime.now().plusMinutes(Random().nextLong(20)),
-                null
-            )
-        )
+        log.info("Check notification on hour")
+        val onHourNotification = service.getNotificationBeforeTime(LocalDateTime.now().plusHours(1))
+        notificationQueue.pushNotificationsToQueue(onHourNotification)
     }
 
     @Scheduled(cron = "0 */1 * * * *")
@@ -41,10 +28,10 @@ class NotificationScheduler(private val notificationQueue: NotificationQueueServ
     @Synchronized
     fun sendNotificationOnTime() {
         val notifications = notificationQueue.getNowNotification()
-        log.info("Check notification")
-        for (notification in notifications) {
-            log.info("title: ${notification.title}, chat: ${notification.chatId}, send time: ${notification.sendTime}")
+        for (n in notifications) {
+            service.sendNotification(n)
         }
+        log.info("Sending notification on time")
     }
 
     companion object {
