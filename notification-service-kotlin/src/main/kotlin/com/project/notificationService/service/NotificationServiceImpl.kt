@@ -1,7 +1,6 @@
 package com.project.notificationService.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.project.notificationService.NotificationRepository
 import com.project.notificationService.models.Notification
 import com.project.notificationService.models.NotificationType
@@ -18,7 +17,7 @@ class NotificationServiceImpl(
     private val repository: NotificationRepository,
     private val notificationQueue: NotificationQueueService,
     private val rabbitTemplate: RabbitTemplate,
-    private val converter: NotificationDtoConverter
+    private val mapper: ObjectMapper
 ) : NotificationService {
     @Transactional
     override fun saveNotification(notification: Notification) {
@@ -50,15 +49,13 @@ class NotificationServiceImpl(
     }
 
     override fun sendNotification(notification: Notification) {
-        val mapper: ObjectMapper = jacksonObjectMapper()
         try {
-            val dto = converter.map(notification)
             rabbitTemplate.convertAndSend(
                 "service.telegram",
                 "telegram-routing-key",
-                mapper.writeValueAsString(dto)
+                mapper.writeValueAsString(notification)
             )
-            log.info("Send notification [ type: ${notification.type.name}, user: ${notification.chatId} ]")
+            log.debug("Send notification [ type: ${notification.type.name}, user: ${notification.chatId} ]")
         } catch (e: Exception) {
             log.error(e.message)
         }

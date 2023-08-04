@@ -20,7 +20,7 @@ public class ErrorNotificationService implements TelegramNotificationService {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, ?> values = Map.of(
                 "title", title,
-                "chat_id", chatId,
+                "chatId", chatId,
                 "text", text,
                 "type", "SYS_INFO"
         );

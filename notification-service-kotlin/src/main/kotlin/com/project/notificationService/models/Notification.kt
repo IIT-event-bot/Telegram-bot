@@ -1,6 +1,5 @@
 package com.project.notificationService.models
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
 import lombok.AllArgsConstructor
 import lombok.Getter
@@ -17,7 +16,7 @@ import java.time.LocalDateTime
 data class Notification(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long?,
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -33,7 +32,6 @@ data class Notification(
     val title: String,
 
     @Column(name = "send_time", nullable = false)
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     var sendTime: LocalDateTime?,
 
     @Column(name = "event_id")

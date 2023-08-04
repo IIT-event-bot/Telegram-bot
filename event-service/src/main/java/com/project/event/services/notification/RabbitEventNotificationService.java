@@ -67,7 +67,7 @@ public class RabbitEventNotificationService implements TelegramEventNotification
         Map<String, ?> values = Map.of(
                 "type", type.name(),
                 "text", text,
-                "event_id", String.valueOf(eventId)
+                "eventId", String.valueOf(eventId)
         );
         try {
             sendNotification(chatId, title, mapper.writeValueAsString(values), sendTime);
@@ -83,9 +83,9 @@ public class RabbitEventNotificationService implements TelegramEventNotification
                                  LocalDateTime sendTime) {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> values = new HashMap<>();
-        values.put("chat_id", chatId);
+        values.put("chatId", chatId);
         values.put("title", title);
-        values.put("send_time", sendTime.toString());
+        values.put("sendTime", sendTime.toString());
 
         try {
             Map<String, Object> mapBody = mapper.readValue(text, new TypeReference<>() {

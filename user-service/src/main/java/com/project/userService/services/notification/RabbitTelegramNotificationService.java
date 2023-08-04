@@ -20,7 +20,7 @@ public class RabbitTelegramNotificationService implements TelegramNotificationSe
         Map<String, String> values = Map.of(
                 "type", "SYS_INFO",
                 "title", title,
-                "chat_id", String.valueOf(chatId),
+                "chatId", String.valueOf(chatId),
                 "text", text);
         try {
             var message = mapper.writeValueAsString(values);

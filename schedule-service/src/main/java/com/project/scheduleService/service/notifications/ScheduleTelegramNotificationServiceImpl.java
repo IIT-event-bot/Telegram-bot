@@ -69,9 +69,9 @@ public class ScheduleTelegramNotificationServiceImpl implements ScheduleTelegram
         Map<String, ?> values = Map.of(
                 "type", "SCHEDULE",
                 "title", title,
-                "chat_id", chatId,
+                "chatId", chatId,
                 "text", text,
-                "send_time", sendTime.toString());
+                "sendTime", sendTime.toString());
         try {
             var message = mapper.writeValueAsString(values);
             rabbitTemplate.convertAndSend("service.notification", "notification-routing-key", message);

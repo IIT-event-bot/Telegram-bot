@@ -1,10 +1,8 @@
 package com.project.notificationService.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.project.notificationService.models.Notification
-import com.project.notificationService.models.NotificationDto
 import org.springframework.context.annotation.Primary
 import org.springframework.data.redis.core.ListOperations
 import org.springframework.data.redis.core.RedisTemplate
@@ -19,8 +17,8 @@ import java.time.ZoneOffset
 @Primary
 class RedisNotificationQueueV2(
     private val redisTemplate: RedisTemplate<String, Any>,
-    private val dtoMapper: NotificationDtoConverter
-) : RedisNotificationQueue(redisTemplate, dtoMapper) {
+    private val mapper: ObjectMapper
+) : RedisNotificationQueue(redisTemplate, mapper) {
     @Synchronized
     @Transactional
     override fun pushNotificationToQueue(notification: Notification) {
@@ -52,9 +50,7 @@ class RedisNotificationQueueV2(
     }
 
     private fun insertNotification(notification: Notification, clusterName: String) {
-        val mapper: ObjectMapper = jacksonObjectMapper()
-        val dto = dtoMapper.map(notification)
-        val json = mapper.writeValueAsString(dto)
+        val json = mapper.writeValueAsString(notification)
         redisTemplate.opsForList().leftPush(clusterName, json)
     }
 
@@ -75,16 +71,14 @@ class RedisNotificationQueueV2(
             }
             notification.addAll(getClusterNotification(clusterName = cluster))
         }
-        return notification//50 35
+        return notification
     }
 
     private fun getClusterNotification(clusterName: String): List<Notification> {
         val notifications: MutableList<Notification> = arrayListOf()
-        val mapper: ObjectMapper = jacksonObjectMapper()
         while (true) {
             val json = redisTemplate.opsForList().rightPop(clusterName)?.toString() ?: break
-            val dto: NotificationDto = mapper.readValue(json)
-            val notification = dtoMapper.map(dto)
+            val notification = mapper.readValue<Notification>(json)
             notifications.add(notification)
         }
         return notifications

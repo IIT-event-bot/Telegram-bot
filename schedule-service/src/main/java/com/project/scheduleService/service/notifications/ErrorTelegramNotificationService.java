@@ -21,7 +21,7 @@ public class ErrorTelegramNotificationService implements TelegramNotificationSer
         Map<String, Object> values = Map.of(
                 "type", "SYS_INFO",
                 "title", title,
-                "chat_id", chatId,
+                "chatId", chatId,
                 "text", text);
         try {
             var message = mapper.writeValueAsString(values);
