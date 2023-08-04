@@ -51,7 +51,11 @@ if __name__ == '__main__':
     __config_logger()
     load_dotenv('../.env')
     loop = asyncio.get_event_loop()
-    rabbit = instance_rabbit_client
-    loop.run_until_complete(rabbit.start_consuming())
-    loop.run_until_complete(main())
-    loop.run_forever()
+    while True:
+        try:
+            rabbit = instance_rabbit_client
+            loop.run_until_complete(rabbit.start_consuming())
+            loop.run_until_complete(main())
+            loop.run_forever()
+        except e :
+            logger.info(e)

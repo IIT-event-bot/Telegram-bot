@@ -1,5 +1,7 @@
 package com.project.notificationService.service
 
+import com.project.notificationService.models.Notification
+import com.project.notificationService.models.NotificationType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -18,7 +20,7 @@ class NotificationScheduler(
     @Transactional
     @Synchronized
     fun saveNotificationOnHour() {
-        log.info("Check notification on hour")
+        log.debug("Check notification on hour")
         val onHourNotification = service.getNotificationBeforeTime(LocalDateTime.now().plusHours(1))
         notificationQueue.pushNotificationsToQueue(onHourNotification)
     }
@@ -31,7 +33,45 @@ class NotificationScheduler(
         for (n in notifications) {
             service.sendNotification(n)
         }
-        log.info("Sending notification...")
+        log.debug("Sending notification...")
+    }
+
+//    @Scheduled(cron = "* * * * * *")
+    @Transactional
+    fun test1() {
+//        for (i in 0L..50) {
+            notificationQueue.pushNotificationToQueue(
+                Notification(
+                    0,
+                    NotificationType.SYS_INFO,
+                    1234,
+                    "text",
+                    "title",
+                    LocalDateTime.now().plusMinutes(5),
+                    null
+                )
+            )
+//        }
+        log.debug("Add from test 1")
+    }
+
+//    @Scheduled(cron = "* * * * * *")
+    @Transactional
+    fun test2() {
+//        for (i in 0L..50) {
+            notificationQueue.pushNotificationToQueue(
+                Notification(
+                    0,
+                    NotificationType.SYS_INFO,
+                    1234,
+                    "text",
+                    "title",
+                    LocalDateTime.now().plusMinutes(5),
+                    null
+                )
+            )
+//        }
+        log.debug("Add from test 2")
     }
 
     companion object {
