@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.project</groupId>
-    <artifactId>notification-service-kotlin</artifactId>
+    <artifactId>notification-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>notification-service-kotlin</name>
     <description>notification-service-kotlin</description>
