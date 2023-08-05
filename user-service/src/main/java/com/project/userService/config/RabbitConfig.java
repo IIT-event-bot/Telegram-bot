@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfig {
     public static final String USER_SERVICE_QUEUE = "user-service";
     @Value("${rabbit.user-service.exchange}")
-    public static String EXCHANGE;
+    private String EXCHANGE;
     @Value("${rabbit.user-service.routingKey}")
-    public static String ROUTING_KEY;
+    private String ROUTING_KEY;
 
     @Value("${spring.rabbitmq.host}")
     private String host;

@@ -22,10 +22,10 @@ public class RabbitTelegramNotificationService implements TelegramNotificationSe
     @Override
     public void sendNotification(long chatId, String title, String text) {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, String> values = Map.of(
+        Map<String, ?> values = Map.of(
                 "type", "SYS_INFO",
                 "title", title,
-                "chatId", String.valueOf(chatId),
+                "chatId", chatId,
                 "text", text);
         try {
             var message = mapper.writeValueAsString(values);
