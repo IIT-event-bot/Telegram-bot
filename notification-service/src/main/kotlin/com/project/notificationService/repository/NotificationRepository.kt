@@ -1,4 +1,4 @@
-package com.project.notificationService
+package com.project.notificationService.repository
 
 import com.project.notificationService.models.Notification
 import org.springframework.data.jpa.repository.JpaRepository

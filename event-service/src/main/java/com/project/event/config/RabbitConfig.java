@@ -2,6 +2,7 @@ package com.project.event.config;
 
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -12,14 +13,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
     public static final String USER_SERVICE_QUEUE = "event-service";
-    public static final String EXCHANGE = "service.event";
-    public static final String ROUTING_KEY = "event-routing-key";
+    @Value("${rabbit.event-service.exchange}")
+    public static String EXCHANGE;
+    @Value("${rabbit.evnt-service.routingKey}")
+    public static String ROUTING_KEY;
 
     @Value("${spring.rabbitmq.host}")
     private String host;
 
     @Bean
-    public CachingConnectionFactory connectionFactory() {
+    public ConnectionFactory connectionFactory() {
         return new CachingConnectionFactory(host);
     }
 

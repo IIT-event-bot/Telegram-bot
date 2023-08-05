@@ -9,6 +9,7 @@ import com.project.scheduleService.service.students.StudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,6 +25,11 @@ public class ScheduleTelegramNotificationServiceImpl implements ScheduleTelegram
     private final RabbitTemplate rabbitTemplate;
     private final GroupService groupService;
     private final StudentService studentService;
+
+    @Value("${rabbit.notification-service.exchange}")
+    private String notificationServiceExchange;
+    @Value("${rabbit.notification-service.routingKey}")
+    private String notificationServiceRoutingKey;
 
     @Override
     public void sendSchedule(List<Lesson> lessons) {
@@ -74,7 +80,7 @@ public class ScheduleTelegramNotificationServiceImpl implements ScheduleTelegram
                 "sendTime", sendTime.toString());
         try {
             var message = mapper.writeValueAsString(values);
-            rabbitTemplate.convertAndSend("service.notification", "notification-routing-key", message);
+            rabbitTemplate.convertAndSend(notificationServiceExchange, notificationServiceRoutingKey, message);
             log.info("Message sending to queue to chat " + chatId);
         } catch (Exception e) {
             log.error(e.getMessage());

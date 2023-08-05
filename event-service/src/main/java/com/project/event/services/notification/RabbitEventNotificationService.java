@@ -9,6 +9,7 @@ import com.project.event.services.student.StudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,11 @@ import java.util.Map;
 public class RabbitEventNotificationService implements TelegramEventNotificationService {
     private final RabbitTemplate rabbitTemplate;
     private final StudentService studentService;
+
+    @Value("${rabbit.notification-service.exchange}")
+    private String notificationServiceExchange;
+    @Value("${rabbit.notification-service.routingKey}")
+    private String notificationServiceRoutingKey;
 
     @Override
     public void sendEvent(Event event) {
@@ -100,7 +106,7 @@ public class RabbitEventNotificationService implements TelegramEventNotification
 
         try {
             var message = mapper.writeValueAsString(values);
-            rabbitTemplate.convertAndSend("service.notification", "notification-routing-key", message);
+            rabbitTemplate.convertAndSend(notificationServiceExchange, notificationServiceRoutingKey, message);
             log.info("Event send to queue to " + chatId);
         } catch (Exception e) {
             log.error(e.getMessage());
