@@ -22,7 +22,7 @@ public class EventScheduleService {
     private final EventRepository repository;
     private final TelegramEventNotificationService notificationService;
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?", zone = "Asia/Yekaterinburg")
     public void sendEventsToday() {
         var now = LocalDateTime.now();
         var dayEnd = now.plusDays(1);
@@ -30,7 +30,7 @@ public class EventScheduleService {
         notificationService.sendEvents(eventsToday);
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?", zone = "Asia/Yekaterinburg")
     public void sendRepeatEvent() {
         var now = LocalDateTime.now();
         var dayEnd = now.plusDays(1);
@@ -39,7 +39,7 @@ public class EventScheduleService {
         notificationService.sendEvents(allRepeats);
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?", zone = "Asia/Yekaterinburg")
     public void sendFeedback() {
         var now = LocalDateTime.now();
         var dayAgo = now.minusDays(1);

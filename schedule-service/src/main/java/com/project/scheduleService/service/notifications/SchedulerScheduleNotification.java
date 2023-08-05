@@ -29,7 +29,7 @@ public class SchedulerScheduleNotification {
     private final AcademicYearService academicYearService;
     private final ScheduleTelegramNotificationService notificationService;
 
-    @Scheduled(cron = "0 30 0 * * *")
+    @Scheduled(cron = "0 30 0 * * *", zone = "Asia/Yekaterinburg")
     public void sendSchedule() {
         if (LocalDate.now().isBefore(academicYearService.getAcademicYear().getDateStart())) {
             return;
