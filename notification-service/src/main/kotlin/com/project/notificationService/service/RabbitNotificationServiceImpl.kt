@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.project.notificationService.config.RabbitConfig
 import com.project.notificationService.models.Notification
+import com.project.notificationService.models.NotificationType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.Message
@@ -23,6 +24,9 @@ class RabbitNotificationServiceImpl(
         val body = String(message.body).removePrefix("\"").removeSuffix("\"").replace("\\", "")
         try {
             val notification: Notification = mapper.readValue<Notification>(body)
+            if (notification.type == NotificationType.SCHEDULE) {
+                notification.sendTime = notification.sendTime!!.minusMinutes(10)
+            }
             service.saveNotification(notification)
         } catch (e: Exception) {
             log.error(e.message)
