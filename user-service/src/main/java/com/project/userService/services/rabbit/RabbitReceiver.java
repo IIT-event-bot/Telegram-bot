@@ -44,11 +44,11 @@ public class RabbitReceiver {
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
             long id = Long.parseLong(rabbitMessage.body().get("id").toString());
-            notificationService.sendNotification(id, "Ошибка при добавлении", "Заявка уже рассматривается");
-        } catch (NullPointerException e) {
+            notificationService.sendNotification(id, "Ошибка при обработке заявки на добавление", "Заявка уже рассматривается");
+        } catch (NullPointerException | IndexOutOfBoundsException e) {
             log.error(e.getMessage());
             long id = Long.parseLong(rabbitMessage.body().get("id").toString());
-            notificationService.sendNotification(id, "Ошибка при добавлении", "Группы с таким названием не существует");
+            notificationService.sendNotification(id, "Ошибка при обработке заявки на добавление", "Группы с таким названием не существует");
         } catch (Exception e) {
             log.error(e.getMessage());
         }
