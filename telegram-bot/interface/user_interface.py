@@ -48,11 +48,17 @@ def help_inline_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(row_width=2).add(create_statement_btn, iit_contacts)
 
 
+def cancel_statement_inline_keyboard() -> InlineKeyboardMarkup:
+    cancel_statement = InlineKeyboardButton('Отмена ❌', callback_data='cancel_statement')
+    return InlineKeyboardMarkup().add(cancel_statement)
+
+
 async def callback_query_statement(call: CallbackQuery, state: FSMContext):
     """подача заявки на добавление"""
     await call.message.edit_text(
         text='Отправь мне свое ФИО и группу в формате: "Фамилия Имя Отчество группа".\nПример: "Иванов Иван '
              'Иванович ПрИ-200"\nПосле того как отправишь анкету нажми "Отправить заявку"')
+    await call.message.edit_reply_markup(reply_markup=cancel_statement_inline_keyboard())
     await States.add_statement.set()
     await state.set_data({'message_id': call.message.message_id})
 
@@ -77,7 +83,7 @@ async def add_statement(message: Message, state: FSMContext):
         surname = split[0]
         patronymic = split[2]
         group_name = split[3]
-        if not re.match(pattern='[а-яА-Я]{3}-\d{3}', string=group_name):
+        if not re.match(pattern='[а-яА-Я]{2,3}-\d{3}', string=group_name):
             raise Exception(f'Группа заполнена неправильно: {group_name}')
     except Exception as e:
         logger.error(e)

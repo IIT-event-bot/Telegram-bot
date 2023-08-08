@@ -32,6 +32,7 @@ async def main():
     dp.register_message_handler(add_statement, state=States.add_statement)
     dp.register_message_handler(parse_comment, state=States.comment)
 
+    dp.register_callback_query_handler(callback_query_cancel_statement, lambda call: 'cancel_statement' in call.data)
     dp.register_callback_query_handler(callback_query_statement, lambda call: call.data == 'create_statement')
     dp.register_callback_query_handler(callback_query_help, lambda call: call.data == 'help')
     dp.register_callback_query_handler(callback_query_send_statement, lambda call: call.data == 'send_statement')
@@ -40,9 +41,8 @@ async def main():
     dp.register_callback_query_handler(add_comment, lambda call: 'add_comment' in call.data)
     dp.register_callback_query_handler(callback_query_check_notification, lambda call: 'check' in call.data)
     dp.register_callback_query_handler(callback_query_mark, lambda call: 'mark' in call.data)
-    dp.register_callback_query_handler(callback_query_cancel_statement, lambda call: call.data == 'cancel_statement')
-    # dp.register_callback_query_handler(callback_query_edit_statement, lambda call: 'edit_statement' in call.data)
-    # dp.register_callback_query_handler(callback_query_cancel_statement, lambda call: call.data == 'c')
+    dp.register_callback_query_handler(callback_query_cancel_statement, lambda call: call.data == 'cancel_statement',
+                                       state=States.add_statement)
     logger.info('Bot starts')
     await dp.start_polling()
 
@@ -57,5 +57,5 @@ if __name__ == '__main__':
             loop.run_until_complete(rabbit.start_consuming())
             loop.run_until_complete(main())
             loop.run_forever()
-        except e :
-            logger.info(e)
+        except Exception as e:
+            logger.info(f'some error {e}')
