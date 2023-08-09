@@ -12,7 +12,7 @@ logger = logging.getLogger()
 
 
 class RabbitMQClient:
-    QUEUE = 'receive-notification'
+    QUEUE = 'telegram-notification'
     EXCHANGE = 'service.telegram'
     ROUTING_KEY = 'telegram-routing-key'
 
@@ -26,23 +26,26 @@ class RabbitMQClient:
 
     async def __callback(self, channel: Channel, body: bytes, envelope, properties):
         json_body = str(body.decode('utf-8'))
-        json_message = json.loads(json_body)
+        json_message = json.loads(json.loads(json_body, strict=False), strict=False)
         try:
             if json_message['type'] == 'INFO':
-                await bot.send_message(chat_id=json_message['chat_id'],
+                await bot.send_message(chat_id=json_message['chatId'],
                                        text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
-                                       reply_markup=ui.confirmation_inline_keyboard(json_message['event_id']))
+                                       reply_markup=ui.confirmation_inline_keyboard(json_message['eventId']))
             elif json_message['type'] == 'SYS_INFO':
-                await bot.send_message(chat_id=json_message['chat_id'],
+                await bot.send_message(chat_id=json_message['chatId'],
                                        text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}')
             elif json_message['type'] == 'EVENT':
-                await bot.send_message(chat_id=json_message['chat_id'],
+                await bot.send_message(chat_id=json_message['chatId'],
                                        text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
-                                       reply_markup=ui.confirmation_inline_keyboard(json_message['event_id']))
+                                       reply_markup=ui.confirmation_inline_keyboard(json_message['eventId']))
             elif json_message['type'] == 'FEEDBACK':
-                await bot.send_message(chat_id=json_message['chat_id'],
+                await bot.send_message(chat_id=json_message['chatId'],
                                        text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
                                        reply_markup=ui.mark_inline_keyboard(json_message['event_id']))
+            elif json_message['type'] == 'SCHEDULE':
+                await bot.send_message(chat_id=json_message['chatId'],
+                                       text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}')
         except Exception as e:
             logger.error(e)
         await self.channel.basic_client_ack(delivery_tag=envelope.delivery_tag)

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package com.project.userService;
+
+message UserResponse {
+  int64 id = 1;
+  string username = 2;
+}
+
+message UserRequest {
+  int64 id = 1;
+}
+
+service UserService {
+  rpc getUserById(UserRequest) returns (UserResponse);
+}
