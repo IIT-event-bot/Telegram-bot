@@ -4,3 +4,6 @@ class UserService:
 
     def get_student_by_user_id(self, user_id: int):
         raise NotImplementedError
+
+    def is_student(self, user_id: int) -> bool:
+        raise NotImplementedError

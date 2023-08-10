@@ -1,8 +1,11 @@
 import logging
+import os
 
+import redis
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 
 from interface.statement import Statement
+from user_repository.redis_repository import RedisRepository
 from user_service.grpc_user_service import GrpcUserService
 from user_service.user_service import UserService
 
@@ -15,11 +18,13 @@ from interface.States import *
 
 import re
 
-user_service: UserService = GrpcUserService()
+user_service: UserService = GrpcUserService(RedisRepository(redis.Redis(host=os.environ['REDIS_HOST'],
+                                                                        port=int(os.environ['REDIS_PORT']),
+                                                                        db=0)))
 
 
 async def test_grpc(message: Message):
-    await message.answer(user_service.get_student_by_user_id(message.chat.id))
+    await message.answer(user_service.get_student_by_user_id(message.chat.id).group_name)
 
 
 async def start_message(message: Message):
