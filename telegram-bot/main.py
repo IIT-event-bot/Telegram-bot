@@ -30,7 +30,6 @@ async def main():
                                                    db=0))
     dp.register_message_handler(start_message, commands=['start'])
     dp.register_message_handler(help_message, commands=['help'])
-    dp.register_message_handler(test_grpc, commands=['grpc'])
 
     dp.register_message_handler(add_statement, state=States.add_statement)
     dp.register_message_handler(parse_comment, state=States.comment)
@@ -46,6 +45,7 @@ async def main():
     dp.register_callback_query_handler(callback_query_mark, lambda call: 'mark' in call.data)
     dp.register_callback_query_handler(callback_query_cancel_statement, lambda call: call.data == 'cancel_statement',
                                        state=States.add_statement)
+    dp.register_callback_query_handler(callback_get_schedule, lambda call: 'schedule' in call.data)
     logger.info('Bot starts')
     await dp.start_polling()
 

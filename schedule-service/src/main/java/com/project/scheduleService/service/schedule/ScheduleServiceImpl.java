@@ -1,5 +1,8 @@
 package com.project.scheduleService.service.schedule;
 
+import com.google.protobuf.Timestamp;
+import com.project.scheduleService.ScheduleServiceGrpc;
+import com.project.scheduleService.ScheduleServiceOuterClass;
 import com.project.scheduleService.models.AcademicYear;
 import com.project.scheduleService.models.DayType;
 import com.project.scheduleService.models.Lesson;
@@ -9,6 +12,7 @@ import com.project.scheduleService.models.dto.WeekDto;
 import com.project.scheduleService.repositories.AcademicYearRepository;
 import com.project.scheduleService.repositories.LessonRepository;
 import com.project.scheduleService.service.students.StudentService;
+import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,13 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ScheduleServiceImpl implements ScheduleService, AcademicYearService {
+public class ScheduleServiceImpl extends ScheduleServiceGrpc.ScheduleServiceImplBase
+        implements ScheduleService, AcademicYearService {
     private final LessonRepository repository;
     private final ScheduleDtoMapper dtoMapper;
     private final AcademicYearRepository academicYearRepository;
@@ -155,5 +161,50 @@ public class ScheduleServiceImpl implements ScheduleService, AcademicYearService
                 studentService.getStudentChatIdById(localUser);
             }
         }
+    }
+
+    @Override
+    public void getScheduleByGroupId(ScheduleServiceOuterClass.ScheduleRequest request,
+                                     StreamObserver<ScheduleServiceOuterClass.ScheduleResponse> responseObserver) {
+        var groupId = request.getGroupId();
+        var lessons = repository.getAllByGroupId(groupId);
+
+        sendLessonList(responseObserver, groupId, lessons);
+    }
+
+    @Override
+    public void getScheduleTodayByGroupId(ScheduleServiceOuterClass.ScheduleRequest request,
+                                          StreamObserver<ScheduleServiceOuterClass.ScheduleResponse> responseObserver) {
+        var groupId = request.getGroupId();
+        var lessons = this.getScheduleOnDate(LocalDate.now());
+
+        sendLessonList(responseObserver, groupId, lessons);
+    }
+
+    private void sendLessonList(StreamObserver<ScheduleServiceOuterClass.ScheduleResponse> responseObserver,
+                                long groupId,
+                                List<Lesson> lessons) {
+        for (Lesson lesson : lessons) {
+            var response = ScheduleServiceOuterClass.ScheduleResponse.newBuilder()
+                    .setId(lesson.getId())
+                    .setTitle(lesson.getTitle())
+                    .setAuditorium(lesson.getAuditorium())
+                    .setTimeStart(Timestamp.newBuilder()
+                            .setSeconds(lesson.getTimeStart()
+                                    .toEpochSecond(LocalDate.now(), ZoneOffset.of("+5"))
+                            ).build()
+                    )
+                    .setTimeEnd(Timestamp.newBuilder()
+                            .setSeconds(lesson.getTimeEnd()
+                                    .toEpochSecond(LocalDate.now(), ZoneOffset.of("+5"))
+                            ).build()
+                    )
+                    .setWeekType(lesson.getWeekType().name())
+                    .setDayType(lesson.getDayType().name())
+                    .setGroupId(groupId)
+                    .build();
+            responseObserver.onNext(response);
+        }
+        responseObserver.onCompleted();
     }
 }

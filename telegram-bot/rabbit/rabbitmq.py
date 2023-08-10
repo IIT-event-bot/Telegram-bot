@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from typing import Any
 
 import aioamqp
 from aioamqp.channel import Channel
@@ -26,29 +27,38 @@ class RabbitMQClient:
 
     async def __callback(self, channel: Channel, body: bytes, envelope, properties):
         json_body = str(body.decode('utf-8'))
-        json_message = json.loads(json.loads(json_body, strict=False), strict=False)
+        json_message: dict[str, Any] = json.loads(json.loads(json_body, strict=False), strict=False)
         try:
-            if json_message['type'] == 'INFO':
-                await bot.send_message(chat_id=json_message['chatId'],
-                                       text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
-                                       reply_markup=ui.confirmation_inline_keyboard(json_message['eventId']))
-            elif json_message['type'] == 'SYS_INFO':
-                await bot.send_message(chat_id=json_message['chatId'],
-                                       text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}')
-            elif json_message['type'] == 'EVENT':
-                await bot.send_message(chat_id=json_message['chatId'],
-                                       text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
-                                       reply_markup=ui.confirmation_inline_keyboard(json_message['eventId']))
-            elif json_message['type'] == 'FEEDBACK':
-                await bot.send_message(chat_id=json_message['chatId'],
-                                       text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}',
-                                       reply_markup=ui.mark_inline_keyboard(json_message['event_id']))
-            elif json_message['type'] == 'SCHEDULE':
-                await bot.send_message(chat_id=json_message['chatId'],
-                                       text=f'<b>{json_message["title"]}</b>\n{json_message["text"]}')
+            await self.handle_message(json_message)
         except Exception as e:
             logger.error(e)
         await self.channel.basic_client_ack(delivery_tag=envelope.delivery_tag)
+
+    @classmethod
+    async def handle_message(cls, message):
+        if message['type'] == 'INFO':
+            await bot.send_message(chat_id=message['chatId'],
+                                   text=f'<b>{message["title"]}</b>\n{message["text"]}',
+                                   reply_markup=ui.confirmation_inline_keyboard(message['eventId']))
+        elif message['type'] == 'SYS_INFO':
+            if ui.user_service.is_student(message['chatId']):
+                await bot.send_message(chat_id=message['chatId'],
+                                       text=f'<b>{message["title"]}</b>\n{message["text"]}')
+            else:
+                await bot.send_message(chat_id=message['chatId'],
+                                       text=f'<b>{message["title"]}</b>\n{message["text"]}',
+                                       reply_markup=ui.student_button())
+        elif message['type'] == 'EVENT':
+            await bot.send_message(chat_id=message['chatId'],
+                                   text=f'<b>{message["title"]}</b>\n{message["text"]}',
+                                   reply_markup=ui.confirmation_inline_keyboard(message['eventId']))
+        elif message['type'] == 'FEEDBACK':
+            await bot.send_message(chat_id=message['chatId'],
+                                   text=f'<b>{message["title"]}</b>\n{message["text"]}',
+                                   reply_markup=ui.mark_inline_keyboard(message['event_id']))
+        elif message['type'] == 'SCHEDULE':
+            await bot.send_message(chat_id=message['chatId'],
+                                   text=f'<b>{message["title"]}</b>\n{message["text"]}')
 
     async def start_consuming(self):
         try:

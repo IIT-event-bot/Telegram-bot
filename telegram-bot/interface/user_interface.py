@@ -6,6 +6,8 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, C
 
 from interface.statement import Statement
 from services.group_service.group_service_grpc import GrpcGroupService
+from services.schedule_service.grpc_schedule_service import GrpcScheduleService
+from services.schedule_service.schedule_service import ScheduleService
 from services.user_repository.redis_repository import RedisRepository
 from services.user_service.grpc_user_service import GrpcUserService
 from services.user_service.user_service import UserService
@@ -24,9 +26,7 @@ user_service: UserService = GrpcUserService(RedisRepository(redis.Redis(host=os.
                                                                         db=0)),
                                             GrpcGroupService())
 
-
-async def test_grpc(message: Message):
-    await message.answer(user_service.get_student_by_user_id(message.chat.id).group_name)
+schedule_service: ScheduleService = GrpcScheduleService()
 
 
 async def start_message(message: Message):
@@ -48,7 +48,10 @@ def start_inline_keyboard() -> InlineKeyboardMarkup:
 
 async def help_message(message: Message):
     """сообщение о функциях команд /help"""
-    await message.answer(f'Чем могу помочь?', reply_markup=help_inline_keyboard())
+    if user_service.is_student(message.chat.id):
+        await message.answer(f'Чем могу помочь?', reply_markup=student_button())
+    else:
+        await message.answer(f'Чем могу помочь?', reply_markup=help_inline_keyboard())
     # logger.info(f'user id: {message.from_user.id} /help')
 
 
@@ -82,12 +85,6 @@ def confirmation_inline_keyboard(event_id: int) -> InlineKeyboardMarkup:
     confirmation_btn = InlineKeyboardButton(f'Уведомление о событии получено {Icon.CHECK.value}',
                                             callback_data=f'check:{event_id}')
     return InlineKeyboardMarkup().add(confirmation_btn)
-
-
-# def student_main_inline_keyboard() -> InlineKeyboardMarkup:
-#     get_schedule = InlineKeyboardButton('Получить расписание', callback_data='get_schedule')
-#     notification_settings = InlineKeyboardButton('Настройка уведомлений', callback_data='notification_settings')
-#     return InlineKeyboardMarkup(row_width=2).add(get_schedule, notification_settings)
 
 
 async def add_statement(message: Message, state: FSMContext):
@@ -242,3 +239,14 @@ async def callback_query_check_notification(call: CallbackQuery):
     await call.message.edit_text(call.message.text)
     await rabbit.send_message_to_event_service(
         f'{{ "method": "CHECK_EVENT", "body": {{ "event_id": {event_id}, "user_id": "{call.from_user.id}" }} }}')
+
+
+def student_button() -> InlineKeyboardMarkup:
+    schedule_btn = InlineKeyboardButton('Расписание', callback_data='get_schedule')
+    return InlineKeyboardMarkup(row_width=2).add(schedule_btn)
+
+
+async def callback_get_schedule(call: CallbackQuery):
+    student = user_service.get_student_by_user_id(call.message.chat.id)
+    schedule = schedule_service.get_schedule_today(student.group_id).__str__()
+    await call.bot.send_message(call.message.chat.id, schedule)
