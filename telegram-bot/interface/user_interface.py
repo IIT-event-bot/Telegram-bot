@@ -5,9 +5,10 @@ import redis
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 
 from interface.statement import Statement
-from user_repository.redis_repository import RedisRepository
-from user_service.grpc_user_service import GrpcUserService
-from user_service.user_service import UserService
+from services.group_service.group_service_grpc import GrpcGroupService
+from services.user_repository.redis_repository import RedisRepository
+from services.user_service.grpc_user_service import GrpcUserService
+from services.user_service.user_service import UserService
 
 logger = logging.getLogger()
 from aiogram.dispatcher import FSMContext
@@ -20,7 +21,8 @@ import re
 
 user_service: UserService = GrpcUserService(RedisRepository(redis.Redis(host=os.environ['REDIS_HOST'],
                                                                         port=int(os.environ['REDIS_PORT']),
-                                                                        db=0)))
+                                                                        db=0)),
+                                            GrpcGroupService())
 
 
 async def test_grpc(message: Message):

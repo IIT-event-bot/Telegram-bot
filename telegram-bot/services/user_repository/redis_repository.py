@@ -1,14 +1,13 @@
-import json
 from datetime import timedelta
 
 import redis
 
 from model.student import Student
 from model.user import User
-from user_repository.user_repository import UserRepository
+from services.user_repository.user_repository import UserRepository
 
 USER_BUCKET_PREFIX = 'usr'
-STUDENT_BUCKET_PREFIX = 'std'
+STUDENT_BUCKET_PREFIX = 'stdt'
 
 
 class RedisRepository(UserRepository):
@@ -20,9 +19,8 @@ class RedisRepository(UserRepository):
         saved = self.redis.get(key)
         if saved is None:
             return None
-        user_json = json.loads(saved)
         self.redis.expire(name=key, time=timedelta(hours=1))
-        return User(user_id=user_json['user_id'], username=user_json['username'], role=user_json['role'])
+        return User.fromJson(saved)
 
     def save_user(self, user):
         key = f'{USER_BUCKET_PREFIX}:{user.user_id}'
@@ -34,14 +32,8 @@ class RedisRepository(UserRepository):
         saved = self.redis.get(key)
         if saved is None:
             return None
-        student_json = json.loads(saved)
         self.redis.expire(name=key, time=timedelta(hours=1))
-        return Student(student_id=student_json['student_id'],
-                       user_id=student_json['user_id'],
-                       name=student_json['name'],
-                       surname=student_json['surname'],
-                       patronymic=student_json['patronymic'],
-                       group_name=student_json['group_name'])
+        return Student.fromJson(saved)
 
     def save_student(self, student):
         key = f'{STUDENT_BUCKET_PREFIX}:{student.user_id}'

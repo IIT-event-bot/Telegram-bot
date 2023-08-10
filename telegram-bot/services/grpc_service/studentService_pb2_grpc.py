@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import proto.studentService_pb2 as studentService__pb2
+import services.grpc_service.studentService_pb2 as studentService__pb2
 
 
 class StudentServiceStub(object):
@@ -12,7 +12,7 @@ class StudentServiceStub(object):
         """Constructor.
 
         Args:
-            channel: A grpc.Channel.
+            channel: A grpc_service.Channel.
         """
         self.getUserByStudentId = channel.unary_unary(
                 '/com.project.studentService.StudentService/getUserByStudentId',
@@ -41,53 +41,53 @@ class StudentServiceServicer(object):
 
     def getUserByStudentId(self, request, context):
         """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_code(grpc_service.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def getStudentsChatIdByGroupId(self, request, context):
         """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_code(grpc_service.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def getStudentById(self, request, context):
         """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_code(grpc_service.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def getStudentByUserId(self, request, context):
         """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_code(grpc_service.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
 def add_StudentServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'getUserByStudentId': grpc.unary_unary_rpc_method_handler(
+            'getUserByStudentId': grpc_service.unary_unary_rpc_method_handler(
                     servicer.getUserByStudentId,
                     request_deserializer=studentService__pb2.StudentRequest.FromString,
                     response_serializer=studentService__pb2.UserResponse.SerializeToString,
             ),
-            'getStudentsChatIdByGroupId': grpc.unary_stream_rpc_method_handler(
+            'getStudentsChatIdByGroupId': grpc_service.unary_stream_rpc_method_handler(
                     servicer.getStudentsChatIdByGroupId,
                     request_deserializer=studentService__pb2.GroupRequest.FromString,
                     response_serializer=studentService__pb2.UserResponse.SerializeToString,
             ),
-            'getStudentById': grpc.unary_unary_rpc_method_handler(
+            'getStudentById': grpc_service.unary_unary_rpc_method_handler(
                     servicer.getStudentById,
                     request_deserializer=studentService__pb2.StudentRequest.FromString,
                     response_serializer=studentService__pb2.StudentResponse.SerializeToString,
             ),
-            'getStudentByUserId': grpc.unary_unary_rpc_method_handler(
+            'getStudentByUserId': grpc_service.unary_unary_rpc_method_handler(
                     servicer.getStudentByUserId,
                     request_deserializer=studentService__pb2.UserRequest.FromString,
                     response_serializer=studentService__pb2.StudentResponse.SerializeToString,
             ),
     }
-    generic_handler = grpc.method_handlers_generic_handler(
+    generic_handler = grpc_service.method_handlers_generic_handler(
             'com.project.studentService.StudentService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
@@ -107,11 +107,11 @@ class StudentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/com.project.studentService.StudentService/getUserByStudentId',
-            studentService__pb2.StudentRequest.SerializeToString,
-            studentService__pb2.UserResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+        return grpc_service.experimental.unary_unary(request, target, '/com.project.studentService.StudentService/getUserByStudentId',
+                                                     studentService__pb2.StudentRequest.SerializeToString,
+                                                     studentService__pb2.UserResponse.FromString,
+                                                     options, channel_credentials,
+                                                     insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def getStudentsChatIdByGroupId(request,
@@ -124,11 +124,11 @@ class StudentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/com.project.studentService.StudentService/getStudentsChatIdByGroupId',
-            studentService__pb2.GroupRequest.SerializeToString,
-            studentService__pb2.UserResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+        return grpc_service.experimental.unary_stream(request, target, '/com.project.studentService.StudentService/getStudentsChatIdByGroupId',
+                                                      studentService__pb2.GroupRequest.SerializeToString,
+                                                      studentService__pb2.UserResponse.FromString,
+                                                      options, channel_credentials,
+                                                      insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def getStudentById(request,
@@ -141,11 +141,11 @@ class StudentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/com.project.studentService.StudentService/getStudentById',
-            studentService__pb2.StudentRequest.SerializeToString,
-            studentService__pb2.StudentResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+        return grpc_service.experimental.unary_unary(request, target, '/com.project.studentService.StudentService/getStudentById',
+                                                     studentService__pb2.StudentRequest.SerializeToString,
+                                                     studentService__pb2.StudentResponse.FromString,
+                                                     options, channel_credentials,
+                                                     insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def getStudentByUserId(request,
@@ -158,8 +158,8 @@ class StudentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/com.project.studentService.StudentService/getStudentByUserId',
-            studentService__pb2.UserRequest.SerializeToString,
-            studentService__pb2.StudentResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+        return grpc_service.experimental.unary_unary(request, target, '/com.project.studentService.StudentService/getStudentByUserId',
+                                                     studentService__pb2.UserRequest.SerializeToString,
+                                                     studentService__pb2.StudentResponse.FromString,
+                                                     options, channel_credentials,
+                                                     insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
