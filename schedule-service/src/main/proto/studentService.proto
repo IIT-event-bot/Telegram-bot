@@ -12,6 +12,7 @@ message StudentResponse {
   string name = 2;
   string surname = 3;
   string patronymic = 4;
+  string groupName = 5;
 }
 
 message StudentRequest {

@@ -5,6 +5,7 @@ package com.project.userService;
 message UserResponse {
   int64 id = 1;
   string username = 2;
+  string role = 3;
 }
 
 message UserRequest {

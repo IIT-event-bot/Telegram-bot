@@ -4,8 +4,8 @@ import com.project.studentService.StudentServiceOuterClass;
 import com.project.userService.models.*;
 import com.project.userService.repository.StudentRepository;
 import com.project.userService.services.group.GroupService;
-import com.project.userService.services.user.UserService;
 import com.project.userService.services.notification.TelegramNotificationService;
+import com.project.userService.services.user.UserService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -97,12 +97,14 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
                                StreamObserver<StudentServiceOuterClass.StudentResponse> responseObserver) {
         var studentId = request.getStudentId();
         var student = repository.getStudentById(studentId);
+        var group = groupService.getGroupById(student.getGroupId());
 
         var response = StudentServiceOuterClass.StudentResponse.newBuilder()
                 .setId(student.getId())
                 .setName(student.getName())
                 .setSurname(student.getSurname())
                 .setPatronymic(student.getPatronymic())
+                .setGroupName(group.getTitle())
                 .build();
 
         responseObserver.onNext(response);
@@ -137,12 +139,14 @@ public class StudentServiceImpl extends com.project.studentService.StudentServic
                                    StreamObserver<StudentServiceOuterClass.StudentResponse> responseObserver) {
         var userId = request.getId();
         var student = repository.getStudentByUserId(userId);
+        var group = groupService.getGroupById(student.getGroupId());
 
         var response = StudentServiceOuterClass.StudentResponse.newBuilder()
                 .setId(student.getId())
                 .setName(student.getName())
                 .setSurname(student.getSurname())
                 .setPatronymic(student.getPatronymic())
+                .setGroupName(group.getTitle())
                 .build();
 
         responseObserver.onNext(response);

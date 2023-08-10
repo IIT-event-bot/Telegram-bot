@@ -26,6 +26,7 @@ public class UserServiceImpl extends com.project.userService.UserServiceGrpc.Use
         var response = UserServiceOuterClass.UserResponse.newBuilder()
                 .setId(user.getId())
                 .setUsername(user.getUsername())
+                .setRole(user.getRole().getName().name())
                 .build();
 
         responseObserver.onNext(response);

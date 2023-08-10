@@ -3,6 +3,8 @@ import logging
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 
 from interface.statement import Statement
+from user_service.grpc_user_service import GrpcUserService
+from user_service.user_service import UserService
 
 logger = logging.getLogger()
 from aiogram.dispatcher import FSMContext
@@ -12,6 +14,12 @@ from interface.Icon import *
 from interface.States import *
 
 import re
+
+user_service: UserService = GrpcUserService()
+
+
+async def test_grpc(message: Message):
+    await message.answer(user_service.get_student_by_user_id(message.chat.id))
 
 
 async def start_message(message: Message):
@@ -115,7 +123,13 @@ async def callback_query_send_statement(call: CallbackQuery, state: FSMContext):
     statement: Statement = data['user_data']
     # logger.info(f'user id: {call.from_user.id} отправили заявку')
     await rabbit.send_message_to_user_service(
-        f'{{"method": "ADD_STATEMENT", "body": {{ "id": {call.message.chat.id}, "name": "{statement.name}", "surname": "{statement.surname}", "patronymic": "{statement.patronymic}", "groupName": "{statement.group}" }} }}')
+        f'{{"method": "ADD_STATEMENT", "body": '
+        f'{{ "id": {call.message.chat.id}, '
+        f'"name": "{statement.name}", '
+        f'"surname": "{statement.surname}", '
+        f'"patronymic": "{statement.patronymic}", '
+        f'"groupName": "{statement.group}" }} '
+        f'}}')
     # await state.finish()
 
 

@@ -8,6 +8,9 @@ aiogram = "*"
 python-dotenv = "*"
 pika = "*"
 aioamqp = "*"
+redis = "*"
+grpcio = "*"
+grpcio-tools = "*"
 
 [dev-packages]
 

@@ -2,7 +2,7 @@ import asyncio
 from logging import WARNING, INFO
 
 from aiogram import Bot, Dispatcher
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from dotenv import load_dotenv, dotenv_values
 
 from interface.user_interface import *
@@ -25,9 +25,12 @@ def __config_logger():
 
 
 async def main():
-    dp = Dispatcher(bot=bot, storage=MemoryStorage())
+    dp = Dispatcher(bot=bot, storage=RedisStorage2(host=os.environ['REDIS_HOST'],
+                                                   port=int(os.environ['REDIS_PORT']),
+                                                   db=0))
     dp.register_message_handler(start_message, commands=['start'])
     dp.register_message_handler(help_message, commands=['help'])
+    dp.register_message_handler(test_grpc, commands=['grpc'])
 
     dp.register_message_handler(add_statement, state=States.add_statement)
     dp.register_message_handler(parse_comment, state=States.comment)
@@ -59,3 +62,7 @@ if __name__ == '__main__':
             loop.run_forever()
         except Exception as e:
             logger.info(f'some error {e}')
+        except KeyboardInterrupt as e:
+            loop.stop()
+            logger.info('App stops')
+            break
