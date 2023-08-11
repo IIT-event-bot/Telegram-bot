@@ -4,13 +4,13 @@ import redis
 
 from model.student import Student
 from model.user import User
-from repositories.user_repository.user_repository import UserRepository
+from repositories.user_repository.user_repository import UserCacheRepository
 
 USER_BUCKET_PREFIX = 'usr'
 STUDENT_BUCKET_PREFIX = 'stdt'
 
 
-class RedisRepository(UserRepository):
+class RedisUserCacheRepository(UserCacheRepository):
     def __init__(self, redis_repo: redis.Redis) -> None:
         self.redis = redis_repo
 

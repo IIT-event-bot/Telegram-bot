@@ -7,12 +7,13 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, C
 
 from interface.statement import Statement
 from repositories.schedule_repository.redis_schedule_repository import RedisScheduleCacheRepository
-from repositories.user_repository.redis_repository import RedisRepository
+from repositories.user_repository.redis_repository import RedisUserCacheRepository
 from services.group_service.group_service_grpc import GrpcGroupService
 from services.schedule_service.grpc_schedule_service import GrpcScheduleService
 from services.schedule_service.proxy_cache_schedule_service import ProxyCacheScheduleRepository
 from services.schedule_service.schedule_service import ScheduleService
 from services.user_service.grpc_user_service import GrpcUserService
+from services.user_service.proxy_cached_user_service import ProxyCachedUserService
 from services.user_service.user_service import UserService
 
 logger = logging.getLogger()
@@ -24,18 +25,18 @@ from interface.States import *
 
 import re
 
-user_service: UserService = GrpcUserService(RedisRepository(redis.Redis(host=os.environ['REDIS_HOST'],
-                                                                        port=int(os.environ['REDIS_PORT']),
-                                                                        db=0)),
-                                            GrpcGroupService())
+user_service: UserService = ProxyCachedUserService(user_service=GrpcUserService(GrpcGroupService()),
+                                                   repository=RedisUserCacheRepository(
+                                                       redis.Redis(host=os.environ['REDIS_HOST'],
+                                                                   port=int(os.environ['REDIS_PORT']),
+                                                                   db=0)))
 
 schedule_service: ScheduleService = ProxyCacheScheduleRepository(GrpcScheduleService(),
                                                                  RedisScheduleCacheRepository(
                                                                      redis.Redis(host=os.environ['REDIS_HOST'],
                                                                                  port=int(os.environ['REDIS_PORT']),
                                                                                  db=0)
-                                                                 )
-                                                                 )
+                                                                 ))
 
 
 async def start_message(message: Message):
