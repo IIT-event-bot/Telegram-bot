@@ -284,7 +284,7 @@ async def callback_get_schedule_week(call: CallbackQuery):
     schedule = schedule_service.get_schedule_on_week(group_id=student.group_id)
     week_schedule_str = format_week_lesson(schedule)
     await call.bot.send_message(chat_id=call.message.chat.id,
-                                text=f'<b>Расписание на неделю</b>{week_schedule_str}')  # TODO
+                                text=f'<b>Расписание на неделю</b>{week_schedule_str}')
 
 
 def format_week_lesson(schedule: dict[str, list]):
