@@ -9,7 +9,7 @@ import services.grpc_service.userService_pb2_grpc
 from model.student import Student
 from model.user import User
 from services.group_service.group_service import GroupService
-from services.user_repository.redis_repository import UserRepository
+from repositories.user_repository.redis_repository import UserRepository
 from services.user_service.user_service import UserService
 
 

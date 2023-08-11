@@ -4,7 +4,7 @@ import redis
 
 from model.student import Student
 from model.user import User
-from services.user_repository.user_repository import UserRepository
+from repositories.user_repository.user_repository import UserRepository
 
 USER_BUCKET_PREFIX = 'usr'
 STUDENT_BUCKET_PREFIX = 'stdt'

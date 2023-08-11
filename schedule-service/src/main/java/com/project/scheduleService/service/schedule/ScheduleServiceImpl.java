@@ -208,6 +208,7 @@ public class ScheduleServiceImpl extends ScheduleServiceGrpc.ScheduleServiceImpl
                     .setId(lesson.getId())
                     .setTitle(lesson.getTitle())
                     .setAuditorium(lesson.getAuditorium())
+                    .setTeacher(lesson.getTeacher())
                     .setTimeStart(Timestamp.newBuilder()
                             .setSeconds(lesson.getTimeStart()
                                     .toEpochSecond(LocalDate.now(), ZoneOffset.of("+5"))

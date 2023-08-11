@@ -1,3 +1,4 @@
+import datetime
 import json
 from datetime import time
 
@@ -32,10 +33,19 @@ class Lesson:
     day_type: str
     group_id: str
 
+    def __str__(self) -> str:
+        return self.toJSON()
+
     def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__,
-                          sort_keys=True,
-                          indent=4)
+        return json.dumps(self, default=self.__json_default,
+                          sort_keys=True)
+
+    @classmethod
+    def __json_default(cls, value):
+        if isinstance(value, datetime.time):
+            return value.strftime('%H:%M:%S')
+        else:
+            return value.__dict__
 
     @staticmethod
     def fromJSON(body):
@@ -45,8 +55,8 @@ class Lesson:
             title=lesson_json['title'],
             teacher=lesson_json['teacher'],
             auditorium=lesson_json['auditorium'],
-            time_start=lesson_json['time_start'],
-            time_end=lesson_json['time_end'],
+            time_start=time.fromisoformat(lesson_json['time_start']),
+            time_end=time.fromisoformat(lesson_json['time_end']),
             week_type=lesson_json['week_type'],
             day_type=lesson_json['day_type'],
             group_id=lesson_json['group_id'])
