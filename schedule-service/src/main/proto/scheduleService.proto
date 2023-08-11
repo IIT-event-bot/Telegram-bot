@@ -21,6 +21,7 @@ message ScheduleResponse {
 }
 
 service ScheduleService {
-  rpc getScheduleByGroupId(ScheduleRequest) returns (stream ScheduleResponse);
-  rpc getScheduleTodayByGroupId(ScheduleRequest) returns (stream ScheduleResponse);
+  rpc getScheduleTomorrow(ScheduleRequest) returns (stream ScheduleResponse);
+  rpc getScheduleToday(ScheduleRequest) returns (stream ScheduleResponse);
+  rpc getScheduleWeek(ScheduleRequest) returns (stream ScheduleResponse);
 }

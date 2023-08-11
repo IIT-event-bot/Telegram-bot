@@ -27,10 +27,11 @@ class Student:
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
-                          sort_keys=True, indent=4)
+                          sort_keys=True,
+                          indent=4)
 
     @staticmethod
-    def fromJson(body):
+    def fromJSON(body):
         student_json = json.loads(body)
         return Student(student_id=student_json['student_id'],
                        user_id=student_json['user_id'],

@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 
@@ -247,6 +248,44 @@ def student_button() -> InlineKeyboardMarkup:
 
 
 async def callback_get_schedule(call: CallbackQuery):
-    student = user_service.get_student_by_user_id(call.message.chat.id)
-    schedule = schedule_service.get_schedule_today(student.group_id).__str__()
-    await call.bot.send_message(call.message.chat.id, schedule)
+    await call.message.edit_text(text='Выберите тип расписания')
+    await call.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(row_width=2).add(
+        InlineKeyboardButton('Сегодня', callback_data='schedule_today'),
+        InlineKeyboardButton('Завтра', callback_data='schedule_tomorrow'),
+        InlineKeyboardButton('На неделю', callback_data='schedule_week')))
+
+
+async def callback_get_schedule_today(call: CallbackQuery):
+    student = user_service.get_student_by_user_id(user_id=call.message.chat.id)
+    schedule = schedule_service.get_schedule_today(group_id=student.group_id)
+    today_schedule_str = format_lesson_list(schedule)
+    await call.bot.send_message(chat_id=call.message.chat.id,
+                                text=f'<b>Расписание на сегодня</b>\n\n{today_schedule_str}')
+
+
+async def callback_get_schedule_tomorrow(call: CallbackQuery):
+    student = user_service.get_student_by_user_id(user_id=call.message.chat.id)
+    schedule = schedule_service.get_schedule_tomorrow(group_id=student.group_id)
+    tomorrow_schedule_str = format_lesson_list(schedule)
+    await call.bot.send_message(chat_id=call.message.chat.id,
+                                text=f'<b>Расписание на завтра</b>\n\n{tomorrow_schedule_str}')
+
+
+async def callback_get_schedule_week(call: CallbackQuery):
+    await call.bot.send_message(chat_id=call.message.chat.id,
+                                text=f'<b>Расписание на неделю</b>')  # TODO
+
+
+def format_lesson_list(schedule: list):
+    lessons = str()
+    now = datetime.datetime.now().time()
+    for lesson in schedule:
+        if lesson.time_start >= now >= lesson.time_end:
+            lessons += '<b>[ Идет сейчас ]</b>\n'
+        lessons += (f'<b>Название</b>: {lesson.title}\n'
+                    f'<b>Аудитория</b>: {lesson.auditorium}\n'
+                    f'<b>Преподаватель</b>: {lesson.teacher}\n'
+                    f'<b>Начало пары</b>: {lesson.time_start.strftime("%H:%M")}\n'
+                    f'<b>Конец пары</b>: {lesson.time_end.strftime("%H:%M")}\n')
+
+    return lessons

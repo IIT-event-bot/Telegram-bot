@@ -13,10 +13,11 @@ class User:
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
-                          sort_keys=True, indent=4)
+                          sort_keys=True,
+                          indent=4)
 
     @staticmethod
-    def fromJson(body):
+    def fromJSON(body):
         user_json = json.loads(body)
         return User(user_id=user_json['user_id'],
                     username=user_json['username'],

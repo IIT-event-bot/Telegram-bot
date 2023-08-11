@@ -14,13 +14,18 @@ class ScheduleServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.getScheduleByGroupId = channel.unary_stream(
-            '/com.project.scheduleService.ScheduleService/getScheduleByGroupId',
+        self.getScheduleTomorrow = channel.unary_stream(
+            '/com.project.scheduleService.ScheduleService/getScheduleTomorrow',
             request_serializer=scheduleService__pb2.ScheduleRequest.SerializeToString,
             response_deserializer=scheduleService__pb2.ScheduleResponse.FromString,
         )
-        self.getScheduleTodayByGroupId = channel.unary_stream(
-            '/com.project.scheduleService.ScheduleService/getScheduleTodayByGroupId',
+        self.getScheduleToday = channel.unary_stream(
+            '/com.project.scheduleService.ScheduleService/getScheduleToday',
+            request_serializer=scheduleService__pb2.ScheduleRequest.SerializeToString,
+            response_deserializer=scheduleService__pb2.ScheduleResponse.FromString,
+        )
+        self.getScheduleWeek = channel.unary_stream(
+            '/com.project.scheduleService.ScheduleService/getScheduleWeek',
             request_serializer=scheduleService__pb2.ScheduleRequest.SerializeToString,
             response_deserializer=scheduleService__pb2.ScheduleResponse.FromString,
         )
@@ -29,13 +34,19 @@ class ScheduleServiceStub(object):
 class ScheduleServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def getScheduleByGroupId(self, request, context):
+    def getScheduleTomorrow(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def getScheduleTodayByGroupId(self, request, context):
+    def getScheduleToday(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def getScheduleWeek(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -44,13 +55,18 @@ class ScheduleServiceServicer(object):
 
 def add_ScheduleServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        'getScheduleByGroupId': grpc.unary_stream_rpc_method_handler(
-            servicer.getScheduleByGroupId,
+        'getScheduleTomorrow': grpc.unary_stream_rpc_method_handler(
+            servicer.getScheduleTomorrow,
             request_deserializer=scheduleService__pb2.ScheduleRequest.FromString,
             response_serializer=scheduleService__pb2.ScheduleResponse.SerializeToString,
         ),
-        'getScheduleTodayByGroupId': grpc.unary_stream_rpc_method_handler(
-            servicer.getScheduleTodayByGroupId,
+        'getScheduleToday': grpc.unary_stream_rpc_method_handler(
+            servicer.getScheduleToday,
+            request_deserializer=scheduleService__pb2.ScheduleRequest.FromString,
+            response_serializer=scheduleService__pb2.ScheduleResponse.SerializeToString,
+        ),
+        'getScheduleWeek': grpc.unary_stream_rpc_method_handler(
+            servicer.getScheduleWeek,
             request_deserializer=scheduleService__pb2.ScheduleRequest.FromString,
             response_serializer=scheduleService__pb2.ScheduleResponse.SerializeToString,
         ),
@@ -65,18 +81,18 @@ class ScheduleService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def getScheduleByGroupId(request,
-                             target,
-                             options=(),
-                             channel_credentials=None,
-                             call_credentials=None,
-                             insecure=False,
-                             compression=None,
-                             wait_for_ready=None,
-                             timeout=None,
-                             metadata=None):
+    def getScheduleTomorrow(request,
+                            target,
+                            options=(),
+                            channel_credentials=None,
+                            call_credentials=None,
+                            insecure=False,
+                            compression=None,
+                            wait_for_ready=None,
+                            timeout=None,
+                            metadata=None):
         return grpc.experimental.unary_stream(request, target,
-                                              '/com.project.scheduleService.ScheduleService/getScheduleByGroupId',
+                                              '/com.project.scheduleService.ScheduleService/getScheduleTomorrow',
                                               scheduleService__pb2.ScheduleRequest.SerializeToString,
                                               scheduleService__pb2.ScheduleResponse.FromString,
                                               options, channel_credentials,
@@ -84,18 +100,37 @@ class ScheduleService(object):
                                               metadata)
 
     @staticmethod
-    def getScheduleTodayByGroupId(request,
-                                  target,
-                                  options=(),
-                                  channel_credentials=None,
-                                  call_credentials=None,
-                                  insecure=False,
-                                  compression=None,
-                                  wait_for_ready=None,
-                                  timeout=None,
-                                  metadata=None):
+    def getScheduleToday(request,
+                         target,
+                         options=(),
+                         channel_credentials=None,
+                         call_credentials=None,
+                         insecure=False,
+                         compression=None,
+                         wait_for_ready=None,
+                         timeout=None,
+                         metadata=None):
         return grpc.experimental.unary_stream(request, target,
-                                              '/com.project.scheduleService.ScheduleService/getScheduleTodayByGroupId',
+                                              '/com.project.scheduleService.ScheduleService/getScheduleToday',
+                                              scheduleService__pb2.ScheduleRequest.SerializeToString,
+                                              scheduleService__pb2.ScheduleResponse.FromString,
+                                              options, channel_credentials,
+                                              insecure, call_credentials, compression, wait_for_ready, timeout,
+                                              metadata)
+
+    @staticmethod
+    def getScheduleWeek(request,
+                        target,
+                        options=(),
+                        channel_credentials=None,
+                        call_credentials=None,
+                        insecure=False,
+                        compression=None,
+                        wait_for_ready=None,
+                        timeout=None,
+                        metadata=None):
+        return grpc.experimental.unary_stream(request, target,
+                                              '/com.project.scheduleService.ScheduleService/getScheduleWeek',
                                               scheduleService__pb2.ScheduleRequest.SerializeToString,
                                               scheduleService__pb2.ScheduleResponse.FromString,
                                               options, channel_credentials,

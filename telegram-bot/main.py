@@ -45,7 +45,11 @@ async def main():
     dp.register_callback_query_handler(callback_query_mark, lambda call: 'mark' in call.data)
     dp.register_callback_query_handler(callback_query_cancel_statement, lambda call: call.data == 'cancel_statement',
                                        state=States.add_statement)
-    dp.register_callback_query_handler(callback_get_schedule, lambda call: 'schedule' in call.data)
+    dp.register_callback_query_handler(callback_get_schedule, lambda call: 'get_schedule' == call.data)
+    dp.register_callback_query_handler(callback_get_schedule_today, lambda call: 'schedule_today' == call.data)
+    dp.register_callback_query_handler(callback_get_schedule_tomorrow, lambda call: 'schedule_tomorrow' == call.data)
+    dp.register_callback_query_handler(callback_get_schedule_week, lambda call: 'schedule_week' == call.data)
+
     logger.info('Bot starts')
     await dp.start_polling()
 

@@ -20,7 +20,7 @@ class RedisRepository(UserRepository):
         if saved is None:
             return None
         self.redis.expire(name=key, time=timedelta(hours=1))
-        return User.fromJson(saved)
+        return User.fromJSON(saved)
 
     def save_user(self, user):
         key = f'{USER_BUCKET_PREFIX}:{user.user_id}'
@@ -33,7 +33,7 @@ class RedisRepository(UserRepository):
         if saved is None:
             return None
         self.redis.expire(name=key, time=timedelta(hours=1))
-        return Student.fromJson(saved)
+        return Student.fromJSON(saved)
 
     def save_student(self, student):
         key = f'{STUDENT_BUCKET_PREFIX}:{student.user_id}'

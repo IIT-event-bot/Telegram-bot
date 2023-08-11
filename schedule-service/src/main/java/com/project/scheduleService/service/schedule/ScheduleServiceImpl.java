@@ -18,10 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -60,7 +57,7 @@ public class ScheduleServiceImpl extends ScheduleServiceGrpc.ScheduleServiceImpl
         var lessons = dtoMapper.convertSchedule(schedule);
         var savedSchedule = repository.getAllByGroupId(lessons.get(0).getGroupId());
         deleteIfNotExist(savedSchedule, lessons);
-        checkLocalStudentExists(lessons);
+        checkLocalStudent(lessons);
         repository.saveAll(lessons);
     }
 
@@ -80,7 +77,7 @@ public class ScheduleServiceImpl extends ScheduleServiceGrpc.ScheduleServiceImpl
             throw new IllegalArgumentException("You can't create schedule without academic year");
         }
         var lessons = dtoMapper.convertSchedule(schedule);
-        checkLocalStudentExists(lessons);
+        checkLocalStudent(lessons);
         repository.saveAll(lessons);
     }
 
@@ -92,8 +89,12 @@ public class ScheduleServiceImpl extends ScheduleServiceGrpc.ScheduleServiceImpl
     @Override
     @Transactional
     public WeekDto getWeek(long groupId, WeekType weekType) {
-        var lessons = repository.getAllByGroupIdAndWeekType(groupId, weekType);
+        var lessons = getWeekLessons(groupId, weekType);
         return dtoMapper.convertWeek(lessons, weekType);
+    }
+
+    private List<Lesson> getWeekLessons(long groupId, WeekType weekType) {
+        return repository.getAllByGroupIdAndWeekType(groupId, weekType);
     }
 
     @Transactional
@@ -155,7 +156,7 @@ public class ScheduleServiceImpl extends ScheduleServiceGrpc.ScheduleServiceImpl
         }
     }
 
-    private void checkLocalStudentExists(List<Lesson> lessons) {
+    private void checkLocalStudent(List<Lesson> lessons) {
         for (Lesson lesson : lessons) {
             for (Long localUser : lesson.getLocalUsers()) {
                 studentService.getStudentChatIdById(localUser);
@@ -164,20 +165,38 @@ public class ScheduleServiceImpl extends ScheduleServiceGrpc.ScheduleServiceImpl
     }
 
     @Override
-    public void getScheduleByGroupId(ScheduleServiceOuterClass.ScheduleRequest request,
-                                     StreamObserver<ScheduleServiceOuterClass.ScheduleResponse> responseObserver) {
-        var groupId = request.getGroupId();
-        var lessons = repository.getAllByGroupId(groupId);
-
+    public void getScheduleTomorrow(ScheduleServiceOuterClass.ScheduleRequest request,
+                                    StreamObserver<ScheduleServiceOuterClass.ScheduleResponse> responseObserver) {
+        long groupId = request.getGroupId();
+        var lessons = getScheduleOnDate(LocalDate.now().plusDays(1));
         sendLessonList(responseObserver, groupId, lessons);
     }
 
     @Override
-    public void getScheduleTodayByGroupId(ScheduleServiceOuterClass.ScheduleRequest request,
-                                          StreamObserver<ScheduleServiceOuterClass.ScheduleResponse> responseObserver) {
-        var groupId = request.getGroupId();
-        var lessons = this.getScheduleOnDate(LocalDate.now());
+    public void getScheduleToday(ScheduleServiceOuterClass.ScheduleRequest request,
+                                 StreamObserver<ScheduleServiceOuterClass.ScheduleResponse> responseObserver) {
+        long groupId = request.getGroupId();
+        var lessons = getScheduleOnDate(LocalDate.now());
+        sendLessonList(responseObserver, groupId, lessons);
+    }
 
+    private WeekType getTodayWeekType() {
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Yekaterinburg"));
+        var semesterStart = getAcademicYear();
+        int differenceWeek = (int) semesterStart.getDateStart().until(today, ChronoUnit.WEEKS);
+        if (semesterStart.getWeekType().equals(WeekType.SECOND_WEEK)) {
+            differenceWeek++;
+        }
+        return WeekType.get(differenceWeek % 2);
+    }
+
+    @Override
+    public void getScheduleWeek(ScheduleServiceOuterClass.ScheduleRequest request,
+                                StreamObserver<ScheduleServiceOuterClass.ScheduleResponse> responseObserver) {
+        long groupId = request.getGroupId();
+
+        var weekType = getTodayWeekType();
+        var lessons = getWeekLessons(groupId, weekType);
         sendLessonList(responseObserver, groupId, lessons);
     }
 
