@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +62,7 @@ public class ScheduleDtoConverter implements ScheduleDtoMapper {
                     convertLessons(dayLessons)
             ));
         }
+        days.sort(Comparator.comparing(a -> DayType.valueOf(a.title())));
         return days;
     }
 
@@ -109,6 +111,7 @@ public class ScheduleDtoConverter implements ScheduleDtoMapper {
     public List<LessonDto> convertLessons(List<Lesson> lessons) {
         return lessons.stream()
                 .map(this::convertLesson)
+                .sorted(Comparator.comparing(LessonDto::timeStart))
                 .toList();
     }
 
