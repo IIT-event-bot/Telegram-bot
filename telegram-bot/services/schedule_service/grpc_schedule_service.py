@@ -19,7 +19,7 @@ class GrpcScheduleService(ScheduleService):
             for lesson in stub.getScheduleToday(request):
                 lessons.append(lesson)
 
-            return self.__convert_to_dto(lessons)
+            return self.__convert_to_list_dto(lessons)
 
     def get_schedule_on_week(self, group_id: int):
         with grpc.insecure_channel(
@@ -30,7 +30,7 @@ class GrpcScheduleService(ScheduleService):
             for lesson in stub.getScheduleWeek(request):
                 lessons.append(lesson)
 
-            return self.__convert_to_dto(lessons)
+            return self.__convert_to_map_dto(lessons)
 
     def get_schedule_tomorrow(self, group_id: int):
         with grpc.insecure_channel(
@@ -41,10 +41,10 @@ class GrpcScheduleService(ScheduleService):
             for lesson in stub.getScheduleTomorrow(request):
                 lessons.append(lesson)
 
-            return self.__convert_to_dto(lessons)
+            return self.__convert_to_list_dto(lessons)
 
     @classmethod
-    def __convert_to_dto(cls, schedule: list):
+    def __convert_to_list_dto(cls, schedule: list) -> list[Lesson]:
         lessons = []
         for lesson in schedule:
             lessons.append(Lesson(
@@ -58,5 +58,25 @@ class GrpcScheduleService(ScheduleService):
                 day_type=lesson.dayType,
                 group_id=lesson.groupId))
 
-        lessons.sort(key=lambda l: l.timeStart)
+        lessons.sort(key=lambda l: l.time_start)
         return lessons
+
+    @classmethod
+    def __convert_to_map_dto(cls, schedule: list) -> dict[str, list[Lesson]]:
+        schedule_dto = dict[str, list[Lesson]]()
+        for lesson in schedule:
+            if schedule_dto.get(lesson.dayType) is None:
+                schedule_dto[lesson.dayType] = []
+            schedule_dto[lesson.dayType].append(Lesson(
+                lesson_id=lesson.id,
+                title=lesson.title,
+                teacher=lesson.teacher,
+                auditorium=lesson.auditorium,
+                time_start=datetime.fromtimestamp(lesson.timeStart.seconds).time(),
+                time_end=datetime.fromtimestamp(lesson.timeEnd.seconds).time(),
+                week_type=lesson.weekType,
+                day_type=lesson.dayType,
+                group_id=lesson.groupId
+            ))
+
+        return schedule_dto

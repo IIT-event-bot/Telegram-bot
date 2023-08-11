@@ -258,7 +258,7 @@ async def callback_get_schedule(call: CallbackQuery):
 async def callback_get_schedule_today(call: CallbackQuery):
     student = user_service.get_student_by_user_id(user_id=call.message.chat.id)
     schedule = schedule_service.get_schedule_today(group_id=student.group_id)
-    today_schedule_str = format_lesson_list(schedule)
+    today_schedule_str = format_today_lesson_list(schedule)
     await call.bot.send_message(chat_id=call.message.chat.id,
                                 text=f'<b>Расписание на сегодня</b>\n\n{today_schedule_str}')
 
@@ -266,22 +266,39 @@ async def callback_get_schedule_today(call: CallbackQuery):
 async def callback_get_schedule_tomorrow(call: CallbackQuery):
     student = user_service.get_student_by_user_id(user_id=call.message.chat.id)
     schedule = schedule_service.get_schedule_tomorrow(group_id=student.group_id)
-    tomorrow_schedule_str = format_lesson_list(schedule)
+    tomorrow_schedule_str = format_tomorrow_lesson_list(schedule)
     await call.bot.send_message(chat_id=call.message.chat.id,
                                 text=f'<b>Расписание на завтра</b>\n\n{tomorrow_schedule_str}')
 
 
 async def callback_get_schedule_week(call: CallbackQuery):
+    student = user_service.get_student_by_user_id(user_id=call.message.chat.id)
+    schedule = schedule_service.get_schedule_on_week(group_id=student.group_id)
+    week_schedule_str = format_week_lesson(schedule)
     await call.bot.send_message(chat_id=call.message.chat.id,
-                                text=f'<b>Расписание на неделю</b>')  # TODO
+                                text=f'<b>Расписание на неделю</b>{week_schedule_str}')  # TODO
 
 
-def format_lesson_list(schedule: list):
+def format_week_lesson(schedule: dict[str, list]):
+    lessons = str()
+    for day in schedule:
+        lessons += f'\n\n<b>[  <u>{format_day_name(day)}</u>  ]</b>\n'
+        for lesson in schedule[day]:
+            lessons += (f'<b>Название</b>: {lesson.title}\n'
+                        f'<b>Аудитория</b>: {lesson.auditorium}\n'
+                        f'<b>Преподаватель</b>: {lesson.teacher}\n'
+                        f'<b>Начало пары</b>: {lesson.time_start.strftime("%H:%M")}\n'
+                        f'<b>Конец пары</b>: {lesson.time_end.strftime("%H:%M")}')
+
+    return lessons
+
+
+def format_today_lesson_list(schedule: list):
     lessons = str()
     now = datetime.datetime.now().time()
     for lesson in schedule:
-        if lesson.time_start >= now >= lesson.time_end:
-            lessons += '<b>[ Идет сейчас ]</b>\n'
+        if lesson.time_start <= now <= lesson.time_end:
+            lessons += '<b>[  <u>Идет сейчас</u>  ]</b>\n'
         lessons += (f'<b>Название</b>: {lesson.title}\n'
                     f'<b>Аудитория</b>: {lesson.auditorium}\n'
                     f'<b>Преподаватель</b>: {lesson.teacher}\n'
@@ -289,3 +306,34 @@ def format_lesson_list(schedule: list):
                     f'<b>Конец пары</b>: {lesson.time_end.strftime("%H:%M")}\n')
 
     return lessons
+
+
+def format_tomorrow_lesson_list(schedule: list):
+    lessons = str()
+    for lesson in schedule:
+        lessons += (f'<b>Название</b>: {lesson.title}\n'
+                    f'<b>Аудитория</b>: {lesson.auditorium}\n'
+                    f'<b>Преподаватель</b>: {lesson.teacher}\n'
+                    f'<b>Начало пары</b>: {lesson.time_start.strftime("%H:%M")}\n'
+                    f'<b>Конец пары</b>: {lesson.time_end.strftime("%H:%M")}\n')
+
+    return lessons
+
+
+def format_day_name(day_name):
+    if day_name == 'MONDAY':
+        return 'Понедельник'
+    elif day_name == 'TUESDAY':
+        return 'Вторник'
+    elif day_name == 'WEDNESDAY':
+        return 'Среда'
+    elif day_name == 'THURSDAY':
+        return 'Четверг'
+    elif day_name == 'FRIDAY':
+        return 'Пятница'
+    elif day_name == 'SATURDAY':
+        return 'Суббота'
+    elif day_name == 'SUNDAY':
+        return 'Воскресенье'
+    else:
+        return day_name
