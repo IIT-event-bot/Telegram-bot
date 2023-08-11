@@ -16,7 +16,8 @@ import java.time.LocalDateTime
 data class Notification(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long?,
+    @Column(name = "id", nullable = false)
+    val id: Long,
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -35,5 +36,8 @@ data class Notification(
     var sendTime: LocalDateTime?,
 
     @Column(name = "event_id")
-    val eventId: Long?
+    val eventId: Long?,
+
+    @Column(name = "is_send", nullable = false)
+    val isSend: Boolean
 )

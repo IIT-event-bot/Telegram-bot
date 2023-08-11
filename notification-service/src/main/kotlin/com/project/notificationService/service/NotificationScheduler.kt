@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 @Service
 @EnableScheduling
@@ -20,7 +21,8 @@ class NotificationScheduler(
     @Synchronized
     fun saveNotificationOnHour() {
         log.debug("Check notification on hour")
-        val onHourNotification = service.getNotificationBeforeTime(LocalDateTime.now().plusHours(1))
+        val onHourNotification =
+            service.getNotificationBeforeTime(LocalDateTime.now(ZoneId.of("Asia/Yekaterinburg")).plusHours(1))
         for (notification in onHourNotification) {
             if (notification.type == NotificationType.SCHEDULE) {
                 notification.sendTime = notification.sendTime!!.minusMinutes(10)
@@ -33,7 +35,8 @@ class NotificationScheduler(
     @Transactional
     @Synchronized
     fun sendNotificationOnTime() {
-        val notifications = notificationQueue.getNowNotification()
+        var notifications = notificationQueue.getNowNotification()
+        notifications += service.getNotSendingBeforeNotification()
         for (n in notifications) {
             service.sendNotification(n)
         }

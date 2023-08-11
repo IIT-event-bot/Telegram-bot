@@ -9,4 +9,6 @@ interface NotificationService {
     fun getNotificationBeforeTime(time: LocalDateTime): List<Notification>
 
     fun sendNotification(notification: Notification)
+
+    fun getNotSendingBeforeNotification(): List<Notification>
 }

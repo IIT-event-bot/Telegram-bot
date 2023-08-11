@@ -6,6 +6,7 @@ import redis
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 
 from interface.statement import Statement
+from model.lesson import Lesson
 from repositories.schedule_repository.redis_schedule_repository import RedisScheduleCacheRepository
 from repositories.user_repository.redis_repository import RedisUserCacheRepository
 from services.group_service.group_service_grpc import GrpcGroupService
@@ -288,7 +289,7 @@ async def callback_get_schedule_week(call: CallbackQuery):
                                 text=f'<b>Расписание на неделю</b>{week_schedule_str}')
 
 
-def format_week_lesson(schedule: dict[str, list]):
+def format_week_lesson(schedule: dict[str, list[Lesson]]):
     lessons = str()
     for day in schedule:
         lessons += f'\n\n<b>[  <u>{format_day_name(day)}</u>  ]</b>\n'
@@ -302,7 +303,7 @@ def format_week_lesson(schedule: dict[str, list]):
     return lessons
 
 
-def format_today_lesson_list(schedule: list):
+def format_today_lesson_list(schedule: list[Lesson]):
     lessons = str()
     now = datetime.datetime.now().time()
     for lesson in schedule:
@@ -317,7 +318,7 @@ def format_today_lesson_list(schedule: list):
     return lessons
 
 
-def format_tomorrow_lesson_list(schedule: list):
+def format_tomorrow_lesson_list(schedule: list[Lesson]):
     lessons = str()
     for lesson in schedule:
         lessons += (f'<b>Название</b>: {lesson.title}\n'

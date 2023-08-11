@@ -28,7 +28,8 @@ class ShutdownAppHandler(
                 text = "Сервис уведомлений выключен",
                 title = "Выключение сервиса",
                 sendTime = LocalDateTime.now(),
-                null
+                null,
+                true
             )
         )
         logger.info("Notification service shutdown")

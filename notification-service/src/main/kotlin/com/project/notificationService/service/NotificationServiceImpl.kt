@@ -45,7 +45,7 @@ class NotificationServiceImpl(
     private fun validateNotification(notification: Notification) {
         if (notification.type in arrayListOf(
                 NotificationType.EVENT,
-                NotificationType.SYS_INFO,
+                NotificationType.FEEDBACK,
                 NotificationType.SCHEDULE
             ) && notification.sendTime == null
         ) {
@@ -53,7 +53,7 @@ class NotificationServiceImpl(
         }
         if (notification.type in arrayListOf(
                 NotificationType.EVENT,
-                NotificationType.SYS_INFO
+                NotificationType.FEEDBACK
             )
             && notification.eventId == null
         ) {
@@ -65,6 +65,7 @@ class NotificationServiceImpl(
         return repository.getAllBySendTimeBetween(LocalDateTime.now(ZoneId.of("Asia/Yekaterinburg")), time)
     }
 
+    @Transactional
     override fun sendNotification(notification: Notification) {
         try {
             rabbitTemplate.convertAndSend(
@@ -72,10 +73,15 @@ class NotificationServiceImpl(
                 tgBotRoutingKey,
                 mapper.writeValueAsString(notification)
             )
+            repository.setSendNotification(notificationId = notification.id)
             log.debug("Send notification [ type: ${notification.type.name}, user: ${notification.chatId} ]")
         } catch (e: Exception) {
             log.error(e.message)
         }
+    }
+
+    override fun getNotSendingBeforeNotification(): List<Notification> {
+        return repository.getNotSendingBeforeNotifications()
     }
 
     companion object {
