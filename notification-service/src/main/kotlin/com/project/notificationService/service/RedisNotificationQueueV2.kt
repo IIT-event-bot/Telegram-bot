@@ -27,12 +27,12 @@ class RedisNotificationQueueV2(
             LocalTime.of(notification.sendTime!!.hour, notification.sendTime!!.minute)
         )
         val longTime: Long = time.toEpochSecond(ZoneOffset.of("+5"))
-        val clusterName = "$CLUSTER_NAME_PREFIX$longTime"
+        val clusterName = "$CLUSTER_NAME_PREFIX$CLUSTER_NAME_DELIMITER$longTime"
         val redisList: ListOperations<String, Any> = redisTemplate.opsForList()
         if (redisList.size(QUEUE_NAME) == 0L) {
             redisList.leftPush(QUEUE_NAME, clusterName)
         } else if (redisList.indexOf(QUEUE_NAME, clusterName) == null) {
-            this.pushAndRefreshCluster(clusterName)
+            pushAndRefreshCluster(clusterName)
         }
         this.insertNotification(notification, clusterName)
     }
@@ -42,8 +42,8 @@ class RedisNotificationQueueV2(
             .range(QUEUE_NAME, 0, -1)!!
             .map { it.toString() }
         clusters += clusterName
-        super.clearQueue()
-        clusters = clusters.sortedBy { it.split("-")[1].toLong() }
+        clearQueue()
+        clusters = clusters.sortedBy { it.split(CLUSTER_NAME_DELIMITER)[1].toLong() }
         for (cluster in clusters) {
             redisTemplate.opsForList().leftPush(QUEUE_NAME, cluster)
         }
@@ -61,7 +61,7 @@ class RedisNotificationQueueV2(
         while (true) {
             val cluster: String = redisQueue.rightPop(QUEUE_NAME)?.toString() ?: break
             val time = LocalDateTime.ofEpochSecond(
-                cluster.split("-")[1].toLong(),
+                cluster.split(CLUSTER_NAME_DELIMITER)[1].toLong(),
                 0,
                 ZoneOffset.of("+5")
             )
@@ -85,6 +85,7 @@ class RedisNotificationQueueV2(
     }
 
     companion object {
-        const val CLUSTER_NAME_PREFIX = "notifications-"
+        const val CLUSTER_NAME_PREFIX = "ntf"
+        const val CLUSTER_NAME_DELIMITER = ":"
     }
 }
