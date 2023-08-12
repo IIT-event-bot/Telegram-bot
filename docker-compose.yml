@@ -42,7 +42,25 @@ services:
       context: event-service
       dockerfile: Dockerfile
     ports:
-      - "22001:8001"
+      - "22001:8000"
+    depends_on:
+      - db
+      - rabbitmq
+      - userservice
+    links:
+      - userservice
+    env_file:
+      - .env
+    restart: on-failure
+
+  scheduleservice:
+    container_name: event_bot_schedule_service
+    build:
+      context: schedule-service
+      dockerfile: Dockerfile
+    ports:
+      - "22002:8000"
+      - "8101:8101"
     depends_on:
       - db
       - rabbitmq
@@ -73,6 +91,12 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - rabbitmq
+      - redis
+      - userservice
+      - scheduleservice
+    links:
+      - userservice
+      - scheduleservice
     env_file:
       - .env
     restart: on-failure

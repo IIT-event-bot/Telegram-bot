@@ -7,4 +7,5 @@ FROM maven
 WORKDIR /app
 COPY --from=builder /src/target/*.jar app.jar
 EXPOSE 8000
+EXPOSE 8101
 ENTRYPOINT ["java", "-jar", "app.jar"]
