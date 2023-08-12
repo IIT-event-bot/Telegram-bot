@@ -9,7 +9,7 @@ from interface.statement import Statement
 from model.lesson import Lesson
 from repositories.schedule_repository.redis_schedule_repository import RedisScheduleCacheRepository
 from repositories.user_repository.redis_repository import RedisUserCacheRepository
-from services.group_service.group_service_grpc import GrpcGroupService
+from services.group_service.grpc_group_service import GrpcGroupService
 from services.schedule_service.grpc_schedule_service import GrpcScheduleService
 from services.schedule_service.proxy_cache_schedule_service import ProxyCacheScheduleRepository
 from services.schedule_service.schedule_service import ScheduleService
@@ -42,17 +42,23 @@ schedule_service: ScheduleService = ProxyCacheScheduleRepository(GrpcScheduleSer
 
 async def start_message(message: Message):
     """стартовое сообщение"""
-    if user_service.is_student(message.chat.id):
-        await message.answer(f'Чем могу помочь?', reply_markup=student_button())
-    else:
-        await message.answer(
-            f'Привет, я бот института информационных технологий. Я помогу тебе узнать свое расписание и '
-            f'буду сообщать тебе о главных мероприятиях института. Нажми "Подать заявку на добавление" и'
-            f' заполни форму.', reply_markup=start_inline_keyboard())
-        """Отправка сообщение о добавлении нового пользователя"""
-        await rabbit.send_message_to_user_service(
-            f'{{"method": "ADD_USER", "body": {{ "username": "{message.chat.username}", "id": {message.chat.id} }} }}')
-    # logger.info(f'user id: {message.from_user.id} /start')
+    try:
+        if user_service.is_student(message.chat.id):
+            await message.answer(f'Чем могу помочь?', reply_markup=student_button())
+        else:
+            await message.answer(
+                f'Привет, я бот института информационных технологий. Я помогу тебе узнать свое расписание и '
+                f'буду сообщать тебе о главных мероприятиях института. Нажми "Подать заявку на добавление" и'
+                f' заполни форму.', reply_markup=start_inline_keyboard())
+            """Отправка сообщение о добавлении нового пользователя"""
+            await rabbit.send_message_to_user_service(
+                f'{{"method": "ADD_USER", "body": {{ "username": "{message.chat.username}", "id": {message.chat.id} }} }}')
+    except Exception as e:
+        logger.error(e)
+        await message.answer('Произошла неизвестная ошибка, попробуйте позже')
+
+
+# logger.info(f'user id: {message.from_user.id} /start')
 
 
 def start_inline_keyboard() -> InlineKeyboardMarkup:
@@ -63,10 +69,14 @@ def start_inline_keyboard() -> InlineKeyboardMarkup:
 
 async def help_message(message: Message):
     """сообщение о функциях команд /help"""
-    if user_service.is_student(message.chat.id):
-        await message.answer(f'Чем могу помочь?', reply_markup=student_button())
-    else:
-        await message.answer(f'Чем могу помочь?', reply_markup=help_inline_keyboard())
+    try:
+        if user_service.is_student(message.chat.id):
+            await message.answer(f'Чем могу помочь?', reply_markup=student_button())
+        else:
+            await message.answer(f'Чем могу помочь?', reply_markup=help_inline_keyboard())
+    except Exception as e:
+        logger.error(e)
+        await message.answer('Произошла неизвестная ошибка, попробуйте позже')
     # logger.info(f'user id: {message.from_user.id} /help')
 
 
@@ -270,27 +280,39 @@ async def callback_get_schedule(call: CallbackQuery):
 
 
 async def callback_get_schedule_today(call: CallbackQuery):
-    student = user_service.get_student_by_user_id(user_id=call.message.chat.id)
-    schedule = schedule_service.get_schedule_today(group_id=student.group_id)
-    today_schedule_str = format_today_lesson_list(schedule)
-    await call.bot.send_message(chat_id=call.message.chat.id,
-                                text=f'<b>Расписание на сегодня</b>\n\n{today_schedule_str}')
+    try:
+        student = user_service.get_student_by_user_id(user_id=call.message.chat.id)
+        schedule = schedule_service.get_schedule_today(group_id=student.group_id)
+        today_schedule_str = format_today_lesson_list(schedule)
+        await call.bot.send_message(chat_id=call.message.chat.id,
+                                    text=f'<b>Расписание на сегодня</b>\n\n{today_schedule_str}')
+    except Exception as e:
+        logger.error(e)
+        await call.message.answer('Произошла неизвестная ошибка, попробуйте позже')
 
 
 async def callback_get_schedule_tomorrow(call: CallbackQuery):
-    student = user_service.get_student_by_user_id(user_id=call.message.chat.id)
-    schedule = schedule_service.get_schedule_tomorrow(group_id=student.group_id)
-    tomorrow_schedule_str = format_tomorrow_lesson_list(schedule)
-    await call.bot.send_message(chat_id=call.message.chat.id,
-                                text=f'<b>Расписание на завтра</b>\n\n{tomorrow_schedule_str}')
+    try:
+        student = user_service.get_student_by_user_id(user_id=call.message.chat.id)
+        schedule = schedule_service.get_schedule_tomorrow(group_id=student.group_id)
+        tomorrow_schedule_str = format_tomorrow_lesson_list(schedule)
+        await call.bot.send_message(chat_id=call.message.chat.id,
+                                    text=f'<b>Расписание на завтра</b>\n\n{tomorrow_schedule_str}')
+    except Exception as e:
+        logger.error(e)
+        await call.message.answer('Произошла неизвестная ошибка, попробуйте позже')
 
 
 async def callback_get_schedule_week(call: CallbackQuery):
-    student = user_service.get_student_by_user_id(user_id=call.message.chat.id)
-    schedule = schedule_service.get_schedule_on_week(group_id=student.group_id)
-    week_schedule_str = format_week_lesson(schedule)
-    await call.bot.send_message(chat_id=call.message.chat.id,
-                                text=f'<b>Расписание на неделю</b>{week_schedule_str}')
+    try:
+        student = user_service.get_student_by_user_id(user_id=call.message.chat.id)
+        schedule = schedule_service.get_schedule_on_week(group_id=student.group_id)
+        week_schedule_str = format_week_lesson(schedule)
+        await call.bot.send_message(chat_id=call.message.chat.id,
+                                    text=f'<b>Расписание на неделю</b>{week_schedule_str}')
+    except Exception as e:
+        logger.error(e)
+        await call.message.answer('Произошла неизвестная ошибка, попробуйте позже')
 
 
 def format_week_lesson(schedule: dict[str, list[Lesson]]):
