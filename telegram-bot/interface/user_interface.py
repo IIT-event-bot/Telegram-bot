@@ -42,12 +42,16 @@ schedule_service: ScheduleService = ProxyCacheScheduleRepository(GrpcScheduleSer
 
 async def start_message(message: Message):
     """стартовое сообщение"""
-    await message.answer(f'Привет, я бот института информационных технологий. Я помогу тебе узнать свое расписание и '
-                         f'буду сообщать тебе о главных мероприятиях института. Нажми "Подать заявку на добавление" и'
-                         f' заполни форму.', reply_markup=start_inline_keyboard())
-    """Отправка сообщение о добавлении нового пользователя"""
-    await rabbit.send_message_to_user_service(
-        f'{{"method": "ADD_USER", "body": {{ "username": "{message.chat.username}", "id": {message.chat.id} }} }}')
+    if user_service.is_student(message.chat.id):
+        await message.answer(f'Чем могу помочь?', reply_markup=student_button())
+    else:
+        await message.answer(
+            f'Привет, я бот института информационных технологий. Я помогу тебе узнать свое расписание и '
+            f'буду сообщать тебе о главных мероприятиях института. Нажми "Подать заявку на добавление" и'
+            f' заполни форму.', reply_markup=start_inline_keyboard())
+        """Отправка сообщение о добавлении нового пользователя"""
+        await rabbit.send_message_to_user_service(
+            f'{{"method": "ADD_USER", "body": {{ "username": "{message.chat.username}", "id": {message.chat.id} }} }}')
     # logger.info(f'user id: {message.from_user.id} /start')
 
 

@@ -3,7 +3,7 @@ from logging import WARNING, INFO
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
-from dotenv import load_dotenv, dotenv_values
+from dotenv import dotenv_values
 
 from interface.user_interface import *
 from rabbit.rabbitmq import *
