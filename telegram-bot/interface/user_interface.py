@@ -122,7 +122,7 @@ async def add_statement(message: Message, state: FSMContext):
     await States.send_statement.set()
     await state.finish()
     await state.set_data(
-        {'user_data': Statement(name=name, surname=surname, patronymic=patronymic, group_name=group_name)})
+        {'user_data': Statement(name=name, surname=surname, patronymic=patronymic, group=group_name).toJSON()})
 
 
 def create_statement_inline_keyboard() -> InlineKeyboardMarkup:
@@ -135,7 +135,7 @@ async def callback_query_send_statement(call: CallbackQuery, state: FSMContext):
     """отправка заявки"""
     await call.message.edit_text(text='Заявка успешно отправлена! ' + Icon.CHECK.value)
     data = await state.get_data('user_data')
-    statement: Statement = data['user_data']
+    statement: Statement = Statement.fromJSON(data['user_data'])
     # logger.info(f'user id: {call.from_user.id} отправили заявку')
     await rabbit.send_message_to_user_service(
         f'{{"method": "ADD_STATEMENT", "body": '

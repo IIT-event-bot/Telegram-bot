@@ -56,7 +56,6 @@ async def main():
 
 if __name__ == '__main__':
     __config_logger()
-    load_dotenv('../.env')
     loop = asyncio.get_event_loop()
     while True:
         try:
