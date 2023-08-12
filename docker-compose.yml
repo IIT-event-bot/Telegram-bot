@@ -5,10 +5,14 @@ services:
     image: postgres
     container_name: db_event_bot
     ports:
-      - "2345:5432"
+      - "54321:5432"
     env_file:
       - .env
     restart: on-failure
+
+  redis:
+    image: redis
+    container_name: event_bot_redis
 
   rabbitmq:
     image: rabbitmq:management
@@ -100,10 +104,6 @@ services:
     env_file:
       - .env
     restart: on-failure
-
-  redis:
-    image: redis
-    container_name: event_bot_redis
 
 #  nginx:
 #    build: nginx/.

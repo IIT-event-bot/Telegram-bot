@@ -2,6 +2,7 @@ package com.project.userService.services.rabbit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.userService.config.RabbitConfig;
+import com.project.userService.exception.UserAlreadyExistException;
 import com.project.userService.models.RabbitMessage;
 import com.project.userService.models.Statement;
 import com.project.userService.models.User;
@@ -41,6 +42,10 @@ public class RabbitReceiver {
 
         try {
             handleRabbitMessage(rabbitMessage);
+        } catch (UserAlreadyExistException e) {
+            log.error(e.getMessage());
+            long id = Long.parseLong(rabbitMessage.body().get("id").toString());
+            notificationService.sendNotification(id, "Ошибка при обработке заявки на добавление", "Вы уже зарегистрированы в системе");
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
             long id = Long.parseLong(rabbitMessage.body().get("id").toString());
@@ -78,6 +83,9 @@ public class RabbitReceiver {
     }
 
     private void saveUserFromQueue(Map<String, Object> body) {
+        if (userService.getUserById(Long.parseLong(body.get("id").toString())) == null) {
+            throw new UserAlreadyExistException();
+        }
         var user = new User();
         user.setId(Long.parseLong(body.get("id").toString()));
         user.setUsername((String) body.get("username"));
