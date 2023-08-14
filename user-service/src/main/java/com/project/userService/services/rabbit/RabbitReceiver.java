@@ -83,7 +83,7 @@ public class RabbitReceiver {
     }
 
     private void saveUserFromQueue(Map<String, Object> body) {
-        if (userService.getUserById(Long.parseLong(body.get("id").toString())) == null) {
+        if (userService.getUserById(Long.parseLong(body.get("id").toString())) != null) {
             throw new UserAlreadyExistException();
         }
         var user = new User();

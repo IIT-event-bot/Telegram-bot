@@ -36,6 +36,9 @@ services:
     depends_on:
       - db
       - rabbitmq
+    links:
+      - db
+      - rabbitmq
     env_file:
       - .env
     restart: on-failure
@@ -53,6 +56,8 @@ services:
       - userservice
     links:
       - userservice
+      - db
+      - rabbitmq
     env_file:
       - .env
     restart: on-failure
@@ -71,6 +76,8 @@ services:
       - userservice
     links:
       - userservice
+      - db
+      - rabbitmq
     env_file:
       - .env
     restart: on-failure
@@ -84,6 +91,10 @@ services:
       - db
       - redis
       - rabbitmq
+    links:
+      - db
+      - rabbitmq
+      - redis
     env_file:
       - .env
     restart: on-failure
@@ -101,9 +112,39 @@ services:
     links:
       - userservice
       - scheduleservice
+      - redis
+      - rabbitmq
     env_file:
       - .env
     restart: on-failure
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus:/etc/prometheus/
+    container_name: prometheus
+    hostname: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    environment:
+      TZ: "Asia/Yekaterinburg"
+    networks:
+      - default
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana:/etc/grafana/provisioning/datasources
 
 #  nginx:
 #    build: nginx/.
