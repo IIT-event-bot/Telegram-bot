@@ -25,6 +25,38 @@ services:
       timeout: 10s
       retries: 5
 
+#  eurekaservice:
+#    container_name: event_bot_eureka_service
+#    build:
+#      context: eurekaServer
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - userservice
+#      - eventservice
+#      - scheduleservice
+#      - notificationservice
+#    env_file:
+#      - .env
+#    restart: on-failure
+#
+#  gateway:
+#    container_name: event_bot_gateway
+#    build:
+#      context: gateway
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8082:8082"
+#    depends_on:
+#      - userservice
+#      - eventservice
+#      - scheduleservice
+#      - notificationservice
+#    env_file:
+#      - .env
+#    restart: on-failure
+
   userservice:
     container_name: event_bot_user_service
     build:
@@ -49,7 +81,7 @@ services:
       context: event-service
       dockerfile: Dockerfile
     ports:
-      - "22001:8000"
+      - "22001:8001"
     depends_on:
       - db
       - rabbitmq
@@ -68,7 +100,7 @@ services:
       context: schedule-service
       dockerfile: Dockerfile
     ports:
-      - "22002:8000"
+      - "22002:8002"
       - "8101:8101"
     depends_on:
       - db
@@ -118,33 +150,33 @@ services:
       - .env
     restart: on-failure
 
-  prometheus:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus:/etc/prometheus/
-    container_name: prometheus
-    hostname: prometheus
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    restart: unless-stopped
-    environment:
-      TZ: "Asia/Yekaterinburg"
-    networks:
-      - default
-
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - ./grafana:/etc/grafana/provisioning/datasources
+#  prometheus:
+#    image: prom/prometheus:latest
+#    volumes:
+#      - ./prometheus:/etc/prometheus/
+#    container_name: prometheus
+#    hostname: prometheus
+#    command:
+#      - --config.file=/etc/prometheus/prometheus.yml
+#    ports:
+#      - "9090:9090"
+#    restart: unless-stopped
+#    environment:
+#      TZ: "Asia/Yekaterinburg"
+#    networks:
+#      - default
+#
+#  grafana:
+#    image: grafana/grafana
+#    container_name: grafana
+#    ports:
+#      - "3000:3000"
+#    restart: unless-stopped
+#    environment:
+#      - GF_SECURITY_ADMIN_USER=admin
+#      - GF_SECURITY_ADMIN_PASSWORD=admin
+#    volumes:
+#      - ./grafana:/etc/grafana/provisioning/datasources
 
 #  nginx:
 #    build: nginx/.
